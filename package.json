@@ -1,0 +1,47 @@
+{
+  "name": "@meeting-tools/sdk",
+  "version": "0.1.0",
+  "description": "SDK for interacting with @baas.mdc API and registering clients with @mpc.mdc",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "meeting-tools": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "openapi:generate": "openapi-generator-cli generate -i tmp/openapi-fixed.json -g typescript-axios -o src/generated/baas -c openapi-generator-config.json --skip-validate-spec",
+    "openapi:clean": "rm -rf src/generated/baas",
+    "openapi:rebuild": "pnpm openapi:clean && pnpm openapi:generate && pnpm build",
+    "tools:generate": "ts-node src/tools-generator/index.ts",
+    "tools:register": "ts-node src/tools-generator/register-tools.ts",
+    "tools:rebuild": "pnpm build && pnpm tools:generate && pnpm tools:register"
+  },
+  "keywords": [
+    "meeting",
+    "baas",
+    "mpc",
+    "api",
+    "sdk"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "2.18.4",
+    "@types/node": "22.13.10",
+    "ts-node": "10.9.2",
+    "tsup": "8.4.0",
+    "typescript": "5.8.2"
+  },
+  "dependencies": {
+    "axios": "1.8.3",
+    "zod": "3.24.2"
+  }
+}

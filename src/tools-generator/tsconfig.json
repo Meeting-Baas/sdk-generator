@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/tools-generator",
+    "rootDir": "."
+  },
+  "include": ["./**/*.ts"],
+  "references": [{ "path": "../baas" }, { "path": "../mpc" }]
+}
