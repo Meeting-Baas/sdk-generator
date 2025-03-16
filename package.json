@@ -1,16 +1,17 @@
 {
-  "name": "@meeting-tools/sdk",
+  "name": "@meeting-baas/sdk",
   "version": "0.1.0",
-  "description": "SDK for interacting with @baas.mdc API and registering clients with @mpc.mdc",
+  "description": "Official SDK for Meeting BaaS API - https://meetingbaas.com",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "bin": {
-    "meeting-tools": "dist/cli.js"
+    "meeting-baas": "dist/cli.js"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsup",
@@ -22,16 +23,36 @@
     "openapi:rebuild": "pnpm openapi:clean && pnpm openapi:generate && pnpm build",
     "tools:generate": "ts-node src/tools-generator/index.ts",
     "tools:register": "ts-node src/tools-generator/register-tools.ts",
-    "tools:rebuild": "pnpm build && pnpm tools:generate && pnpm tools:register"
+    "tools:rebuild": "pnpm build && pnpm tools:generate && pnpm tools:register",
+    "bundle:build": "pnpm build && pnpm tools:generate && node scripts/prepare-bundle.js",
+    "bundle:test": "node scripts/test-bundle.js",
+    "prepublishOnly": "pnpm lint && pnpm bundle:build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meeting-baas/sdk-generator.git"
+  },
+  "homepage": "https://meetingbaas.com",
+  "bugs": {
+    "url": "https://github.com/meeting-baas/sdk-generator/issues"
   },
   "keywords": [
     "meeting",
     "baas",
     "mpc",
     "api",
-    "sdk"
+    "sdk",
+    "google-meet",
+    "zoom",
+    "microsoft-teams",
+    "transcription",
+    "recording",
+    "meeting-bot"
   ],
-  "author": "",
+  "author": "SAS SPOKE <support@meetingbaas.com> (https://meetingbaas.com)",
   "license": "MIT",
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "2.18.4",

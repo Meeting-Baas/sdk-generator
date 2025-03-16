@@ -267,9 +267,11 @@ async function writeToolDefinitions(
  * DO NOT EDIT DIRECTLY - Regenerate using the tools generator
  */
 
-// Import the SDK using the package entry point
-import { BaasClient, MpcTools, BaasTypes } from "@meeting-tools/sdk";
-import { ToolDefinition } from "@meeting-tools/sdk/dist/mpc/types";
+// Import the SDK using relative paths (for local development)
+import { BaasClient } from "../../src/baas/client";
+import * as MpcTools from "../../src/mpc/tools";
+import * as BaasTypes from "../../src/generated/baas/models";
+import { ToolDefinition } from "../../src/mpc/types";
 
 ${code.replace(/MpcTools\./g, "MpcTools.").replace(/BaasClient/g, "BaasClient")}
 `;
@@ -285,7 +287,8 @@ ${code.replace(/MpcTools\./g, "MpcTools.").replace(/BaasClient/g, "BaasClient")}
  * DO NOT EDIT DIRECTLY - Regenerate using the tools generator
  */
 
-import { ToolDefinition } from "@meeting-tools/sdk/dist/mpc/types";
+// Import types using relative paths (for local development)
+import { ToolDefinition } from "../../src/mpc/types";
 ${Object.keys(toolDefinitions)
   .map((method) => {
     const toolName =

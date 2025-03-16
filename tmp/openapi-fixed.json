@@ -1,0 +1,1008 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Meeting BaaS API",
+    "summary": "API for recording and transcribing video meetings across Zoom, Google Meet, and Microsoft Teams. Features include bot management, calendar integration, and transcription services.",
+    "description": "Meeting BaaS API",
+    "termsOfService": "https://meetingbaas.com/terms-and-conditions",
+    "version": "1.1"
+  },
+  "servers": [
+    {
+      "url": "https://api.meetingbaas.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/bots/": {
+      "post": {
+        "summary": "Join",
+        "description": "Have a bot join a meeting, now or in the future",
+        "operationId": "join",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "LegacyApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/bots/{uuid}": {
+      "parameters": [
+        {
+          "name": "uuid",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Bot UUID"
+        }
+      ],
+      "delete": {
+        "summary": "Leave",
+        "description": "Leave",
+        "operationId": "leave",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaveResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bots/{uuid}/delete_data": {
+      "parameters": [
+        {
+          "name": "uuid",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Bot UUID"
+        }
+      ],
+      "post": {
+        "summary": "Delete Data",
+        "description": "Deletes a bot's data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.",
+        "operationId": "delete_data",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no content"
+          },
+          "403": {
+            "description": "no content"
+          },
+          "404": {
+            "description": "no content"
+          },
+          "429": {
+            "description": "no content"
+          }
+        }
+      }
+    },
+    "/bots/meeting_data": {
+      "get": {
+        "summary": "Get Meeting Data",
+        "description": "Get meeting recording and metadata",
+        "operationId": "get_meeting_data",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "bot_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendars/": {
+      "get": {
+        "tags": ["Calendars"],
+        "summary": "List Calendars",
+        "description": "Retrieves all calendars that have been integrated with the system for the authenticated user.",
+        "operationId": "list_calendars",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Calendar"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Calendars"],
+        "summary": "Create Calendar",
+        "description": "Integrates a new calendar with the system using OAuth credentials.",
+        "operationId": "create_calendar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCalendarParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCalendarResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendars/{uuid}": {
+      "parameters": [
+        {
+          "name": "uuid",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Calendar UUID"
+        }
+      ],
+      "get": {
+        "tags": ["Calendars"],
+        "summary": "Get Calendar",
+        "description": "Retrieves detailed information about a specific calendar integration by its UUID.",
+        "operationId": "get_calendar",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Calendar"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Calendars"],
+        "summary": "Delete Calendar",
+        "description": "Permanently removes a calendar integration by its UUID.",
+        "operationId": "delete_calendar",
+        "responses": {
+          "200": {
+            "description": "no content"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Calendars"],
+        "summary": "Update Calendar",
+        "description": "Updates a calendar integration with new credentials or platform while maintaining the same UUID.",
+        "operationId": "update_calendar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCalendarParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCalendarResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendar_events/{uuid}": {
+      "parameters": [
+        {
+          "name": "uuid",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Event UUID"
+        }
+      ],
+      "get": {
+        "tags": ["Calendars"],
+        "summary": "Get Event",
+        "description": "Retrieves comprehensive details about a specific calendar event by its UUID.",
+        "operationId": "get_event",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendar_events/{uuid}/bot": {
+      "parameters": [
+        {
+          "name": "uuid",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Event UUID"
+        }
+      ],
+      "post": {
+        "tags": ["Calendars"],
+        "summary": "Schedule Record Event",
+        "description": "Configures a bot to automatically join and record a specific calendar event at its scheduled time.",
+        "operationId": "schedule_record_event",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all_occurrences",
+            "description": "schedule a bot to all occurences of a recurring event",
+            "schema": {
+              "description": "schedule a bot to all occurences of a recurring event",
+              "type": ["boolean", "null"]
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BotParam2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Calendars"],
+        "summary": "Unschedule Record Event",
+        "description": "Cancels a previously scheduled recording for a calendar event.",
+        "operationId": "unschedule_record_event",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all_occurrences",
+            "description": "unschedule a bot from all occurences of a recurring event",
+            "schema": {
+              "description": "unschedule a bot from all occurences of a recurring event",
+              "type": ["boolean", "null"]
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Calendars"],
+        "summary": "Patch Bot",
+        "description": "Updates the configuration of a bot already scheduled to record an event.",
+        "operationId": "patch_bot",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all_occurrences",
+            "description": "schedule a bot to all occurences of a recurring event",
+            "schema": {
+              "description": "schedule a bot to all occurences of a recurring event",
+              "type": ["boolean", "null"]
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BotParam3"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendars/resync_all": {
+      "post": {
+        "tags": ["Calendars"],
+        "summary": "Resync All Calendars",
+        "description": "Initiates a complete refresh of data for all connected calendars.",
+        "operationId": "resync_all_calendars",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResyncAllCalendarsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-meeting-baas-api-key",
+        "description": "API key for authentication"
+      }
+    },
+    "schemas": {
+      "ResyncAllCalendarsResponse": {
+        "type": "object",
+        "required": ["errors", "synced_calendars"],
+        "properties": {
+          "errors": {
+            "description": "List of calendar UUIDs that failed to resync, with detailed error messages explaining the failure reason",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["uuid", "error"],
+              "properties": {
+                "uuid": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "synced_calendars": {
+            "description": "List of calendar UUIDs that were successfully resynced with their calendar provider (Google, Microsoft)",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "ResyncAllResponse": {
+        "type": "object",
+        "required": ["errors", "synced_calendars"],
+        "properties": {
+          "errors": {
+            "description": "List of calendar UUIDs that failed to resync, with error messages",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["uuid", "error"],
+              "properties": {
+                "uuid": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "synced_calendars": {
+            "description": "List of calendar UUIDs that were successfully resynced",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "JoinRequest": {
+        "type": "object",
+        "required": ["bot_name", "meeting_url", "reserved"],
+        "properties": {
+          "bot_name": {
+            "type": "string"
+          },
+          "meeting_url": {
+            "type": "string"
+          },
+          "reserved": {
+            "type": "boolean",
+            "description": "Whether or not the bot should come from the available pool of bots or be a dedicated bot"
+          },
+          "webhook_url": {
+            "type": ["string", "null"],
+            "description": "A webhook URL to send events to"
+          },
+          "bot_image": {
+            "type": ["string", "null"],
+            "format": "uri",
+            "description": "The image to use for the bot"
+          },
+          "deduplication_key": {
+            "type": ["string", "null"],
+            "description": "Used to prevent duplicate bots joining meetings"
+          },
+          "entry_message": {
+            "type": ["string", "null"],
+            "description": "Message to send upon joining"
+          },
+          "recording_mode": {
+            "$ref": "#/components/schemas/RecordingMode"
+          },
+          "speech_to_text": {
+            "$ref": "#/components/schemas/SpeechToText"
+          },
+          "extra": {
+            "$ref": "#/components/schemas/Extra",
+            "description": "Custom data object"
+          }
+        }
+      },
+      "JoinResponse": {
+        "type": "object",
+        "required": ["bot_id"],
+        "properties": {
+          "bot_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "LeaveResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DeleteResponse": {
+        "type": "object",
+        "required": ["ok", "status"],
+        "properties": {
+          "ok": {
+            "description": "Whether the request was processed successfully",
+            "type": "boolean"
+          },
+          "status": {
+            "description": "The detailed status of the deletion operation",
+            "$ref": "#/components/schemas/DeleteStatus"
+          }
+        }
+      },
+      "DeleteStatus": {
+        "type": "string",
+        "enum": ["deleted", "partiallyDeleted", "alreadyDeleted", "noDataFound"]
+      },
+      "RecordingMode": {
+        "type": "string",
+        "enum": ["speaker_view", "gallery_view", "audio_only"]
+      },
+      "SpeechToText": {
+        "type": "object",
+        "required": ["provider"],
+        "properties": {
+          "provider": {
+            "$ref": "#/components/schemas/SpeechToTextProvider"
+          },
+          "api_key": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "SpeechToTextProvider": {
+        "type": "string",
+        "enum": ["Gladia", "Runpod", "Default"]
+      },
+      "Extra": {
+        "type": "object",
+        "description": "Custom data object",
+        "additionalProperties": true
+      },
+      "Metadata": {
+        "type": "object",
+        "required": ["bot_data", "content_deleted", "duration", "mp4"],
+        "properties": {
+          "bot_data": {
+            "type": "object"
+          },
+          "content_deleted": {
+            "type": "boolean",
+            "description": "Indicates whether the recording has been deleted"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Duration of the recording in seconds"
+          },
+          "mp4": {
+            "type": "string",
+            "description": "URL to access the recording MP4 file. Will be null if content has been deleted."
+          }
+        }
+      },
+      "Calendar": {
+        "type": "object",
+        "required": ["email", "google_id", "name", "uuid"],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "google_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resource_id": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "CreateCalendarParams": {
+        "type": "object",
+        "required": [
+          "oauth_client_id",
+          "oauth_client_secret",
+          "oauth_refresh_token",
+          "platform"
+        ],
+        "properties": {
+          "oauth_client_id": {
+            "type": "string"
+          },
+          "oauth_client_secret": {
+            "type": "string"
+          },
+          "oauth_refresh_token": {
+            "type": "string"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/Provider"
+          },
+          "raw_calendar_id": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "UpdateCalendarParams": {
+        "type": "object",
+        "required": [
+          "oauth_client_id",
+          "oauth_client_secret",
+          "oauth_refresh_token",
+          "platform"
+        ],
+        "properties": {
+          "oauth_client_id": {
+            "type": "string"
+          },
+          "oauth_client_secret": {
+            "type": "string"
+          },
+          "oauth_refresh_token": {
+            "type": "string"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/Provider"
+          }
+        }
+      },
+      "CreateCalendarResponse": {
+        "type": "object",
+        "required": ["calendar"],
+        "properties": {
+          "calendar": {
+            "$ref": "#/components/schemas/Calendar"
+          }
+        }
+      },
+      "Provider": {
+        "type": "string",
+        "enum": ["Google", "Microsoft"]
+      },
+      "Event": {
+        "type": "object",
+        "required": [
+          "attendees",
+          "calendar_uuid",
+          "deleted",
+          "end_time",
+          "google_id",
+          "is_organizer",
+          "is_recurring",
+          "last_updated_at",
+          "meeting_url",
+          "name",
+          "raw",
+          "start_time",
+          "uuid"
+        ],
+        "properties": {
+          "attendees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Attendee"
+            }
+          },
+          "bot_param": {
+            "description": "Associated bot parameters if a bot is scheduled for this event",
+            "$ref": "#/components/schemas/BotParam"
+          },
+          "calendar_uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deleted": {
+            "description": "Indicates whether this event has been deleted",
+            "type": "boolean"
+          },
+          "end_time": {
+            "description": "The end time of the event in UTC timezone",
+            "type": "string",
+            "format": "date-time"
+          },
+          "google_id": {
+            "description": "The unique identifier of the event from the calendar provider (Google, Microsoft)",
+            "type": "string"
+          },
+          "is_organizer": {
+            "description": "Indicates whether the current user is the organizer of this event",
+            "type": "boolean"
+          },
+          "is_recurring": {
+            "description": "Indicates whether this event is part of a recurring series",
+            "type": "boolean"
+          },
+          "last_updated_at": {
+            "description": "The timestamp when this event was last updated",
+            "type": "string",
+            "format": "date-time"
+          },
+          "meeting_url": {
+            "description": "The URL that can be used to join the meeting (if available)",
+            "type": "string"
+          },
+          "name": {
+            "description": "The title/name of the calendar event",
+            "type": "string"
+          },
+          "raw": {
+            "description": "The raw calendar data from the provider in JSON format",
+            "$ref": "#/components/schemas/Extra"
+          },
+          "recurring_event_id": {
+            "description": "For recurring events, the ID of the parent recurring event series (if applicable)",
+            "type": ["string", "null"]
+          },
+          "start_time": {
+            "description": "The start time of the event in UTC timezone",
+            "type": "string",
+            "format": "date-time"
+          },
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Attendee": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "description": "The email address of the meeting attendee",
+            "type": "string"
+          },
+          "name": {
+            "description": "The display name of the attendee if available from the calendar provider (Google, Microsoft)",
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "BotParam": {
+        "type": "object",
+        "required": ["bot_name", "extra", "webhook_url"],
+        "properties": {
+          "bot_name": {
+            "type": "string"
+          },
+          "bot_image": {
+            "type": ["string", "null"]
+          },
+          "webhook_url": {
+            "type": "string"
+          },
+          "deduplication_key": {
+            "type": ["string", "null"]
+          },
+          "enter_message": {
+            "type": ["string", "null"]
+          },
+          "recording_mode": {
+            "$ref": "#/components/schemas/RecordingMode"
+          },
+          "speech_to_text": {
+            "type": "object",
+            "required": ["provider"],
+            "properties": {
+              "provider": {
+                "$ref": "#/components/schemas/SpeechToTextProvider"
+              },
+              "api_key": {
+                "type": ["string", "null"]
+              }
+            }
+          },
+          "extra": {
+            "$ref": "#/components/schemas/Extra"
+          },
+          "streaming_audio_frequency": {
+            "$ref": "#/components/schemas/AudioFrequency"
+          },
+          "streaming_input": {
+            "type": ["string", "null"]
+          },
+          "streaming_output": {
+            "type": ["string", "null"]
+          },
+          "noone_joined_timeout": {
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "waiting_room_timeout": {
+            "type": ["integer", "null"],
+            "format": "int32"
+          }
+        }
+      },
+      "BotParam2": {
+        "type": "object",
+        "required": ["bot_name", "extra"],
+        "properties": {
+          "bot_name": {
+            "type": "string"
+          },
+          "bot_image": {
+            "type": ["string", "null"]
+          },
+          "webhook_url": {
+            "type": ["string", "null"]
+          },
+          "deduplication_key": {
+            "type": ["string", "null"]
+          },
+          "enter_message": {
+            "type": ["string", "null"]
+          },
+          "recording_mode": {
+            "$ref": "#/components/schemas/RecordingMode"
+          },
+          "speech_to_text": {
+            "$ref": "#/components/schemas/SpeechToText"
+          },
+          "extra": {
+            "$ref": "#/components/schemas/Extra"
+          },
+          "streaming_audio_frequency": {
+            "$ref": "#/components/schemas/AudioFrequency"
+          },
+          "streaming_input": {
+            "type": ["string", "null"]
+          },
+          "streaming_output": {
+            "type": ["string", "null"]
+          },
+          "noone_joined_timeout": {
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "waiting_room_timeout": {
+            "type": ["integer", "null"],
+            "format": "int32"
+          }
+        }
+      },
+      "BotParam3": {
+        "type": "object",
+        "properties": {
+          "bot_name": {
+            "type": ["string", "null"]
+          },
+          "bot_image": {
+            "type": ["string", "null"]
+          },
+          "webhook_url": {
+            "type": ["string", "null"]
+          },
+          "deduplication_key": {
+            "type": ["string", "null"]
+          },
+          "enter_message": {
+            "type": ["string", "null"]
+          },
+          "recording_mode": {
+            "$ref": "#/components/schemas/RecordingMode"
+          },
+          "speech_to_text": {
+            "$ref": "#/components/schemas/SpeechToText"
+          },
+          "extra": {
+            "$ref": "#/components/schemas/Extra"
+          },
+          "streaming_audio_frequency": {
+            "$ref": "#/components/schemas/AudioFrequency"
+          },
+          "streaming_input": {
+            "type": ["string", "null"]
+          },
+          "streaming_output": {
+            "type": ["string", "null"]
+          },
+          "noone_joined_timeout": {
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "waiting_room_timeout": {
+            "type": ["integer", "null"],
+            "format": "int32"
+          }
+        }
+      },
+      "AudioFrequency": {
+        "type": "string",
+        "enum": ["16khz", "24khz"]
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}

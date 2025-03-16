@@ -1,4 +1,5 @@
 // Main SDK Export file
+// This file exports the core SDK functionality
 
 // Re-export BaaS functionality
 export { BaasClient } from "./baas/client";
