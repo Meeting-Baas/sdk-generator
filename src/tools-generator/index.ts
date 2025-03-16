@@ -27,7 +27,7 @@ const config: Config = {
   anthropicApiKey: process.env.ANTHROPIC_API_KEY || "",
   outputDir: path.resolve(__dirname, "../../dist/generated-tools"),
   debug: process.env.DEBUG === "true",
-  model: process.env.MODEL || "claude-3-opus-20240229",
+  model: process.env.MODEL || "claude-3-sonnet-20240229",
 };
 
 // Get method information from a class
@@ -70,6 +70,47 @@ function getMethodInfo(methodName: string): string {
   } catch (error) {
     console.error(`Error extracting info for method ${methodName}:`, error);
     return `Failed to extract info for ${methodName}`;
+  }
+}
+
+// Try to extract API endpoint information
+function getEndpointInfo(methodName: string): string {
+  try {
+    // We can add logic here to map method names to OpenAPI endpoints
+    // This would provide more context to the AI about the specific API details
+
+    // Read one of the generated API files to find information
+    const apiFiles = [
+      "src/generated/baas/api/default-api.ts",
+      "src/generated/baas/api/calendars-api.ts",
+    ];
+    let endpointInfo = "";
+
+    for (const apiFile of apiFiles) {
+      if (fs.existsSync(apiFile)) {
+        const apiSource = fs.readFileSync(apiFile, "utf-8");
+        // Look for sections describing the endpoint related to this method
+        const methodPattern = new RegExp(
+          `\\*\\s+@summary.*?\\s+${methodName
+            .replace(/([A-Z])/g, "\\$1")
+            .toLowerCase()}.*?\\s+@param`,
+          "is"
+        );
+        const match = methodPattern.exec(apiSource);
+        if (match && match[0]) {
+          endpointInfo = match[0];
+          break;
+        }
+      }
+    }
+
+    return endpointInfo || "No endpoint info found";
+  } catch (error) {
+    console.error(
+      `Error extracting endpoint info for method ${methodName}:`,
+      error
+    );
+    return `Failed to extract endpoint info for ${methodName}`;
   }
 }
 
@@ -146,6 +187,7 @@ async function generateToolDefinition(
 ): Promise<string> {
   // Get method info to provide to the LLM
   const methodInfo = getMethodInfo(methodName);
+  const endpointInfo = getEndpointInfo(methodName);
 
   // If no API key available, generate a stub tool instead
   if (!config.anthropicApiKey) {
@@ -153,8 +195,36 @@ async function generateToolDefinition(
     return generateSimpleStubToolDefinition(methodName);
   }
 
+  // Provide context about the Meeting BaaS API and its endpoints
+  const apiContext = `
+Meeting BaaS API Overview:
+- Unified API for Google Meet, Zoom, and Microsoft Teams
+- Provides access to 13 endpoints for bot management and calendar integration
+- Includes features like meeting recording, transcription, and calendar sync
+- Supports both direct meeting interaction and scheduled recordings via calendars
+
+The SDK wraps the following main API categories:
+1. Bot Management:
+   - Join meetings with customizable bot parameters
+   - Leave meetings and clean up resources
+   - Get recording data and transcripts
+   - Delete meeting data for privacy compliance
+   - List bots with metadata and filtering options
+   - Retranscribe audio with different providers
+
+2. Calendar Integration:
+   - List and integrate calendars from Google and Microsoft
+   - Create, update, and delete calendar connections 
+   - List and filter calendar events
+   - Get detailed event information
+   - Schedule recordings for specific events or recurring series
+   - Update bot configurations for scheduled recordings
+`;
+
   const prompt = `
 You are a TypeScript expert who converts SDK methods into MPC tool definitions.
+
+${apiContext}
 
 Given the following SDK method:
 
@@ -162,15 +232,28 @@ METHOD NAME: ${methodName}
 METHOD INFO:
 ${methodInfo}
 
+ENDPOINT INFO:
+${endpointInfo}
+
 And these example MPC tools:
 ${exampleTools}
 
 Create an MPC tool definition that wraps this SDK method. The tool should:
 1. Have a descriptive name based on the method name (converting camelCase to snake_case)
-2. Include a clear description of what the tool does
+2. Include a clear description of what the tool does, including which API endpoint it uses
 3. Define all necessary parameters with proper types, descriptions, and required flags
-4. Include proper error handling and meaningful response formatting
-5. Use the BaasClient instance that will be provided to execute the method
+4. Handle any complex parameter conversions between snake_case (tool) and camelCase (SDK)
+5. Format responses to be user-friendly, especially for complex objects
+6. Include proper error handling with specific error messages based on the API context
+7. Use the BaasClient instance that will be provided to execute the method
+8. Consider both bot-related and calendar-related functionality appropriately
+
+Make sure the generated tool adheres to these conventions:
+- Parameters use snake_case naming
+- SDK methods use camelCase naming
+- Enum values should match API specifications exactly
+- All required parameters must be marked as required
+- Response formatting should be human-readable for use in an AI assistant context
 
 Respond ONLY with valid TypeScript code for the tool definition, with no explanation or additional text.
 The code should use the MpcTools helper functions like createTool, createStringParameter, etc.
@@ -231,6 +314,8 @@ async function generateAllToolDefinitions(): Promise<Record<string, string>> {
   );
 
   const toolDefinitions: Record<string, string> = {};
+
+  console.log(`Found ${baasMethods.length} methods to convert to MPC tools`);
 
   for (const method of baasMethods) {
     if (method.startsWith("_")) continue; // Skip private methods
@@ -340,6 +425,9 @@ export const allTools: ToolDefinition[] = [
 async function main() {
   try {
     console.log("Starting MPC tools generator...");
+    console.log(
+      "This will generate MPC tools for all 13 Meeting BaaS API endpoints"
+    );
 
     // Check if API key is available, but continue with stub generation if not
     if (!config.anthropicApiKey) {
@@ -359,6 +447,7 @@ async function main() {
     await writeToolDefinitions(toolDefinitions);
 
     console.log("Tool generation complete!");
+    console.log(`Generated ${Object.keys(toolDefinitions).length} MPC tools`);
   } catch (error) {
     console.error("Error generating tools:", error);
     process.exit(1);
