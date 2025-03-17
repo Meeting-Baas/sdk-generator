@@ -222,7 +222,7 @@ The SDK wraps the following main API categories:
 `;
 
   const prompt = `
-You are a TypeScript expert who converts SDK methods into MPC tool definitions.
+You are a TypeScript expert who converts SDK methods into MPC tool definitions, with a focus on user-friendly and flexible tool creation.
 
 ${apiContext}
 
@@ -238,25 +238,80 @@ ${endpointInfo}
 And these example MPC tools:
 ${exampleTools}
 
-Create an MPC tool definition that wraps this SDK method. The tool should:
-1. Have a descriptive name based on the method name (converting camelCase to snake_case)
-2. Include a clear description of what the tool does, including which API endpoint it uses
-3. Define all necessary parameters with proper types, descriptions, and required flags
-4. Handle any complex parameter conversions between snake_case (tool) and camelCase (SDK)
-5. Format responses to be user-friendly, especially for complex objects
-6. Include proper error handling with specific error messages based on the API context
-7. Use the BaasClient instance that will be provided to execute the method
-8. Consider both bot-related and calendar-related functionality appropriately
+Create one or more MPC tool definitions that wrap this SDK method. Consider the following approaches:
 
-Make sure the generated tool adheres to these conventions:
-- Parameters use snake_case naming
-- SDK methods use camelCase naming
-- Enum values should match API specifications exactly
-- All required parameters must be marked as required
-- Response formatting should be human-readable for use in an AI assistant context
+1. FULL TOOL: Create a comprehensive tool with all parameters (both required and optional)
+   - Best for power users who want full control
+   - Includes all possible parameters with clear descriptions
+   - Example: join_meeting_tool with all options
 
-Respond ONLY with valid TypeScript code for the tool definition, with no explanation or additional text.
-The code should use the MpcTools helper functions like createTool, createStringParameter, etc.
+2. SIMPLE TOOL: Create a streamlined version with only essential parameters
+   - Best for common use cases
+   - Focuses on the most frequently used parameters
+   - Example: join_meeting_simple_tool with just meeting_url and bot_name
+
+3. SPECIALIZED TOOLS: Create separate tools for specific use cases
+   - Break down complex methods into focused tools
+   - Each tool handles a specific scenario
+   - Examples:
+     * join_meeting_with_recording_tool (for recording-focused use)
+     * join_meeting_with_transcription_tool (for transcription-focused use)
+     * join_meeting_with_custom_bot_tool (for custom bot configuration)
+
+4. SEARCH/QUERY TOOLS: For endpoints with complex filtering/search capabilities
+   - Create focused tools for specific search scenarios
+   - Examples for /bots/bots_with_metadata:
+     * search_bots_by_name_tool (filter by bot_name)
+     * search_bots_by_date_tool (filter by created_after/created_before)
+     * search_bots_by_extra_tool (filter by extra JSON payload)
+     * search_bots_by_meeting_url_tool (filter by meeting URL)
+   - Examples for /bots/meeting_data:
+     * search_transcript_by_speaker_tool (find specific speaker)
+     * search_transcript_by_time_tool (find content in time range)
+     * search_transcript_by_text_tool (find specific text)
+
+IMPORTANT: Sometimes a single tool is the best approach:
+- For simple endpoints with few parameters
+- When the parameters are tightly coupled
+- When creating multiple tools would add unnecessary complexity
+- For endpoints that are always used together
+
+For each tool definition:
+1. Use descriptive names that clearly indicate the tool's purpose
+2. Convert camelCase to snake_case for tool names
+3. Include clear descriptions of what the tool does
+4. Define parameters with proper types and descriptions
+5. Handle parameter conversions between snake_case (tool) and camelCase (SDK)
+6. Format responses to be human-readable
+7. Include proper error handling with specific messages
+8. Use the BaasClient instance provided
+
+Naming and Formatting Conventions:
+- Tool names: snake_case (e.g., join_meeting_with_recording)
+- Parameters: snake_case (e.g., meeting_url, bot_name)
+- SDK methods: camelCase (e.g., joinMeeting)
+- Enum values: match API specifications exactly
+- Required parameters: clearly marked as required
+- Response formatting: human-readable for AI assistant context
+
+Example Tool Structure:
+1. Full Tool:
+   join_meeting_tool: All parameters, maximum flexibility
+   
+2. Simple Tool:
+   join_meeting_simple_tool: Essential parameters only
+   
+3. Specialized Tools:
+   join_meeting_with_recording_tool: Focused on recording setup
+   join_meeting_with_transcription_tool: Focused on transcription setup
+
+4. Search/Query Tools:
+   search_bots_by_name_tool: Focused on name-based search
+   search_bots_by_date_tool: Focused on date-based filtering
+   search_transcript_by_speaker_tool: Focused on speaker search
+
+Respond ONLY with valid TypeScript code for the tool definition(s), with no explanation or additional text.
+Use the MpcTools helper functions like createTool, createStringParameter, etc.
 `;
 
   try {
