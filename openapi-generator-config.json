@@ -1,7 +1,7 @@
 {
   "supportsES6": true,
   "npmName": "@meeting-baas/sdk",
-  "npmVersion": "0.1.0",
+  "npmVersion": "0.2.0",
   "modelPropertyNaming": "camelCase",
   "enumPropertyNaming": "camelCase",
   "withSeparateModelsAndApi": true,
