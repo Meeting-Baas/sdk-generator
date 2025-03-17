@@ -1,7 +1,7 @@
 # Meeting BaaS SDK
 
 <p align="center">
-  <img src="https://meetingbaas.com/static/a7d46fd33668f28baa9cbf66005489f0/a6312/preview.png" alt="Meeting BaaS" width="120">
+  <img src="https://meetingbaas.com/static/a3e9f3dbde935920a3558317a514ff1a/b5380/preview.png" alt="Meeting BaaS" width="720">
 </p>
 
 Official SDK for interacting with the [Meeting BaaS](https://meetingbaas.com) API - The unified API for Google Meet, Zoom, and Microsoft Teams.
