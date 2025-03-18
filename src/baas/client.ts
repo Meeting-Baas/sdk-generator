@@ -1,5 +1,5 @@
 // BaaS Client Wrapper
-import { CalendarsApi, Configuration, DefaultApi } from "../generated/baas";
+import { BotsApi, CalendarsApi, Configuration } from "../generated/baas";
 import {
   CreateCalendarParams,
   JoinRequest,
@@ -27,7 +27,7 @@ export interface BaasClientConfig {
  * A wrapper around the generated BaaS API client to provide a more user-friendly interface
  */
 export class BaasClient {
-  private defaultApi: DefaultApi;
+  private botsApi: BotsApi;
   private calendarsApi: CalendarsApi;
   private config: Configuration;
 
@@ -41,7 +41,7 @@ export class BaasClient {
       basePath: config.baseUrl || "https://api.meetingbaas.com",
     });
 
-    this.defaultApi = new DefaultApi(this.config);
+    this.botsApi = new BotsApi(this.config);
     this.calendarsApi = new CalendarsApi(this.config);
   }
 
@@ -76,7 +76,7 @@ export class BaasClient {
       extra: options.extra,
     };
 
-    const response = await this.defaultApi.join(request);
+    const response = await this.botsApi.join(request);
     return response.data.bot_id;
   }
 
@@ -86,7 +86,7 @@ export class BaasClient {
    * @returns Boolean indicating success
    */
   async leaveMeeting(botId: string): Promise<boolean> {
-    const response = await this.defaultApi.leave(botId);
+    const response = await this.botsApi.leave(botId);
     return response.data.ok;
   }
 
@@ -96,7 +96,7 @@ export class BaasClient {
    * @returns Meeting metadata
    */
   async getMeetingData(botId: string): Promise<any> {
-    const response = await this.defaultApi.getMeetingData(botId);
+    const response = await this.botsApi.getMeetingData(botId);
     return response.data;
   }
 
@@ -109,7 +109,7 @@ export class BaasClient {
     ok: boolean;
     status: string;
   }> {
-    const response = await this.defaultApi.deleteData(botId);
+    const response = await this.botsApi.deleteData(botId);
     return response.data;
   }
 

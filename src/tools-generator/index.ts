@@ -9,7 +9,12 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { BaasClient } from "../baas/client";
+import {
+  BotsApi,
+  CalendarsApi,
+  Configuration,
+  WebhooksApi,
+} from "../generated/baas";
 import { loadEnv } from "./load-env";
 
 // Load environment variables from .env file if present
@@ -357,24 +362,47 @@ Use the MpcTools helper functions like createTool, createStringParameter, etc.
   }
 }
 
-// Generate all tool definitions
-async function generateAllToolDefinitions(): Promise<Record<string, string>> {
-  const baasClientInstance = new BaasClient({ apiKey: "dummy-key" });
-  const baasMethods = getClassMethods(baasClientInstance);
-
-  // Get example tools for reference
-  const exampleTools = fs.readFileSync(
+// Load example tools from file
+async function loadExampleTools(): Promise<string> {
+  return fs.readFileSync(
     path.resolve(__dirname, "./example-tool-templates.ts"),
     "utf-8"
   );
+}
+
+// Generate all tool definitions
+async function generateAllToolDefinitions(): Promise<Record<string, string>> {
+  const config = new Configuration({ apiKey: "dummy-key" });
+  const botsApi = new BotsApi(config);
+  const calendarsApi = new CalendarsApi(config);
+  const webhooksApi = new WebhooksApi(config);
+
+  // Get methods from each API
+  const botsMethods = getClassMethods(botsApi).filter(
+    (method) => !method.startsWith("_")
+  );
+  const calendarsMethods = getClassMethods(calendarsApi).filter(
+    (method) => !method.startsWith("_")
+  );
+  const webhooksMethods = getClassMethods(webhooksApi).filter(
+    (method) => !method.startsWith("_")
+  );
+
+  // Combine all methods
+  const allMethods = [
+    ...botsMethods.map((m) => `BotsApi.${m}`),
+    ...calendarsMethods.map((m) => `CalendarsApi.${m}`),
+    ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
+  ];
+
+  // Get example tools for reference
+  const exampleTools = await loadExampleTools();
 
   const toolDefinitions: Record<string, string> = {};
 
-  console.log(`Found ${baasMethods.length} methods to convert to MPC tools`);
+  console.log(`Found ${allMethods.length} methods to convert to MPC tools`);
 
-  for (const method of baasMethods) {
-    if (method.startsWith("_")) continue; // Skip private methods
-
+  for (const method of allMethods) {
     console.log(`Generating tool definition for ${method}...`);
     const toolCode = await generateToolDefinition(method, exampleTools);
     toolDefinitions[method] = toolCode;
@@ -480,12 +508,43 @@ export const allTools: ToolDefinition[] = [
 async function main() {
   try {
     console.log("Starting MPC tools generator...");
-    console.log(
-      "This will generate MPC tools for all 13 Meeting BaaS API endpoints"
+
+    // Get all API instances
+    const config = new Configuration({ apiKey: "dummy-key" });
+    const botsApi = new BotsApi(config);
+    const calendarsApi = new CalendarsApi(config);
+    const webhooksApi = new WebhooksApi(config);
+
+    // Get methods from each API
+    const botsMethods = getClassMethods(botsApi).filter(
+      (method) => !method.startsWith("_")
+    );
+    const calendarsMethods = getClassMethods(calendarsApi).filter(
+      (method) => !method.startsWith("_")
+    );
+    const webhooksMethods = getClassMethods(webhooksApi).filter(
+      (method) => !method.startsWith("_")
     );
 
+    // Combine all methods
+    const allMethods = [
+      ...botsMethods.map((m) => `BotsApi.${m}`),
+      ...calendarsMethods.map((m) => `CalendarsApi.${m}`),
+      ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
+    ];
+
+    console.log(
+      `This will generate MPC tools for ${allMethods.length} Meeting BaaS API methods:`
+    );
+    console.log("Methods to be converted:");
+    allMethods.forEach((method, index) => {
+      console.log(`${index + 1}. ${method}`);
+    });
+    console.log(); // Empty line for readability
+
     // Check if API key is available, but continue with stub generation if not
-    if (!config.anthropicApiKey) {
+    const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+    if (!anthropicApiKey) {
       console.warn(
         "No Anthropic API key found in environment variables or .env file."
       );
