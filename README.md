@@ -6,17 +6,19 @@
 
 Official SDK for interacting with the [Meeting BaaS](https://meetingbaas.com) API - The unified API for Google Meet, Zoom, and Microsoft Teams.
 
+> **Note**: This package is automatically generated from the Meeting BaaS OpenAPI specification. For development and contribution guidelines, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+
 ## Features
 
 - **BaaS API Client**: Strongly typed functions for interacting with the Meeting BaaS API
 - **Bot Management**: Create, join, and manage meeting bots across platforms
 - **Calendar Integration**: Connect calendars and automatically schedule meeting recordings
-- **Complete API Coverage**: Access to all 13 endpoints of the Meeting BaaS API
+- **Complete API Coverage**: Access to all Meeting BaaS API endpoints
 - **TypeScript Support**: Full TypeScript definitions for all APIs
 - **MPC Tool Registration**: Simple way to register client tools with an MPC server
 - **CLI Interface**: Command-line tools for common operations
-- **Automatic MPC Tool Generation**: Generate MPC tools from SDK methods
-- **Combined Package Mode**: Special bundle for MPC server installations with pre-generated tools
+- **Automatic MPC Tool Generation**: Pre-generated MPC tools for all SDK methods
+- **Combined Package Mode**: Special bundle for MPC server installations
 
 ## Installation
 
@@ -80,7 +82,7 @@ console.log("Meeting data:", meetingData);
 await client.deleteData(botId);
 ```
 
-### Using Generated MPC Tools
+### Using MPC Tools
 
 ```typescript
 import { register_tool } from "your-mpc-server";
@@ -98,7 +100,7 @@ register_tool(delete_data_tool);
 
 ### MPC Server Bundle Mode
 
-For MPC server deployments, you can use the combined package mode, which includes both the SDK and MPC tools:
+For MPC server deployments, use the combined package mode:
 
 ```typescript
 import { BaasClient, registerTools, SDK_MODE } from "@meeting-baas/sdk/bundle";
@@ -115,10 +117,6 @@ const client = new BaasClient({
 // Register all tools with your MPC server
 import { register_tool } from "your-mpc-server";
 await registerTools(allTools, register_tool);
-
-// Or register individual tools
-import { join_meeting_tool } from "@meeting-baas/sdk/tools";
-register_tool(join_meeting_tool);
 ```
 
 ### Calendar Integration
@@ -151,168 +149,14 @@ await client.scheduleRecordEvent(events[0].uuid, {
 });
 ```
 
-## SDK API Coverage
+## Available MPC Tools
 
-The SDK provides access to all 13 endpoints of the Meeting BaaS API, including:
-
-### Bot Management
-
-- Join meetings with customizable bot parameters
-- Leave meetings and clean up resources
-- Get recording data and transcripts
-- Delete meeting data for privacy compliance
-- List bots with metadata and filtering options
-- Retranscribe audio with different providers
-
-### Calendar Integration
-
-- List and integrate calendars from Google and Microsoft
-- Create, update, and delete calendar connections
-- List and filter calendar events
-- Get detailed event information
-- Schedule recordings for specific events or recurring series
-- Update bot configurations for scheduled recordings
-
-## MPC Tools Generation
-
-The SDK includes an automatic MPC tool generation system that creates Claude Plugin (MPC) tools from SDK methods. Here's how it works:
-
-### How MPC Tools Are Generated
-
-1. **Template-Based Generation**: The SDK uses example templates in `src/tools-generator/example-tool-templates.ts` to inform the tool generation process.
-
-2. **AI-Powered Generation**: When you run `pnpm tools:generate`, the system:
-
-   - Analyzes all methods in the BaasClient SDK
-   - Calls the Anthropic API with method signatures and example templates
-   - Generates properly formatted MPC tool definitions for each SDK method
-   - Writes these generated tools to the output directory (`dist/generated-tools`)
-
-3. **Generated Tool Structure**: Each generated tool includes:
-   - Properly defined parameters (with types, descriptions, and required flags)
-   - Parameter conversion between snake_case (tool) and camelCase (SDK)
-   - User-friendly formatting for complex responses
-   - Comprehensive error handling
-
-### Using Generated MPC Tools
-
-The generated tools are included in the SDK distribution and can be used in several ways:
-
-#### Importing Individual Tools
-
-```typescript
-import {
-  join_meeting_tool,
-  get_meeting_transcript_tool,
-  search_meeting_transcript_tool,
-  find_key_moments_tool,
-  list_upcoming_meetings_tool,
-} from "@meeting-baas/sdk/tools";
-
-// Register with your MPC server
-import { register_tool } from "your-mpc-server";
-register_tool(join_meeting_tool);
-register_tool(search_meeting_transcript_tool);
-```
-
-#### Importing All Tools
-
-```typescript
-import { allTools } from "@meeting-baas/sdk/tools";
-import { register_tool } from "your-mpc-server";
-
-// Register all tools
-for (const tool of allTools) {
-  register_tool(tool);
-}
-```
-
-#### Bundle Mode for MPC Servers
-
-```typescript
-import { registerTools } from "@meeting-baas/sdk/bundle";
-import { allTools } from "@meeting-baas/sdk/tools";
-import { register_tool } from "your-mpc-server";
-
-// Register all tools at once
-await registerTools(allTools, register_tool);
-```
-
-### Available MPC Tools
-
-The SDK generates tools for all API endpoints, including:
+The SDK includes pre-generated MPC tools for all API endpoints:
 
 - **Meeting Management**: Join meetings, leave meetings, get meeting data
 - **Transcript Tools**: Get formatted transcripts, search within transcripts, find key moments
 - **Calendar Integration**: List calendars, integrate with OAuth, schedule recordings
 - **Data Management**: Delete meeting data, list bots with metadata
-
-## Development
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm
-
-### Setup
-
-1. Clone the repository
-
-```bash
-git clone https://github.com/meeting-baas/sdk-generator.git
-cd sdk-generator
-```
-
-2. Install dependencies
-
-```bash
-pnpm install
-```
-
-### Development Workflow
-
-The SDK is built in three main steps:
-
-1. **OpenAPI Client Generation**: Generates TypeScript code from the BaaS OpenAPI specification
-2. **SDK Build**: Compiles the SDK code, including the OpenAPI-generated client
-3. **MPC Tools Generation**: Generates MPC tool definitions that wrap the SDK methods
-
-### Build Commands
-
-```bash
-# Step 1: Fetch the OpenAPI spec and generate the client
-./scripts/openapi-fetch-generate.sh --generate
-
-# Step 2: Build the SDK
-pnpm build
-
-# Step 3: Generate MPC tool definitions
-pnpm tools:generate
-
-# Alternatively, run all steps in sequence
-pnpm tools:rebuild
-```
-
-### Customizing MPC Tool Generation
-
-To customize how MPC tools are generated:
-
-1. Edit the example templates in `src/tools-generator/example-tool-templates.ts`
-2. Add new examples for specific types of tools (e.g., transcript search, calendar integration)
-3. Run the generation process again with `pnpm tools:generate`
-
-### Environment Variables
-
-For MPC tools generation, create a `.env` file with:
-
-```
-ANTHROPIC_API_KEY=your_anthropic_api_key
-DEBUG=true
-```
-
-## Contributing
-
-We welcome contributions to the Meeting BaaS SDK! Please feel free to submit issues or pull requests.
 
 ## About Meeting BaaS
 
