@@ -174,4 +174,186 @@ export class BaasClient {
     const response = await this.calendarsApi.resyncAllCalendars();
     return response.data;
   }
+
+  /**
+   * List events from a calendar
+   * @param calendarId Calendar UUID
+   * @param options Optional filtering options
+   * @returns Array of calendar events
+   */
+  async listEvents(
+    calendarId: string,
+    options?: {
+      attendeeEmail?: string;
+      cursor?: string;
+      organizerEmail?: string;
+      startDateGte?: string;
+      startDateLte?: string;
+      status?: string;
+      updatedAtGte?: string;
+    }
+  ): Promise<any> {
+    const response = await this.calendarsApi.listEvents(
+      calendarId,
+      options?.attendeeEmail,
+      options?.cursor,
+      options?.organizerEmail,
+      options?.startDateGte,
+      options?.startDateLte,
+      options?.status,
+      options?.updatedAtGte
+    );
+    return response.data;
+  }
+
+  /**
+   * Get a specific calendar event
+   * @param uuid Event UUID
+   * @returns Event data
+   */
+  async getEvent(uuid: string): Promise<any> {
+    const response = await this.calendarsApi.getEvent(uuid);
+    return response.data;
+  }
+
+  /**
+   * Schedule a recording for a calendar event
+   * @param uuid Event UUID
+   * @param options Recording configuration
+   * @returns Updated event data
+   */
+  async scheduleRecordEvent(
+    uuid: string,
+    options: {
+      botName: string;
+      extra?: Record<string, any>;
+    }
+  ): Promise<any> {
+    const response = await this.calendarsApi.scheduleRecordEvent(uuid, {
+      bot_name: options.botName,
+      extra: options.extra || {},
+    });
+    return response.data;
+  }
+
+  /**
+   * Unschedule a recording for a calendar event
+   * @param uuid Event UUID
+   * @param allOccurrences Whether to unschedule all occurrences
+   * @returns Updated event data
+   */
+  async unscheduleRecordEvent(
+    uuid: string,
+    allOccurrences?: boolean
+  ): Promise<any> {
+    const response = await this.calendarsApi.unscheduleRecordEvent(
+      uuid,
+      allOccurrences
+    );
+    return response.data;
+  }
+
+  /**
+   * Update a calendar integration
+   * @param uuid Calendar UUID
+   * @param options Update options
+   * @returns Updated calendar data
+   */
+  async updateCalendar(
+    uuid: string,
+    options: {
+      oauthClientId?: string;
+      oauthClientSecret?: string;
+      oauthRefreshToken?: string;
+      platform?: Provider;
+      rawCalendarId?: string;
+    }
+  ): Promise<any> {
+    const request: any = {};
+
+    if (options.oauthClientId) request.oauth_client_id = options.oauthClientId;
+    if (options.oauthClientSecret)
+      request.oauth_client_secret = options.oauthClientSecret;
+    if (options.oauthRefreshToken)
+      request.oauth_refresh_token = options.oauthRefreshToken;
+    if (options.platform) request.platform = options.platform;
+    if (options.rawCalendarId) request.raw_calendar_id = options.rawCalendarId;
+
+    const response = await this.calendarsApi.updateCalendar(uuid, request);
+    return response.data;
+  }
+
+  /**
+   * List recent bots with metadata
+   * @param options Optional filtering options
+   * @returns Array of bots with metadata
+   */
+  async listRecentBots(options?: {
+    botName?: string;
+    createdAfter?: string;
+    createdBefore?: string;
+    cursor?: string;
+    filterByExtra?: string;
+    limit?: number;
+    meetingUrl?: string;
+    sortByExtra?: string;
+    speakerName?: string;
+  }): Promise<any> {
+    const response = await this.botsApi.listRecentBots(
+      options?.botName,
+      options?.createdAfter,
+      options?.createdBefore,
+      options?.cursor,
+      options?.filterByExtra,
+      options?.limit,
+      options?.meetingUrl,
+      options?.sortByExtra,
+      options?.speakerName
+    );
+    return response.data;
+  }
+
+  /**
+   * Get bots with metadata
+   * @param options Optional filtering options
+   * @returns Array of bots with metadata
+   */
+  async botsWithMetadata(options?: {
+    botName?: string;
+    createdAfter?: string;
+    createdBefore?: string;
+    cursor?: string;
+    filterByExtra?: string;
+    limit?: number;
+    meetingUrl?: string;
+    sortByExtra?: string;
+    speakerName?: string;
+  }): Promise<any> {
+    const response = await this.botsApi.botsWithMetadata(
+      options?.botName,
+      options?.createdAfter,
+      options?.createdBefore,
+      options?.cursor,
+      options?.filterByExtra,
+      options?.limit,
+      options?.meetingUrl,
+      options?.sortByExtra,
+      options?.speakerName
+    );
+    return response.data;
+  }
+
+  /**
+   * Retranscribe a bot's audio
+   * @param options Retranscription options
+   */
+  async retranscribeBot(options: {
+    botId: string;
+    provider?: SpeechToText;
+  }): Promise<void> {
+    await this.botsApi.retranscribeBot({
+      bot_uuid: options.botId,
+      speech_to_text: options.provider || undefined,
+    });
+  }
 }
