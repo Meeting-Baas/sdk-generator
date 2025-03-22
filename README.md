@@ -6,7 +6,7 @@
 
 Official SDK for interacting with the [Meeting BaaS](https://meetingbaas.com) API - The unified API for Google Meet, Zoom, and Microsoft Teams.
 
-> **Note**: This package is automatically generated from the Meeting BaaS OpenAPI specification. For development and contribution guidelines, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+> **Note**: This package is automatically generated from the Meeting BaaS OpenAPI specification. For development and contribution guidelines, see [DEVELOPMENT.md](https://github.com/meeting-baas/sdk-generator/blob/HEAD/DEVELOPMENT.md). For the official API reference, visit [docs.meetingbaas.com](https://docs.meetingbaas.com).
 
 ## Features
 
@@ -166,7 +166,7 @@ The SDK provides a simple interface for interacting with Meeting BaaS. Initializ
 import { BaasClient } from "@meeting-baas/sdk";
 
 const client = new BaasClient({
-  apiKey: "your-api-key"
+  apiKey: "your-api-key",
 });
 ```
 
@@ -181,8 +181,19 @@ const client = new BaasClient({
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.bots.botsWithMetadata('example', 'example', 'example', 'example', 'example', 123, 'example', 'example', 'example');
+await client.bots.botsWithMetadata(
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  123,
+  "example",
+  "example",
+  "example"
+);
 ```
+
 </details>
 
 #### `botsWithMetadata(botName?: string?, createdAfter?: string?, createdBefore?: string?, cursor?: string?, filterByExtra?: string?, limit?: number, meetingUrl?: string?, sortByExtra?: string?, speakerName?: string?)`
@@ -194,8 +205,19 @@ BotsApi
 
 ```typescript
 // Returns: Promise<ListRecentBotsResponse>
-await client.bots.botsWithMetadata('example', 'example', 'example', 'example', 'example', 123, 'example', 'example', 'example');
+await client.bots.botsWithMetadata(
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  123,
+  "example",
+  "example",
+  "example"
+);
 ```
+
 </details>
 
 #### `deleteData(uuid: string)`
@@ -207,8 +229,9 @@ Deletes a bot\'s data including recording, transcription, and logs
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.bots.deleteData('example');
+await client.bots.deleteData("example");
 ```
+
 </details>
 
 #### `deleteData(uuid: string)`
@@ -220,8 +243,9 @@ Deletes a bot\'s data including recording, transcription, and logs
 
 ```typescript
 // Returns: Promise<DeleteResponse>
-await client.bots.deleteData('example');
+await client.bots.deleteData("example");
 ```
+
 </details>
 
 #### `getMeetingData(botId: string)`
@@ -233,8 +257,9 @@ Get meeting recording and metadata Get Meeting Data botId [options] Override htt
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.bots.getMeetingData('example');
+await client.bots.getMeetingData("example");
 ```
+
 </details>
 
 #### `getMeetingData(botId: string)`
@@ -246,8 +271,9 @@ Get meeting recording and metadata Get Meeting Data botId [options] Override htt
 
 ```typescript
 // Returns: Promise<Metadata>
-await client.bots.getMeetingData('example');
+await client.bots.getMeetingData("example");
 ```
+
 </details>
 
 #### `join(joinRequest: JoinRequest)`
@@ -265,6 +291,7 @@ await client.bots.join({
   // ... JoinRequest properties
 });
 ```
+
 </details>
 
 #### `join(joinRequest: JoinRequest)`
@@ -282,6 +309,7 @@ await client.bots.join({
   // ... JoinRequest properties
 });
 ```
+
 </details>
 
 #### `leave(uuid: string)`
@@ -293,8 +321,9 @@ Leave Leave uuid The UUID identifier [options] Override http request option.
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.bots.leave('example');
+await client.bots.leave("example");
 ```
+
 </details>
 
 #### `leave(uuid: string)`
@@ -306,8 +335,9 @@ Leave Leave uuid The UUID identifier [options] Override http request option.
 
 ```typescript
 // Returns: Promise<LeaveResponse>
-await client.bots.leave('example');
+await client.bots.leave("example");
 ```
+
 </details>
 
 #### `listRecentBots(botName?: string?, createdAfter?: string?, createdBefore?: string?, cursor?: string?, filterByExtra?: string?, limit?: number, meetingUrl?: string?, sortByExtra?: string?, speakerName?: string?)`
@@ -319,8 +349,19 @@ Retrieves a paginated list of the user\'s bots with metadata, sorted by creation
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.bots.listRecentBots('example', 'example', 'example', 'example', 'example', 123, 'example', 'example', 'example');
+await client.bots.listRecentBots(
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  123,
+  "example",
+  "example",
+  "example"
+);
 ```
+
 </details>
 
 #### `listRecentBots(botName?: string?, createdAfter?: string?, createdBefore?: string?, cursor?: string?, filterByExtra?: string?, limit?: number, meetingUrl?: string?, sortByExtra?: string?, speakerName?: string?)`
@@ -332,8 +373,19 @@ Retrieves a paginated list of the user\'s bots with metadata, sorted by creation
 
 ```typescript
 // Returns: Promise<ListRecentBotsResponse>
-await client.bots.listRecentBots('example', 'example', 'example', 'example', 'example', 123, 'example', 'example', 'example');
+await client.bots.listRecentBots(
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  123,
+  "example",
+  "example",
+  "example"
+);
 ```
+
 </details>
 
 #### `retranscribeBot(retranscribeBody: RetranscribeBody)`
@@ -351,6 +403,7 @@ await client.bots.retranscribeBot({
   // ... RetranscribeBody properties
 });
 ```
+
 </details>
 
 #### `retranscribeBot(retranscribeBody: RetranscribeBody)`
@@ -368,6 +421,7 @@ await client.bots.retranscribeBot({
   // ... RetranscribeBody properties
 });
 ```
+
 </details>
 
 ### Calendars API
@@ -387,6 +441,7 @@ await client.calendars.createCalendar({
   // ... CreateCalendarParams properties
 });
 ```
+
 </details>
 
 #### `createCalendar(createCalendarParams: CreateCalendarParams)`
@@ -404,6 +459,7 @@ await client.calendars.createCalendar({
   // ... CreateCalendarParams properties
 });
 ```
+
 </details>
 
 #### `deleteCalendar(uuid: string)`
@@ -415,8 +471,9 @@ Permanently removes a calendar integration by its UUID, including all associated
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.deleteCalendar('example');
+await client.calendars.deleteCalendar("example");
 ```
+
 </details>
 
 #### `deleteCalendar(uuid: string)`
@@ -428,8 +485,9 @@ Permanently removes a calendar integration by its UUID, including all associated
 
 ```typescript
 // Returns: Promise<void>
-await client.calendars.deleteCalendar('example');
+await client.calendars.deleteCalendar("example");
 ```
+
 </details>
 
 #### `getCalendar(uuid: string)`
@@ -441,8 +499,9 @@ Retrieves detailed information about a specific calendar integration by its UUID
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.getCalendar('example');
+await client.calendars.getCalendar("example");
 ```
+
 </details>
 
 #### `getCalendar(uuid: string)`
@@ -454,8 +513,9 @@ Retrieves detailed information about a specific calendar integration by its UUID
 
 ```typescript
 // Returns: Promise<Calendar>
-await client.calendars.getCalendar('example');
+await client.calendars.getCalendar("example");
 ```
+
 </details>
 
 #### `getEvent(uuid: string)`
@@ -467,8 +527,9 @@ Retrieves comprehensive details about a specific calendar event by its UUID
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.getEvent('example');
+await client.calendars.getEvent("example");
 ```
+
 </details>
 
 #### `getEvent(uuid: string)`
@@ -480,8 +541,9 @@ Retrieves comprehensive details about a specific calendar event by its UUID
 
 ```typescript
 // Returns: Promise<Event>
-await client.calendars.getEvent('example');
+await client.calendars.getEvent("example");
 ```
+
 </details>
 
 #### `listCalendars()`
@@ -501,8 +563,18 @@ Retrieves a paginated list of calendar events with comprehensive filtering optio
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.listEvents('example', 'example', 'example', 'example', 'example', 'example', 'example', 'example');
+await client.calendars.listEvents(
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  "example"
+);
 ```
+
 </details>
 
 #### `listEvents(calendarId: string, attendeeEmail?: string?, cursor?: string?, organizerEmail?: string?, startDateGte?: string?, startDateLte?: string?, status?: string?, updatedAtGte?: string?)`
@@ -514,8 +586,18 @@ Retrieves a paginated list of calendar events with comprehensive filtering optio
 
 ```typescript
 // Returns: Promise<ListEventResponse>
-await client.calendars.listEvents('example', 'example', 'example', 'example', 'example', 'example', 'example', 'example');
+await client.calendars.listEvents(
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  "example",
+  "example"
+);
 ```
+
 </details>
 
 #### `listRawCalendars(listRawCalendarsParams: ListRawCalendarsParams)`
@@ -533,6 +615,7 @@ await client.calendars.listRawCalendars({
   // ... ListRawCalendarsParams properties
 });
 ```
+
 </details>
 
 #### `listRawCalendars(listRawCalendarsParams: ListRawCalendarsParams)`
@@ -550,6 +633,7 @@ await client.calendars.listRawCalendars({
   // ... ListRawCalendarsParams properties
 });
 ```
+
 </details>
 
 #### `patchBot(uuid: string, botParam3: BotParam3, allOccurrences?: boolean?)`
@@ -563,10 +647,15 @@ Updates the configuration of a bot already scheduled to record an event
 import { BotParam3 } from "@meeting-baas/sdk";
 
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.patchBot('example', {
-  // ... BotParam3 properties
-}, true);
+await client.calendars.patchBot(
+  "example",
+  {
+    // ... BotParam3 properties
+  },
+  true
+);
 ```
+
 </details>
 
 #### `patchBot(uuid: string, botParam3: BotParam3, allOccurrences?: boolean?)`
@@ -580,10 +669,15 @@ Updates the configuration of a bot already scheduled to record an event
 import { BotParam3 } from "@meeting-baas/sdk";
 
 // Returns: Promise<Array<Event>
-await client.calendars.patchBot('example', {
-  // ... BotParam3 properties
-}, true);
+await client.calendars.patchBot(
+  "example",
+  {
+    // ... BotParam3 properties
+  },
+  true
+);
 ```
+
 </details>
 
 #### `resyncAllCalendars()`
@@ -605,10 +699,15 @@ Configures a bot to automatically join and record a specific calendar event at i
 import { BotParam2 } from "@meeting-baas/sdk";
 
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.scheduleRecordEvent('example', {
-  // ... BotParam2 properties
-}, true);
+await client.calendars.scheduleRecordEvent(
+  "example",
+  {
+    // ... BotParam2 properties
+  },
+  true
+);
 ```
+
 </details>
 
 #### `scheduleRecordEvent(uuid: string, botParam2: BotParam2, allOccurrences?: boolean?)`
@@ -622,10 +721,15 @@ Configures a bot to automatically join and record a specific calendar event at i
 import { BotParam2 } from "@meeting-baas/sdk";
 
 // Returns: Promise<Array<Event>
-await client.calendars.scheduleRecordEvent('example', {
-  // ... BotParam2 properties
-}, true);
+await client.calendars.scheduleRecordEvent(
+  "example",
+  {
+    // ... BotParam2 properties
+  },
+  true
+);
 ```
+
 </details>
 
 #### `unscheduleRecordEvent(uuid: string, allOccurrences?: boolean?)`
@@ -637,8 +741,9 @@ Cancels a previously scheduled recording for a calendar event and releases assoc
 
 ```typescript
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.unscheduleRecordEvent('example', true);
+await client.calendars.unscheduleRecordEvent("example", true);
 ```
+
 </details>
 
 #### `unscheduleRecordEvent(uuid: string, allOccurrences?: boolean?)`
@@ -650,8 +755,9 @@ Cancels a previously scheduled recording for a calendar event and releases assoc
 
 ```typescript
 // Returns: Promise<Array<Event>
-await client.calendars.unscheduleRecordEvent('example', true);
+await client.calendars.unscheduleRecordEvent("example", true);
 ```
+
 </details>
 
 #### `updateCalendar(uuid: string, updateCalendarParams: UpdateCalendarParams)`
@@ -665,10 +771,11 @@ Updates a calendar integration with new credentials or platform while maintainin
 import { UpdateCalendarParams } from "@meeting-baas/sdk";
 
 // Returns: Promise<(axios?: AxiosInstance, basePath?: string) =>
-await client.calendars.updateCalendar('example', {
+await client.calendars.updateCalendar("example", {
   // ... UpdateCalendarParams properties
 });
 ```
+
 </details>
 
 #### `updateCalendar(uuid: string, updateCalendarParams: UpdateCalendarParams)`
@@ -682,10 +789,11 @@ Updates a calendar integration with new credentials or platform while maintainin
 import { UpdateCalendarParams } from "@meeting-baas/sdk";
 
 // Returns: Promise<CreateCalendarResponse>
-await client.calendars.updateCalendar('example', {
+await client.calendars.updateCalendar("example", {
   // ... UpdateCalendarParams properties
 });
 ```
+
 </details>
 
 ### Webhooks API
