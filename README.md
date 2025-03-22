@@ -158,6 +158,51 @@ The SDK includes pre-generated MPC tools for all API endpoints:
 - **Calendar Integration**: List calendars, integrate with OAuth, schedule recordings
 - **Data Management**: Delete meeting data, list bots with metadata
 
+## Generated MPC Tools List
+
+All SDK methods are automatically converted to snake_case MPC tools. Here's the complete list:
+
+### Bots API Tools
+
+- `join_meeting`
+- `leave_meeting`
+- `get_meeting_data`
+- `delete_data`
+- `bots_with_metadata`
+- `list_recent_bots`
+- `retranscribe_bot`
+
+### Calendars API Tools
+
+- `create_calendar`
+- `delete_calendar`
+- `get_calendar`
+- `get_event`
+- `list_calendars`
+- `list_events`
+- `list_raw_calendars`
+- `patch_bot`
+- `resync_all_calendars`
+- `schedule_record_event`
+- `unschedule_record_event`
+- `update_calendar`
+
+### Webhooks API Tools
+
+- `bot_webhook_documentation`
+- `calendar_webhook_documentation`
+- `webhook_documentation`
+
+Each tool accepts parameters matching the SDK method's signature, converted to snake_case. For example:
+
+```typescript
+join_meeting({
+  bot_name: "Meeting Assistant",
+  meeting_url: "https://meet.google.com/abc-def-ghi",
+  reserved: true,
+});
+```
+
 ## Available Methods
 
 The SDK provides a simple interface for interacting with Meeting BaaS. Initialize the client with your API key:
