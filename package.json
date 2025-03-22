@@ -27,7 +27,8 @@
     "tools:rebuild": "pnpm build && pnpm tools:generate && pnpm tools:register",
     "bundle:build": "pnpm build && node scripts/prepare-bundle.js",
     "bundle:test": "node scripts/test-bundle.js",
-    "prepublishOnly": "pnpm lint && pnpm bundle:build"
+    "docs:generate": "node scripts/generate-docs.js",
+    "prepublishOnly": "pnpm lint && pnpm bundle:build && pnpm docs:generate"
   },
   "publishConfig": {
     "access": "public"
