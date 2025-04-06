@@ -1,5 +1,10 @@
 // BaaS Client Wrapper
-import { BotsApi, CalendarsApi, Configuration } from "../generated/baas";
+import {
+  CalendarsApi,
+  Configuration,
+  DefaultApi,
+  WebhooksApi,
+} from "../generated/baas";
 import {
   CreateCalendarParams,
   JoinRequest,
@@ -27,8 +32,9 @@ export interface BaasClientConfig {
  * A wrapper around the generated BaaS API client to provide a more user-friendly interface
  */
 export class BaasClient {
-  private botsApi: BotsApi;
+  private botsApi: DefaultApi;
   private calendarsApi: CalendarsApi;
+  private webhooksApi: WebhooksApi;
   private config: Configuration;
 
   /**
@@ -41,8 +47,9 @@ export class BaasClient {
       basePath: config.baseUrl || "https://api.meetingbaas.com",
     });
 
-    this.botsApi = new BotsApi(this.config);
+    this.botsApi = new DefaultApi(this.config);
     this.calendarsApi = new CalendarsApi(this.config);
+    this.webhooksApi = new WebhooksApi(this.config);
   }
 
   /**
@@ -73,6 +80,7 @@ export class BaasClient {
       entry_message: options.entryMessage,
       recording_mode: options.recordingMode,
       speech_to_text: options.speechToText,
+      start_time: options.startTime,
       extra: options.extra,
     };
 
@@ -171,7 +179,7 @@ export class BaasClient {
    * @returns Resync result
    */
   async resyncAllCalendars(): Promise<any> {
-    const response = await this.calendarsApi.resyncAllCalendars();
+    const response = await this.calendarsApi.resyncAll();
     return response.data;
   }
 
@@ -195,13 +203,13 @@ export class BaasClient {
   ): Promise<any> {
     const response = await this.calendarsApi.listEvents(
       calendarId,
-      options?.attendeeEmail,
-      options?.cursor,
-      options?.organizerEmail,
-      options?.startDateGte,
-      options?.startDateLte,
-      options?.status,
-      options?.updatedAtGte
+      options?.attendeeEmail || null,
+      options?.cursor || null,
+      options?.organizerEmail || null,
+      options?.startDateGte || null,
+      options?.startDateLte || null,
+      options?.status || null,
+      options?.updatedAtGte || null
     );
     return response.data;
   }
@@ -220,6 +228,7 @@ export class BaasClient {
    * Schedule a recording for a calendar event
    * @param uuid Event UUID
    * @param options Recording configuration
+   * @param allOccurrences Whether to schedule all occurrences
    * @returns Updated event data
    */
   async scheduleRecordEvent(
@@ -227,12 +236,31 @@ export class BaasClient {
     options: {
       botName: string;
       extra?: Record<string, any>;
-    }
+      botImage?: string;
+      webhookUrl?: string;
+      deduplicationKey?: string;
+      entryMessage?: string;
+      recordingMode?: RecordingMode;
+      speechToText?: SpeechToText;
+    },
+    allOccurrences?: boolean
   ): Promise<any> {
-    const response = await this.calendarsApi.scheduleRecordEvent(uuid, {
+    const request = {
       bot_name: options.botName,
       extra: options.extra || {},
-    });
+      bot_image: options.botImage,
+      webhook_url: options.webhookUrl,
+      deduplication_key: options.deduplicationKey,
+      enter_message: options.entryMessage,
+      recording_mode: options.recordingMode,
+      speech_to_text: options.speechToText,
+    };
+
+    const response = await this.calendarsApi.scheduleRecordEvent(
+      uuid,
+      request,
+      allOccurrences || null
+    );
     return response.data;
   }
 
@@ -248,7 +276,7 @@ export class BaasClient {
   ): Promise<any> {
     const response = await this.calendarsApi.unscheduleRecordEvent(
       uuid,
-      allOccurrences
+      allOccurrences || null
     );
     return response.data;
   }
@@ -284,6 +312,96 @@ export class BaasClient {
   }
 
   /**
+   * List raw calendars from a provider
+   * @param options Provider credentials
+   * @returns List of raw calendars
+   */
+  async listRawCalendars(options: {
+    oauthClientId: string;
+    oauthClientSecret: string;
+    oauthRefreshToken: string;
+    platform: Provider;
+  }): Promise<any> {
+    const request = {
+      oauth_client_id: options.oauthClientId,
+      oauth_client_secret: options.oauthClientSecret,
+      oauth_refresh_token: options.oauthRefreshToken,
+      platform: options.platform,
+    };
+
+    const response = await this.calendarsApi.listRawCalendars(request);
+    return response.data;
+  }
+
+  /**
+   * Update a bot configuration for a calendar event
+   * @param uuid Event UUID
+   * @param options Bot configuration updates
+   * @param allOccurrences Whether to update all occurrences
+   * @returns Updated event data
+   */
+  async patchBot(
+    uuid: string,
+    options: {
+      botName?: string;
+      botImage?: string;
+      extra?: Record<string, any>;
+      webhookUrl?: string;
+      deduplicationKey?: string;
+      entryMessage?: string;
+      recordingMode?: RecordingMode;
+      speechToText?: SpeechToText;
+    },
+    allOccurrences?: boolean
+  ): Promise<any> {
+    const request: any = {};
+
+    if (options.botName) request.bot_name = options.botName;
+    if (options.botImage) request.bot_image = options.botImage;
+    if (options.extra) request.extra = options.extra;
+    if (options.webhookUrl) request.webhook_url = options.webhookUrl;
+    if (options.deduplicationKey)
+      request.deduplication_key = options.deduplicationKey;
+    if (options.entryMessage) request.enter_message = options.entryMessage;
+    if (options.recordingMode) request.recording_mode = options.recordingMode;
+    if (options.speechToText) request.speech_to_text = options.speechToText;
+
+    const response = await this.calendarsApi.patchBot(
+      uuid,
+      request,
+      allOccurrences || null
+    );
+    return response.data;
+  }
+
+  /**
+   * Get webhook documentation
+   * @returns Webhook documentation
+   */
+  async getWebhookDocumentation(): Promise<any> {
+    const response = await this.webhooksApi.webhookDocumentation();
+    return response.data;
+  }
+
+  /**
+   * Get bot webhook documentation
+   * @returns Bot webhook documentation
+   */
+  async getBotWebhookDocumentation(): Promise<any> {
+    const response = await this.webhooksApi.botWebhookDocumentation();
+    return response.data;
+  }
+
+  /**
+   * Get calendar webhook documentation
+   * @returns Calendar webhook documentation
+   */
+  async getCalendarWebhookDocumentation(): Promise<any> {
+    const response = await this.webhooksApi.calendarWebhookDocumentation();
+    return response.data;
+  }
+
+  /**
    * List recent bots with metadata
    * @param options Optional filtering options
    * @returns Array of bots with metadata
@@ -300,15 +418,15 @@ export class BaasClient {
     speakerName?: string;
   }): Promise<any> {
     const response = await this.botsApi.listRecentBots(
-      options?.botName,
-      options?.createdAfter,
-      options?.createdBefore,
-      options?.cursor,
-      options?.filterByExtra,
+      options?.botName || null,
+      options?.createdAfter || null,
+      options?.createdBefore || null,
+      options?.cursor || null,
+      options?.filterByExtra || null,
       options?.limit,
-      options?.meetingUrl,
-      options?.sortByExtra,
-      options?.speakerName
+      options?.meetingUrl || null,
+      options?.sortByExtra || null,
+      options?.speakerName || null
     );
     return response.data;
   }
@@ -330,15 +448,15 @@ export class BaasClient {
     speakerName?: string;
   }): Promise<any> {
     const response = await this.botsApi.botsWithMetadata(
-      options?.botName,
-      options?.createdAfter,
-      options?.createdBefore,
-      options?.cursor,
-      options?.filterByExtra,
+      options?.botName || null,
+      options?.createdAfter || null,
+      options?.createdBefore || null,
+      options?.cursor || null,
+      options?.filterByExtra || null,
       options?.limit,
-      options?.meetingUrl,
-      options?.sortByExtra,
-      options?.speakerName
+      options?.meetingUrl || null,
+      options?.sortByExtra || null,
+      options?.speakerName || null
     );
     return response.data;
   }
@@ -353,7 +471,7 @@ export class BaasClient {
   }): Promise<void> {
     await this.botsApi.retranscribeBot({
       bot_uuid: options.botId,
-      speech_to_text: options.provider || undefined,
+      speech_to_text: options.provider || null,
     });
   }
 }

@@ -134,7 +134,29 @@ exports.execute${toolName
  * @auto-generated
  */
 
-module.exports = require('./tools/index.js');
+// Export all tools from the tools directory
+${toolFiles
+  .map((file) => {
+    const toolName = path.basename(file, ".ts");
+    return `const ${toolName}_tool = require('./tools/${toolName}').${toolName}_tool;
+exports.${toolName}_tool = ${toolName}_tool;`;
+  })
+  .join("\n\n")}
+
+// Export allTools array for convenience
+exports.allTools = [
+${toolFiles
+  .map((file) => {
+    const toolName = path.basename(file, ".ts");
+    return `  ${toolName}_tool,`;
+  })
+  .join("\n")}
+];
+
+// Export SDK utility methods
+exports.registerTools = require('./bundle').registerTools;
+exports.BaasClient = require('./index').BaasClient;
+exports.SDK_MODE = "MPC_TOOLS";
 `;
     fs.writeFileSync(path.join(DIST_DIR, "tools.js"), toolsIndexCjs);
 
@@ -147,11 +169,32 @@ module.exports = require('./tools/index.js');
  * @auto-generated
  */
 
-export * from './tools/index.js';
+// Export all tools from the tools directory
+${toolFiles
+  .map((file) => {
+    const toolName = path.basename(file, ".ts");
+    return `export { ${toolName}_tool } from './tools/${toolName}';`;
+  })
+  .join("\n")}
+
+// Export allTools array for convenience
+export const allTools = [
+${toolFiles
+  .map((file) => {
+    const toolName = path.basename(file, ".ts");
+    return `  ${toolName}_tool,`;
+  })
+  .join("\n")}
+];
+
+// Export SDK utility methods
+export { registerTools } from './bundle';
+export { BaasClient } from './index';
+export const SDK_MODE = "MPC_TOOLS";
 `;
     fs.writeFileSync(path.join(DIST_DIR, "tools.mjs"), toolsIndexEsm);
 
-    // Create types version
+    // Create TypeScript definitions
     const toolsIndexDts = `/**
  * Bundled MPC tools index
  * 
@@ -160,7 +203,27 @@ export * from './tools/index.js';
  * @auto-generated
  */
 
-export * from './tools/index';
+import { ToolDefinition } from './index';
+import { BaasClient } from './index';
+
+// Export all tools
+${toolFiles
+  .map((file) => {
+    const toolName = path.basename(file, ".ts");
+    return `export declare const ${toolName}_tool: ToolDefinition;`;
+  })
+  .join("\n")}
+
+// Export allTools array for convenience
+export declare const allTools: ToolDefinition[];
+
+// Export SDK utility methods
+export declare function registerTools(
+  tools: ToolDefinition[],
+  registerFn: (tool: any) => Promise<void> | void
+): Promise<void>;
+export { BaasClient };
+export declare const SDK_MODE: string;
 `;
     fs.writeFileSync(path.join(DIST_DIR, "tools.d.ts"), toolsIndexDts);
 

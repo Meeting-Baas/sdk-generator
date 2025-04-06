@@ -8,6 +8,23 @@
   "bin": {
     "meeting-baas": "dist/cli.js"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./tools": {
+      "import": "./dist/tools.mjs",
+      "require": "./dist/tools.js",
+      "types": "./dist/tools.d.ts"
+    },
+    "./bundle": {
+      "import": "./dist/bundle.mjs",
+      "require": "./dist/bundle.js",
+      "types": "./dist/bundle.d.ts"
+    }
+  },
   "files": [
     "dist",
     "README.md",
@@ -24,8 +41,8 @@
     "openapi:rebuild": "pnpm openapi:clean && pnpm openapi:generate && pnpm build",
     "tools:generate": "ts-node src/tools-generator/index.ts",
     "tools:register": "ts-node src/tools-generator/register-tools.ts",
-    "tools:rebuild": "pnpm build && pnpm tools:generate && pnpm tools:register",
-    "bundle:build": "pnpm build && node scripts/prepare-bundle.js",
+    "tools:rebuild": "pnpm build && pnpm tools:generate",
+    "bundle:build": "pnpm build && pnpm tools:generate && node scripts/prepare-bundle.js",
     "bundle:test": "node scripts/test-bundle.js",
     "docs:generate": "node scripts/generate-docs.js",
     "prepublishOnly": "pnpm lint && pnpm bundle:build && pnpm docs:generate"

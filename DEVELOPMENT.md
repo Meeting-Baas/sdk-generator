@@ -149,9 +149,9 @@ DEBUG=true                          # For verbose output
 
 ## MPC Tools Generation
 
-The SDK includes an automatic MPC tool generation system that creates Claude Plugin (MPC) tools from SDK methods. Here's how it works:
+The SDK includes an automatic MPC tool generation system that creates Claude Plugin (MPC) tools from SDK methods. These tools are now included by default in the package and can be accessed via the `/tools` export path.
 
-### How MPC Tools Are Generated
+### How MPC Tools Are Generated and Distributed
 
 1. **Template-Based Generation**: The SDK uses example templates in `src/tools-generator/example-tool-templates.ts` to inform the tool generation process.
 
@@ -163,18 +163,43 @@ The SDK includes an automatic MPC tool generation system that creates Claude Plu
    - Writes these generated tools to the output directory (`dist/generated-tools`)
 
 3. **Generated Tool Structure**: Each generated tool includes:
+
    - Properly defined parameters (with types, descriptions, and required flags)
    - Parameter conversion between snake_case (tool) and camelCase (SDK)
    - User-friendly formatting for complex responses
    - Comprehensive error handling
 
-### Customizing MPC Tool Generation
+4. **Distribution**: All generated tools are:
+   - Built automatically as part of `pnpm bundle:build`
+   - Included in the published package
+   - Available via the `/tools` export path: `import { join_meeting_tool } from "@meeting-baas/sdk/tools"`
 
-To customize how MPC tools are generated:
+### Building With Tools
 
-1. Edit the example templates in `src/tools-generator/example-tool-templates.ts`
-2. Add new examples for specific types of tools (e.g., transcript search, calendar integration)
-3. Run the generation process again with `pnpm tools:generate`
+The build process now automatically includes MPC tools generation:
+
+```bash
+# Build the SDK with tools
+pnpm bundle:build
+```
+
+This process:
+
+1. Builds the base SDK
+2. Generates MPC tools for all SDK methods
+3. Bundles everything for distribution
+
+### Using MPC Tools in Development
+
+During development, you can test the tools by:
+
+```bash
+# Build the SDK and generate tools
+pnpm bundle:build
+
+# Test the tools with a local MPC server
+pnpm bundle:test
+```
 
 ## Contributing
 
