@@ -76,10 +76,39 @@ This step:
 
 - Uses Anthropic API to generate MPC tool definitions
 - Requires `ANTHROPIC_API_KEY` in `.env`
-- Generates tools in `dist/generated-tools/`
-- Creates TypeScript definitions for each tool
+- Generates TypeScript tool files in `dist/generated-tools/`
+- Creates tool definitions for each SDK method
 
-### 4. MPC Tools Registration
+### 4. Bundle Build
+
+```bash
+pnpm bundle:build
+```
+
+⚠️ **Important**: This command regenerates all tools using the Anthropic API before building the bundle.
+
+This step:
+
+- Builds the base SDK
+- Regenerates all MPC tools (calling the Anthropic API)
+- Compiles all tools to JavaScript
+- Creates the necessary exports in the `dist/` directory
+
+### 5. Bundle Without Regenerating Tools
+
+If you've already generated the tools and want to avoid regenerating them (to save API calls or time), you can directly use the prepare-bundle script:
+
+```bash
+node scripts/prepare-bundle.js
+```
+
+This script:
+
+- Takes existing TypeScript tool definitions from `dist/generated-tools/`
+- Compiles them to JavaScript
+- Creates the bundled exports without regenerating the tools
+
+### 6. MPC Tools Registration (Optional)
 
 ```bash
 pnpm tools:register
@@ -89,49 +118,56 @@ This step:
 
 - Registers generated tools with an MPC server
 - Requires `MPC_SERVER_URL` in `.env` (defaults to http://localhost:3000)
-- Generates JSON-RPC registration payload
+- Note: This requires the tools to be already bundled (run `node scripts/prepare-bundle.js` first)
 
-### 5. Bundle Build
+### Common Workflows
+
+#### Complete Development Workflow
+
+For a complete development cycle from OpenAPI spec to bundled tools:
 
 ```bash
-pnpm bundle:build
+# 1. Update OpenAPI client
+pnpm openapi:rebuild
+
+# 2. Build the SDK
+pnpm build
+
+# 3. Generate MPC tools
+pnpm tools:generate
+
+# 4. Create the bundle (without regenerating tools)
+node scripts/prepare-bundle.js
+
+# 5. Test the bundle
+pnpm bundle:test
 ```
 
-This step:
+#### Tools-Only Workflow
 
-- Compiles generated tools to JavaScript
-- Creates a bundled package in `dist/`
-- Generates index files for tools
-- No LLM keys required
-
-### Complete Build
+If you're only making changes to MPC tools:
 
 ```bash
-# Run all steps in sequence
-pnpm tools:rebuild
+# 1. Generate tools
+pnpm tools:generate
+
+# 2. Create the bundle (without regenerating)
+node scripts/prepare-bundle.js
+```
+
+#### Quick Build for Publishing
+
+For publishing (regenerates everything):
+
+```bash
+pnpm prepublishOnly
 ```
 
 This runs:
 
-1. `pnpm build`
-2. `pnpm tools:generate`
-3. `pnpm tools:register`
-
-### Publishing
-
-```bash
-# Run linting and bundle build before publishing
-pnpm prepublishOnly
-
-# Publish to npm
-pnpm publish
-```
-
-The `prepublishOnly` script:
-
-- Runs TypeScript linting
-- Builds the bundle
-- No LLM keys required
+- TypeScript linting
+- Builds the bundle (including regenerating tools)
+- No LLM keys required for the final bundling
 
 ## Environment Variables
 
@@ -170,35 +206,21 @@ The SDK includes an automatic MPC tool generation system that creates Claude Plu
    - Comprehensive error handling
 
 4. **Distribution**: All generated tools are:
-   - Built automatically as part of `pnpm bundle:build`
+   - Built automatically during the bundling process
    - Included in the published package
    - Available via the `/tools` export path: `import { join_meeting_tool } from "@meeting-baas/sdk/tools"`
 
-### Building With Tools
+### Testing MPC Tools
 
-The build process now automatically includes MPC tools generation:
-
-```bash
-# Build the SDK with tools
-pnpm bundle:build
-```
-
-This process:
-
-1. Builds the base SDK
-2. Generates MPC tools for all SDK methods
-3. Bundles everything for distribution
-
-### Using MPC Tools in Development
-
-During development, you can test the tools by:
+You can test the generated and bundled tools using:
 
 ```bash
-# Build the SDK and generate tools
-pnpm bundle:build
-
-# Test the tools with a local MPC server
+# Test the bundled tools
 pnpm bundle:test
+
+# Or create a simple test script
+echo 'const { allTools } = require("./dist/tools"); console.log(`Loaded ${allTools.length} tools`);' > test.js
+node test.js
 ```
 
 ## Contributing
@@ -225,9 +247,16 @@ We welcome contributions to the Meeting BaaS SDK! Please feel free to submit iss
 src/
 ├── baas/           # BaaS client implementation
 ├── generated/      # Generated OpenAPI client
-├── mpc/           # MPC tools and types
+├── mpc/            # MPC tools and types
 ├── tools-generator/ # MPC tools generation
-└── index.ts       # Main entry point
+└── index.ts        # Main entry point
+
+dist/
+├── index.js        # CommonJS bundle
+├── index.mjs       # ES Module bundle
+├── tools.js        # CommonJS tools bundle
+├── tools.mjs       # ES Module tools bundle
+└── generated-tools/ # Generated TypeScript tool definitions
 ```
 
 ## License

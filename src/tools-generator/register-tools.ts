@@ -7,7 +7,8 @@
 
 import fs from "fs";
 import path from "path";
-import { MpcClient } from "../mpc";
+import { BaasClient } from "../baas/client";
+import { ToolDefinition } from "../mpc/types";
 import { loadEnv } from "./load-env";
 
 // Load environment variables from .env file if present
@@ -20,11 +21,74 @@ interface Config {
   debug: boolean;
 }
 
+// Default configuration
 const config: Config = {
   mpcServerUrl: process.env.MPC_SERVER_URL || "http://localhost:3000",
   protocolVersion: process.env.PROTOCOL_VERSION,
   debug: process.env.DEBUG === "true",
 };
+
+/**
+ * Register Meeting BaaS SDK tools with any MPC server
+ *
+ * @param tools Array of tool definitions to register
+ * @param registerFn The registration function from your MPC server implementation
+ * @returns Promise that resolves when all tools are registered
+ */
+export async function registerTools(
+  tools: ToolDefinition[],
+  registerFn: (tool: any) => Promise<void> | void
+): Promise<void> {
+  if (!tools || tools.length === 0) {
+    console.warn("No tools provided for registration");
+    return;
+  }
+
+  console.log(`Registering ${tools.length} Meeting BaaS tools...`);
+
+  // Register each tool with the provided function
+  for (const tool of tools) {
+    try {
+      await registerFn(tool);
+      if (config.debug) {
+        console.log(`Registered tool: ${tool.name}`);
+      }
+    } catch (error) {
+      console.error(`Failed to register tool ${tool.name}:`, error);
+    }
+  }
+
+  console.log("Tool registration complete!");
+}
+
+/**
+ * Create a Meeting BaaS client and register all tools with an MPC server
+ *
+ * @param tools Array of tool definitions to register
+ * @param registerFn The registration function from your MPC server
+ * @param apiKey Meeting BaaS API key
+ * @param baseUrl Optional custom base URL for the Meeting BaaS API
+ * @returns The BaasClient instance
+ */
+export function setupBaasTools(
+  tools: ToolDefinition[],
+  registerFn: (tool: any) => Promise<void> | void,
+  apiKey: string,
+  baseUrl?: string
+): BaasClient {
+  // Create the client
+  const client = new BaasClient({
+    apiKey,
+    baseUrl,
+  });
+
+  // Register the tools
+  registerTools(tools, registerFn).catch((error) => {
+    console.error("Error registering tools:", error);
+  });
+
+  return client;
+}
 
 // Try to dynamically load the generated tools
 // This allows us to run the registration even if the tools haven't been generated yet
@@ -50,8 +114,8 @@ async function loadGeneratedTools() {
   }
 }
 
-// Register tools with the MPC server
-async function registerTools() {
+// Main function to run from CLI
+async function main() {
   try {
     console.log(
       `Starting tool registration with MPC server at ${config.mpcServerUrl}...`
@@ -67,60 +131,45 @@ async function registerTools() {
       return;
     }
 
-    // Create MPC client
-    const mpcClient = new MpcClient({
-      serverUrl: config.mpcServerUrl,
-      protocolVersion: config.protocolVersion,
-    });
+    console.log(`Found ${allTools.length} tools to register`);
 
-    // Register each tool
-    for (const tool of allTools) {
-      console.log(`Registering tool: ${tool.name}`);
-      mpcClient.registerTool(tool);
-    }
-
-    // Generate registration payload
-    const registrationPayload = mpcClient.generateToolsRegistration();
-
+    // In CLI mode, just show the tool names and schema
     if (config.debug) {
-      console.log(
-        "Registration payload:",
-        JSON.stringify(registrationPayload, null, 2)
-      );
+      for (const tool of allTools) {
+        console.log(`Tool: ${tool.name}`);
+        console.log(`  Description: ${tool.description}`);
+        console.log(
+          `  Parameters: ${JSON.stringify(tool.parameters, null, 2)}`
+        );
+        console.log("-".repeat(40));
+      }
     }
 
     console.log(
-      `Successfully registered ${allTools.length} tools with the MPC server.`
+      "To use these tools in your MPC server, add this to your code:"
     );
-    console.log("Tool registration complete!");
+    console.log(`
+import { registerTools, allTools } from "@meeting-baas/sdk/tools";
+import { BaasClient } from "@meeting-baas/sdk";
 
-    // In a real implementation, you would send this payload to the MPC server
-    // For now, we just show how to generate it
-    console.log("----------------------------------------");
-    console.log(
-      "To complete registration, send this JSON-RPC payload to your MPC server:"
-    );
-    console.log(JSON.stringify(registrationPayload, null, 2));
-    console.log("----------------------------------------");
-  } catch (error) {
-    console.error("Error registering tools:", error);
-    process.exit(1);
-  }
-}
+// Create a client for making actual API calls
+const client = new BaasClient({
+  apiKey: "your-api-key"
+});
 
-// Main function
-async function main() {
-  try {
-    await registerTools();
+// Register all tools with your MPC server
+registerTools(allTools, (tool) => {
+  // Your server's registration function
+  server.registerTool(tool);
+});
+    `);
   } catch (error) {
     console.error("Error in main function:", error);
     process.exit(1);
   }
 }
 
-// Run the registration
+// Run the registration if this script is executed directly
 if (require.main === module) {
   main();
 }
-
-export { registerTools };

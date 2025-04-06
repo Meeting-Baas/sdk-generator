@@ -61,8 +61,10 @@ function processTools() {
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `const ${toolName}_tool = require('./${toolName}').${toolName}_tool;
-exports.${toolName}_tool = ${toolName}_tool;`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `const ${safeVarName}_tool = require('./${toolName}').${safeVarName}_tool;
+exports.${safeVarName}_tool = ${safeVarName}_tool;`;
   })
   .join("\n\n")}
 
@@ -71,7 +73,9 @@ exports.allTools = [
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `  ${toolName}_tool,`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `  ${safeVarName}_tool,`;
   })
   .join("\n")}
 ];
@@ -83,6 +87,18 @@ ${toolFiles
     // Create stub files for each tool
     toolFiles.forEach((file) => {
       const toolName = path.basename(file, ".ts");
+      // Replace dots with underscores for valid JS identifiers
+      const safeVarName = toolName.replace(/\./g, "_");
+
+      // Create a valid camelCase function name for the execute function
+      const parts = safeVarName.split("_");
+      const functionName =
+        parts[0] +
+        parts
+          .slice(1)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join("");
+
       const toolJs = `/**
  * ${toolName} MPC Tool
  * 
@@ -96,20 +112,17 @@ ${toolFiles
 const { MpcTools } = require('../index');
 
 // Create tool definition
-const ${toolName}_tool = MpcTools.createTool(
+const ${safeVarName}_tool = MpcTools.createTool(
   "${toolName.replace(/_/g, "-")}",
   "Generated tool for ${toolName.replace(/_/g, " ")}",
   []
 );
 
 // Export the tool
-exports.${toolName}_tool = ${toolName}_tool;
+exports.${safeVarName}_tool = ${safeVarName}_tool;
 
 // Export the execution function
-exports.execute${toolName
-        .split("_")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join("")} = async function(args, context, baasClient) {
+exports.execute${functionName} = async function(args, context, baasClient) {
   try {
     return \`This is a stub implementation for ${toolName}. Please check the documentation for proper usage.\`;
   } catch (error) {
@@ -138,8 +151,10 @@ exports.execute${toolName
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `const ${toolName}_tool = require('./tools/${toolName}').${toolName}_tool;
-exports.${toolName}_tool = ${toolName}_tool;`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `const ${safeVarName}_tool = require('./tools/${toolName}').${safeVarName}_tool;
+exports.${safeVarName}_tool = ${safeVarName}_tool;`;
   })
   .join("\n\n")}
 
@@ -148,15 +163,33 @@ exports.allTools = [
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `  ${toolName}_tool,`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `  ${safeVarName}_tool,`;
   })
   .join("\n")}
 ];
 
-// Export SDK utility methods
+// Export utility functions for tool registration
 exports.registerTools = require('./bundle').registerTools;
+exports.setupBaasTools = require('./bundle').setupBaasTools;
 exports.BaasClient = require('./index').BaasClient;
 exports.SDK_MODE = "MPC_TOOLS";
+
+// Export helper functions
+exports.getToolByName = function(name) {
+  return exports.allTools.find(tool => tool.name === name);
+};
+
+exports.registerAllTools = async function(registerFn, apiKey) {
+  for (const tool of exports.allTools) {
+    try {
+      await registerFn(tool);
+    } catch (error) {
+      console.error(\`Failed to register tool \${tool.name}:\`, error);
+    }
+  }
+};
 `;
     fs.writeFileSync(path.join(DIST_DIR, "tools.js"), toolsIndexCjs);
 
@@ -173,7 +206,9 @@ exports.SDK_MODE = "MPC_TOOLS";
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `export { ${toolName}_tool } from './tools/${toolName}';`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `export { ${safeVarName}_tool } from './tools/${toolName}';`;
   })
   .join("\n")}
 
@@ -182,15 +217,32 @@ export const allTools = [
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `  ${toolName}_tool,`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `  ${safeVarName}_tool,`;
   })
   .join("\n")}
 ];
 
-// Export SDK utility methods
-export { registerTools } from './bundle';
+// Export utility functions for tool registration
+export { registerTools, setupBaasTools } from './bundle';
 export { BaasClient } from './index';
 export const SDK_MODE = "MPC_TOOLS";
+
+// Export helper functions
+export function getToolByName(name) {
+  return allTools.find(tool => tool.name === name);
+}
+
+export async function registerAllTools(registerFn, apiKey) {
+  for (const tool of allTools) {
+    try {
+      await registerFn(tool);
+    } catch (error) {
+      console.error(\`Failed to register tool \${tool.name}:\`, error);
+    }
+  }
+}
 `;
     fs.writeFileSync(path.join(DIST_DIR, "tools.mjs"), toolsIndexEsm);
 
@@ -210,20 +262,47 @@ import { BaasClient } from './index';
 ${toolFiles
   .map((file) => {
     const toolName = path.basename(file, ".ts");
-    return `export declare const ${toolName}_tool: ToolDefinition;`;
+    // Replace dots with underscores for valid JS identifiers
+    const safeVarName = toolName.replace(/\./g, "_");
+    return `export declare const ${safeVarName}_tool: ToolDefinition;`;
   })
   .join("\n")}
 
 // Export allTools array for convenience
 export declare const allTools: ToolDefinition[];
 
-// Export SDK utility methods
+// Export utility functions for tool registration
 export declare function registerTools(
   tools: ToolDefinition[],
   registerFn: (tool: any) => Promise<void> | void
 ): Promise<void>;
+
+export declare function setupBaasTools(
+  tools: ToolDefinition[],
+  registerFn: (tool: any) => Promise<void> | void,
+  apiKey: string,
+  baseUrl?: string
+): BaasClient;
+
 export { BaasClient };
 export declare const SDK_MODE: string;
+
+// Export helper functions
+export declare function getToolByName(name: string): ToolDefinition | undefined;
+export declare function registerAllTools(
+  registerFn: (tool: ToolDefinition) => Promise<void> | void,
+  apiKey?: string
+): Promise<void>;
+
+// Export parameter types for TypeScript users
+export declare type ToolParameters = {
+  ${toolFiles
+    .map((file) => {
+      const toolName = path.basename(file, ".ts");
+      return `'${toolName}': Parameters<typeof ${toolName}_tool.handler>[0];`;
+    })
+    .join("\n  ")}
+};
 `;
     fs.writeFileSync(path.join(DIST_DIR, "tools.d.ts"), toolsIndexDts);
 

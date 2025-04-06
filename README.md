@@ -153,6 +153,103 @@ await client.scheduleRecordEvent(events[0].uuid, {
 });
 ```
 
+## MPC Server Integration
+
+The Meeting BaaS SDK comes with pre-generated MPC (Model Context Protocol) tools that can be easily integrated with any MPC server implementation. These tools are bundled by default and can be imported directly.
+
+### Simple Integration
+
+The simplest way to use the MPC tools:
+
+```typescript
+import { allTools, registerTools } from "@meeting-baas/sdk/tools";
+import { BaasClient } from "@meeting-baas/sdk";
+
+// Create a BaaS client with your API key
+const client = new BaasClient({
+  apiKey: process.env.MEETING_BAAS_API_KEY,
+});
+
+// Register all tools with your MPC server
+// Replace registerTool with your server's registration function
+registerTools(allTools, (tool) => {
+  server.registerTool(tool);
+});
+```
+
+### One-Line Setup
+
+For even simpler integration, use the `setupBaasTools` convenience function:
+
+```typescript
+import { allTools, setupBaasTools } from "@meeting-baas/sdk/tools";
+
+// Create a client and register all tools in one step
+const client = setupBaasTools(
+  allTools,
+  server.registerTool,
+  process.env.MEETING_BAAS_API_KEY
+);
+```
+
+### Using Specific Tools
+
+If you only need specific tools:
+
+```typescript
+import {
+  join_meeting_tool,
+  get_meeting_data_tool,
+  registerTools,
+} from "@meeting-baas/sdk/tools";
+
+// Register only the tools you need
+registerTools([join_meeting_tool, get_meeting_data_tool], server.registerTool);
+```
+
+### Accessing Tool Definitions
+
+The tool definitions include detailed parameter schemas and metadata:
+
+```typescript
+import { getToolByName } from "@meeting-baas/sdk/tools";
+
+// Get a specific tool by name
+const joinMeetingTool = getToolByName("join_meeting");
+console.log(joinMeetingTool.parameters); // View parameter schema
+```
+
+### Next.js API Route Example
+
+For Next.js applications:
+
+```typescript
+// app/api/mcp/route.ts
+import { allTools, registerTools } from "@meeting-baas/sdk/tools";
+import { BaasClient } from "@meeting-baas/sdk";
+import { McpServer } from "your-mcp-server-library";
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  // Initialize your MPC server
+  const server = new McpServer();
+
+  // Create BaaS client
+  const client = new BaasClient({
+    apiKey: process.env.MEETING_BAAS_API_KEY,
+  });
+
+  // Register tools
+  await registerTools(allTools, server.registerTool);
+
+  // Process the request with your MPC server
+  const result = await server.processRequest(messages);
+
+  return Response.json(result);
+}
+```
+
 ## Available MPC Tools
 
 The SDK includes pre-generated MPC tools for all API endpoints that can be directly imported and used in your MPC server implementation.

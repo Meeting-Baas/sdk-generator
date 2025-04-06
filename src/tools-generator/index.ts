@@ -10,9 +10,9 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import {
-  BotsApi,
   CalendarsApi,
   Configuration,
+  DefaultApi,
   WebhooksApi,
 } from "../generated/baas";
 import { loadEnv } from "./load-env";
@@ -88,6 +88,7 @@ function getEndpointInfo(methodName: string): string {
     const apiFiles = [
       "src/generated/baas/api/default-api.ts",
       "src/generated/baas/api/calendars-api.ts",
+      "src/generated/baas/api/webhooks-api.ts",
     ];
     let endpointInfo = "";
 
@@ -209,7 +210,7 @@ Meeting BaaS API Overview:
 - Supports both direct meeting interaction and scheduled recordings via calendars
 
 The SDK wraps the following main API categories:
-1. Bot Management:
+1. Bot Management (DefaultApi):
    - Join meetings with customizable bot parameters
    - Leave meetings and clean up resources
    - Get recording data and transcripts
@@ -217,13 +218,18 @@ The SDK wraps the following main API categories:
    - List bots with metadata and filtering options
    - Retranscribe audio with different providers
 
-2. Calendar Integration:
+2. Calendar Integration (CalendarsApi):
    - List and integrate calendars from Google and Microsoft
    - Create, update, and delete calendar connections 
    - List and filter calendar events
    - Get detailed event information
    - Schedule recordings for specific events or recurring series
    - Update bot configurations for scheduled recordings
+   
+3. Webhooks Documentation (WebhooksApi):
+   - Get documentation about webhook events
+   - Understand bot webhook event formats
+   - Learn about calendar webhook notifications
 `;
 
   const prompt = `
@@ -373,12 +379,12 @@ async function loadExampleTools(): Promise<string> {
 // Generate all tool definitions
 async function generateAllToolDefinitions(): Promise<Record<string, string>> {
   const config = new Configuration({ apiKey: "dummy-key" });
-  const botsApi = new BotsApi(config);
+  const defaultApi = new DefaultApi(config);
   const calendarsApi = new CalendarsApi(config);
   const webhooksApi = new WebhooksApi(config);
 
   // Get methods from each API
-  const botsMethods = getClassMethods(botsApi).filter(
+  const botsMethods = getClassMethods(defaultApi).filter(
     (method) => !method.startsWith("_")
   );
   const calendarsMethods = getClassMethods(calendarsApi).filter(
@@ -390,7 +396,7 @@ async function generateAllToolDefinitions(): Promise<Record<string, string>> {
 
   // Combine all methods
   const allMethods = [
-    ...botsMethods.map((m) => `BotsApi.${m}`),
+    ...botsMethods.map((m) => `DefaultApi.${m}`),
     ...calendarsMethods.map((m) => `CalendarsApi.${m}`),
     ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
   ];
@@ -496,6 +502,38 @@ export const allTools: ToolDefinition[] = [
     })
     .join(",\n  ")}
 ];
+
+// Export convenient method to register all tools with an MPC server
+export async function registerAllTools(
+  registerFn: (tool: ToolDefinition) => Promise<void> | void,
+  apiKey?: string
+): Promise<void> {
+  for (const tool of allTools) {
+    try {
+      await registerFn(tool);
+    } catch (error) {
+      console.error(\`Failed to register tool \${tool.name}:\`, error);
+    }
+  }
+}
+
+// Export helper to get a specific tool by name
+export function getToolByName(name: string): ToolDefinition | undefined {
+  return allTools.find(tool => tool.name === name);
+}
+
+// Export a type map of all tool parameters for TypeScript users
+export type ToolParameters = {
+  ${Object.keys(toolDefinitions)
+    .map((method) => {
+      const snakeCaseName = method
+        .replace(/([A-Z])/g, "_$1")
+        .toLowerCase()
+        .replace(/^_/, "");
+      return `'${snakeCaseName}': Parameters<typeof ${snakeCaseName}_tool.handler>[0];`;
+    })
+    .join("\n  ")}
+};
 `;
 
   fs.writeFileSync(path.join(config.outputDir, "index.ts"), indexCode);
@@ -511,12 +549,12 @@ async function main() {
 
     // Get all API instances
     const config = new Configuration({ apiKey: "dummy-key" });
-    const botsApi = new BotsApi(config);
+    const defaultApi = new DefaultApi(config);
     const calendarsApi = new CalendarsApi(config);
     const webhooksApi = new WebhooksApi(config);
 
     // Get methods from each API
-    const botsMethods = getClassMethods(botsApi).filter(
+    const botsMethods = getClassMethods(defaultApi).filter(
       (method) => !method.startsWith("_")
     );
     const calendarsMethods = getClassMethods(calendarsApi).filter(
@@ -528,7 +566,7 @@ async function main() {
 
     // Combine all methods
     const allMethods = [
-      ...botsMethods.map((m) => `BotsApi.${m}`),
+      ...botsMethods.map((m) => `DefaultApi.${m}`),
       ...calendarsMethods.map((m) => `CalendarsApi.${m}`),
       ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
     ];
