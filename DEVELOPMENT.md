@@ -157,17 +157,35 @@ node scripts/prepare-bundle.js
 
 #### Quick Build for Publishing
 
-For publishing (regenerates everything):
+There are now two main publishing-related scripts:
 
 ```bash
-pnpm prepublishOnly
+# 1. Prepare a full release (when making significant changes or version bumps)
+pnpm prepare-release
+
+# 2. Publish the package (after preparing it)
+pnpm publish
 ```
 
-This runs:
+The scripts do the following:
 
-- TypeScript linting
-- Builds the bundle (including regenerating tools)
-- No LLM keys required for the final bundling
+- **prepare-release**: Comprehensive preparation for a new release
+
+  - Runs TypeScript linting
+  - Builds the complete bundle (including regenerating tools)
+  - Generates documentation
+  - Use this when creating a new version or significant update
+
+- **prepublishOnly**: Lightweight check before publishing
+  - Only runs `bundle:test` to verify the package is correctly built
+  - Does NOT rebuild anything or make API calls
+  - This makes publishing faster and prevents unnecessary regeneration
+
+This separation allows for:
+
+1. Thorough preparation of releases when needed
+2. Quick publishing without rebuilding everything
+3. Prevention of unnecessary API calls to Anthropic during publishing
 
 ## Environment Variables
 

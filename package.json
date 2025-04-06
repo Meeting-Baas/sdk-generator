@@ -45,7 +45,8 @@
     "bundle:build": "pnpm build && pnpm tools:generate && node scripts/prepare-bundle.js",
     "bundle:test": "node scripts/test-bundle.js",
     "docs:generate": "node scripts/generate-docs.js",
-    "prepublishOnly": "pnpm lint && pnpm bundle:build && pnpm docs:generate"
+    "prepublishOnly": "pnpm bundle:test",
+    "prepare-release": "pnpm lint && pnpm bundle:build && pnpm docs:generate"
   },
   "publishConfig": {
     "access": "public"
