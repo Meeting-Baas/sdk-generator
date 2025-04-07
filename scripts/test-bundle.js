@@ -130,6 +130,182 @@ try {
   console.log("\n2. Testing tools export (@meeting-baas/sdk/tools)...");
   const toolsExport = require("../dist/tools.js");
 
+  // ENHANCED DIAGNOSTICS - Added for easier manual troubleshooting
+  console.log("\n📊 TOOLS EXPORT DIAGNOSTICS:");
+  console.log("Export type:", typeof toolsExport);
+  console.log("Export keys:", Object.keys(toolsExport));
+
+  // Check main tools.js file
+  console.log("\n📄 EXAMINING MAIN TOOLS.JS FILE:");
+  const mainToolsPath = path.resolve(__dirname, "..", "dist/tools.js");
+  if (fs.existsSync(mainToolsPath)) {
+    try {
+      const toolsContent = fs.readFileSync(mainToolsPath, "utf8");
+      const contentSnippet = toolsContent.substring(0, 1000) + "..."; // Just show the first 1000 chars
+
+      console.log(
+        "tools.js file size:",
+        (toolsContent.length / 1024).toFixed(2),
+        "KB"
+      );
+      console.log(
+        "tools.js imports from tools/index:",
+        toolsContent.includes("require('./tools/index')")
+      );
+      console.log(
+        "tools.js contains 'allTools':",
+        toolsContent.includes("allTools")
+      );
+
+      // Check how allTools might be imported
+      const requireMatch = toolsContent.match(
+        /(?:const|var|let)\s+(\w+)\s*=\s*require\(['"]\.\/tools\/index['"]\)/
+      );
+      if (requireMatch) {
+        const importVar = requireMatch[1];
+        console.log(`Found import from tools/index as variable: ${importVar}`);
+
+        // Check if that variable's allTools is exported
+        const reexportMatch = toolsContent.match(
+          new RegExp(`exports\\.allTools\\s*=\\s*${importVar}\\.allTools`)
+        );
+        if (reexportMatch) {
+          console.log("✓ Properly re-exports allTools from tools/index");
+        } else {
+          console.log("❌ Missing re-export of allTools from tools/index");
+        }
+      }
+
+      // Look for specific object spread pattern that might be problematic
+      if (
+        toolsContent.match(
+          /Object\.assign\(exports,\s*require\(['"]\.\/tools\/index['"]\)\)/
+        )
+      ) {
+        console.log("Found Object.assign(exports, require('./tools/index'))");
+      }
+
+      if (toolsContent.match(/\.\.\.require\(['"]\.\/tools\/index['"]\)/)) {
+        console.log("Found ...require('./tools/index') spread syntax");
+      }
+    } catch (error) {
+      console.error("Failed to read tools.js:", error.message);
+    }
+  } else {
+    console.error("❌ Main tools.js file not found at", mainToolsPath);
+  }
+
+  if (toolsExport) {
+    console.log(
+      "Has allTools property:",
+      Object.hasOwnProperty.call(toolsExport, "allTools")
+    );
+    console.log("allTools type:", typeof toolsExport.allTools);
+    console.log(
+      "Has registerTools property:",
+      Object.hasOwnProperty.call(toolsExport, "registerTools")
+    );
+    console.log("registerTools type:", typeof toolsExport.registerTools);
+  }
+
+  // Simple check of tools directory contents
+  const toolsDirPath = path.resolve(__dirname, "..", "dist/tools");
+  console.log("\n📂 TOOLS DIRECTORY CONTENTS:");
+
+  if (fs.existsSync(toolsDirPath)) {
+    const toolsDirFiles = fs.readdirSync(toolsDirPath);
+    console.log(`Found ${toolsDirFiles.length} files in tools directory.`);
+
+    // Check for index.js specifically
+    if (toolsDirFiles.includes("index.js")) {
+      console.log("✓ index.js found in tools directory");
+
+      // Examine index.js briefly to see if allTools is exported
+      try {
+        const indexContent = fs.readFileSync(
+          path.join(toolsDirPath, "index.js"),
+          "utf8"
+        );
+        console.log(
+          "index.js contains 'allTools':",
+          indexContent.includes("allTools")
+        );
+        console.log(
+          "index.js contains 'exports.allTools':",
+          indexContent.includes("exports.allTools")
+        );
+        console.log(
+          "index.js contains 'registerTools':",
+          indexContent.includes("registerTools")
+        );
+
+        // Add more detailed analysis of the index.js file
+        console.log("\nAnalyzing how allTools is defined and exported:");
+
+        // Look for allTools definition
+        const allToolsDefMatch = indexContent.match(
+          /(?:const|var|let)\s+allTools\s*=\s*\[([\s\S]*?)\];/
+        );
+        if (allToolsDefMatch) {
+          console.log("✓ Found allTools definition");
+          // Count how many tools are in the array
+          const toolsCount = (allToolsDefMatch[1].match(/,/g) || []).length + 1;
+          console.log(`  Contains approximately ${toolsCount} tools`);
+        } else {
+          console.log("❌ Could not find allTools definition");
+        }
+
+        // Look for exports.allTools assignment
+        const exportsMatch = indexContent.match(
+          /exports\.allTools\s*=\s*allTools/
+        );
+        if (exportsMatch) {
+          console.log("✓ Found proper exports.allTools assignment");
+        } else {
+          console.log("❌ Missing exports.allTools assignment");
+        }
+
+        // Check for export * from syntax
+        const exportStarMatch = indexContent.match(/exports\.\* from/g);
+        if (exportStarMatch) {
+          console.log(
+            `Found ${exportStarMatch.length} 'export * from' statements`
+          );
+        }
+
+        // Check for module.exports
+        if (indexContent.includes("module.exports")) {
+          console.log("⚠️ Found module.exports style (CommonJS)");
+        }
+
+        // Check for export default
+        if (indexContent.includes("export default")) {
+          console.log("⚠️ Found export default style (ESM)");
+        }
+      } catch (error) {
+        console.error("Failed to read index.js:", error.message);
+      }
+    } else {
+      console.error("❌ index.js is missing from tools directory!");
+    }
+
+    // List some tool files (limit to 5 to avoid cluttering output)
+    const toolFiles = toolsDirFiles.filter(
+      (f) => f !== "index.js" && f.endsWith(".js")
+    );
+    console.log("\nSample tool files:");
+    toolFiles.slice(0, 5).forEach((file) => console.log(` - ${file}`));
+
+    if (toolFiles.length > 5) {
+      console.log(`... and ${toolFiles.length - 5} more tool files`);
+    }
+  } else {
+    console.error("❌ tools directory not found at", toolsDirPath);
+  }
+
+  console.log("\n--- End of Enhanced Diagnostics ---\n");
+  // END OF ENHANCED DIAGNOSTICS
+
   // Check for allTools array
   if (!toolsExport.allTools || !Array.isArray(toolsExport.allTools)) {
     console.error("Missing allTools array in tools export!");
@@ -367,4 +543,122 @@ try {
 } catch (error) {
   console.error("Error testing bundle:", error);
   process.exit(1);
+}
+
+// Create a standalone debug script if requested
+if (process.argv.includes("--generate-debug")) {
+  console.log("\n🔍 Generating standalone debug script...");
+
+  const debugScriptContent = `#!/usr/bin/env node
+/**
+ * Tools Export Debug Script
+ * 
+ * This script helps diagnose issues with the tools export in the Meeting BaaS SDK.
+ * Run it with: node debug-tools.js
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+console.log("\\n🔍 MEETING BAAS SDK TOOLS DIAGNOSIS\\n");
+
+try {
+  // Check file existence first
+  console.log("Checking for tools.js file...");
+  const toolsPath = path.resolve(__dirname, "dist/tools.js");
+  
+  if (!fs.existsSync(toolsPath)) {
+    console.error("❌ tools.js file not found at:", toolsPath);
+    console.log("Make sure you've built the project with: pnpm bundle:build");
+    process.exit(1);
+  }
+  
+  console.log("✓ Found tools.js file");
+  
+  // Check the tools directory
+  console.log("\\nChecking tools directory...");
+  const toolsDir = path.resolve(__dirname, "dist/tools");
+  
+  if (!fs.existsSync(toolsDir)) {
+    console.error("❌ tools directory not found at:", toolsDir);
+    process.exit(1);
+  }
+  
+  const toolsFiles = fs.readdirSync(toolsDir);
+  console.log(\`✓ Found tools directory with \${toolsFiles.length} files\`);
+  
+  if (toolsFiles.includes("index.js")) {
+    console.log("✓ Found index.js in tools directory");
+  } else {
+    console.error("❌ index.js is missing from tools directory!");
+  }
+  
+  // Try to load the tools export
+  console.log("\\nLoading tools.js export...");
+  const toolsExport = require("./dist/tools.js");
+  
+  console.log("Tools export type:", typeof toolsExport);
+  console.log("\\nExported properties:");
+  Object.keys(toolsExport).forEach(key => {
+    console.log(\` - \${key}: \${typeof toolsExport[key]}\`);
+  });
+  
+  if (toolsExport.allTools) {
+    if (Array.isArray(toolsExport.allTools)) {
+      console.log(\`\\n✓ Found allTools array with \${toolsExport.allTools.length} tools\`);
+      
+      if (toolsExport.allTools.length > 0) {
+        console.log("\\nSample tool structure:");
+        console.log(JSON.stringify(toolsExport.allTools[0], null, 2));
+        
+        console.log("\\nAll tool names:");
+        toolsExport.allTools.forEach(tool => {
+          console.log(\` - \${tool.name}\`);
+        });
+      } else {
+        console.error("❌ allTools array is empty!");
+      }
+    } else {
+      console.error(\`❌ allTools is not an array! Type: \${typeof toolsExport.allTools}\`);
+    }
+  } else {
+    console.error("❌ allTools property not found in export!");
+    
+    // Check index.js content to see if allTools is there but not exported properly
+    console.log("\\nChecking index.js content for allTools...");
+    try {
+      const indexContent = fs.readFileSync(path.join(toolsDir, "index.js"), "utf8");
+      console.log("index.js contains 'allTools':", indexContent.includes("allTools"));
+      console.log("index.js contains 'exports.allTools':", indexContent.includes("exports.allTools"));
+      
+      // Show a snippet of code around allTools if found
+      const allToolsIdx = indexContent.indexOf("allTools");
+      if (allToolsIdx !== -1) {
+        const startIdx = Math.max(0, allToolsIdx - 100);
+        const endIdx = Math.min(indexContent.length, allToolsIdx + 300);
+        console.log("\\nCode snippet around allTools definition:");
+        console.log(indexContent.substring(startIdx, endIdx));
+      }
+    } catch (error) {
+      console.error("Failed to read index.js:", error.message);
+    }
+  }
+  
+  // Check registerTools function
+  if (typeof toolsExport.registerTools === "function") {
+    console.log("\\n✓ registerTools function found");
+  } else {
+    console.error(\`❌ registerTools is not a function! Type: \${typeof toolsExport.registerTools}\`);
+  }
+  
+  console.log("\\n✅ Debug complete");
+} catch (error) {
+  console.error("\\n❌ Error running debug script:", error);
+  process.exit(1);
+}
+`;
+
+  fs.writeFileSync("debug-tools.js", debugScriptContent);
+  console.log("✓ Debug script generated: debug-tools.js");
+  console.log("Run it with: node debug-tools.js");
 }
