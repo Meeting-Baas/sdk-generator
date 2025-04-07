@@ -135,6 +135,35 @@ try {
   exportMatches.forEach((match) => {
     console.log(`- ${match.trim()}`);
   });
+
+  // Look for schema exports specifically
+  console.log("\nLooking for schema exports in index.js:");
+  const schemaMatches = indexJsContent.match(/exports\.(\w+Schema)\s*=/g) || [];
+  if (schemaMatches.length > 0) {
+    console.log("Found schema exports in index.js:");
+    schemaMatches.forEach((match) => {
+      const schemaName = match.match(/exports\.(\w+)\s*=/)[1];
+      console.log(`- ${schemaName}`);
+    });
+  } else {
+    console.log("No schema exports found in index.js");
+  }
+
+  // Look for Zod imports or references
+  if (indexJsContent.includes("zod")) {
+    console.log("Found references to 'zod' in index.js");
+  }
+
+  // Check for type exports
+  const typeExportMatches =
+    indexJsContent.match(/export\s+type\s+(\w+)/g) || [];
+  if (typeExportMatches.length > 0) {
+    console.log("Found type exports in index.js:");
+    typeExportMatches.forEach((match) => {
+      console.log(`- ${match}`);
+    });
+  }
+
   console.log("=== END OF IMPORT/EXPORT PATTERNS ===\n");
 
   // Check if allTools is already exported
@@ -159,7 +188,23 @@ try {
     // Add the re-export at the end of the file
     updatedContent =
       toolsJsContent +
-      `\n\n// Added by fix-tools-export.js\nexports.allTools = ${importVar}.allTools;\n`;
+      `\n\n// Added by fix-tools-export.js\n` +
+      `// Re-exporting allTools\n` +
+      `exports.allTools = ${importVar}.allTools;\n\n` +
+      `// Re-exporting any schemas that might exist\n` +
+      `// Common schema naming patterns\n` +
+      `for (const key in ${importVar}) {\n` +
+      `  // Export anything that looks like a schema (ends with Schema)\n` +
+      `  if (key.endsWith('Schema')) {\n` +
+      `    exports[key] = ${importVar}[key];\n` +
+      `    console.log('Re-exported schema: ' + key);\n` +
+      `  }\n` +
+      `  // Also export any types\n` +
+      `  if (key === 'ToolParameters' || key === 'ToolSchema') {\n` +
+      `    exports[key] = ${importVar}[key];\n` +
+      `    console.log('Re-exported type: ' + key);\n` +
+      `  }\n` +
+      `}\n`;
   } else {
     // We didn't find a clean import, so add a new one
     console.log("No import from tools/index found, adding a new one");
@@ -171,6 +216,20 @@ try {
 // Added by fix-tools-export.js
 const toolsIndex = require('./tools/index');
 exports.allTools = toolsIndex.allTools;
+
+// Re-export any schemas that might exist
+for (const key in toolsIndex) {
+  // Export anything that looks like a schema (ends with Schema)
+  if (key.endsWith('Schema')) {
+    exports[key] = toolsIndex[key];
+    console.log('Re-exported schema: ' + key);
+  }
+  // Also export any types
+  if (key === 'ToolParameters' || key === 'ToolSchema') {
+    exports[key] = toolsIndex[key];
+    console.log('Re-exported type: ' + key);
+  }
+}
 `;
   }
 
@@ -196,6 +255,20 @@ try {
   if (toolsIndex && toolsIndex.allTools) {
     exports.allTools = toolsIndex.allTools;
     console.log('Successfully exported allTools from tools/index.js');
+    
+    // Also export any schemas that might exist
+    for (const key in toolsIndex) {
+      // Export anything that looks like a schema (ends with Schema)
+      if (key.endsWith('Schema')) {
+        exports[key] = toolsIndex[key];
+        console.log('Re-exported schema: ' + key);
+      }
+      // Also export any types
+      if (key === 'ToolParameters' || key === 'ToolSchema') {
+        exports[key] = toolsIndex[key];
+        console.log('Re-exported type: ' + key);
+      }
+    }
   } else {
     console.error('Failed to find allTools in tools/index.js');
     

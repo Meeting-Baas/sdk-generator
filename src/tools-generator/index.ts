@@ -149,7 +149,7 @@ function generateSimpleStubToolDefinition(methodName: string): string {
    .join("\n")}
  */
 export const ${toolName}_tool: ToolDefinition = MpcTools.createTool(
-  '${toolName}',
+  '${toolName.replace(/_/g, "-")}',
   'Stub tool for ${methodName} method',
   [
     // Define parameters here based on the method signature
@@ -160,6 +160,18 @@ export const ${toolName}_tool: ToolDefinition = MpcTools.createTool(
     ),
   ]
 );
+
+/**
+ * Schema definition for runtime validation of ${methodName} parameters
+ */
+export const ${toolName}_schema = {
+  type: "object",
+  properties: {
+    api_key: { type: "string" },
+    // Add other parameters based on method signature
+  },
+  required: ["api_key"]
+};
 
 /**
  * Execution function for the ${toolName} tool
@@ -473,12 +485,18 @@ ${Object.keys(toolDefinitions)
         .replace(/([A-Z])/g, "_$1")
         .toLowerCase()
         .replace(/^_/, "") + "_tool";
+    const schemaName =
+      method
+        .replace(/\./g, "_")
+        .replace(/([A-Z])/g, "_$1")
+        .toLowerCase()
+        .replace(/^_/, "") + "_schema";
     const fileName = method
       .replace(/\./g, "_")
       .replace(/([A-Z])/g, "_$1")
       .toLowerCase()
       .replace(/^_/, "");
-    return `import { ${toolName} } from './${fileName}';`;
+    return `import { ${toolName}, ${schemaName} } from './${fileName}';`;
   })
   .join("\n")}
 
@@ -509,6 +527,22 @@ export const allTools: ToolDefinition[] = [
     .join(",\n  ")}
 ];
 
+// Export all schemas in a map for easy validation
+export const allSchemas = {
+  ${Object.keys(toolDefinitions)
+    .map((method) => {
+      const snakeCaseName = method
+        .replace(/\./g, "_")
+        .replace(/([A-Z])/g, "_$1")
+        .toLowerCase()
+        .replace(/^_/, "");
+      const schemaName = snakeCaseName + "_schema";
+      const toolName = snakeCaseName.replace(/_/g, "-");
+      return `"${toolName}": ${schemaName},`;
+    })
+    .join("\n  ")}
+};
+
 // Export convenient method to register all tools with an MPC server
 export async function registerAllTools(
   registerFn: (tool: ToolDefinition) => Promise<void> | void,
@@ -526,6 +560,11 @@ export async function registerAllTools(
 // Export helper to get a specific tool by name
 export function getToolByName(name: string): ToolDefinition | undefined {
   return allTools.find(tool => tool.name === name);
+}
+
+// Export helper to get a schema by tool name
+export function getSchemaByName(name: string): any {
+  return allSchemas[name];
 }
 
 // Export a type map of all tool parameters for TypeScript users

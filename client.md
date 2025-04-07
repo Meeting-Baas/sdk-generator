@@ -1,10 +1,10 @@
-# Using Meeting BaaS SDK 0.3.0 with MPC Server
+# Using Meeting BaaS SDK 0.3.2 with MPC Server
 
 This guide explains how to leverage the pre-generated MPC tools in Meeting BaaS SDK 0.3.0 to simplify your MPC server implementation.
 
-## What's New in 0.3.0
+## What's New in 0.3.2
 
-Meeting BaaS SDK 0.3.0 includes **pre-generated MPC tools** for all API endpoints, eliminating the need to manually implement each tool. This significantly simplifies MPC server integration.
+Meeting BaaS SDK 0.3.2 includes **pre-generated MPC tools** for all API endpoints, eliminating the need to manually implement each tool. This significantly simplifies MPC server integration.
 
 ## Simplified MPC Server Implementation
 
@@ -198,7 +198,7 @@ export function registerMeetingTools(
 
 ## Benefit Summary
 
-By using the pre-generated tools in Meeting BaaS SDK 0.3.0, you:
+By using the pre-generated tools in Meeting BaaS SDK 0.3.2, you:
 
 1. **Eliminate manual tool implementation**: No need to write boilerplate for each API endpoint
 2. **Reduce maintenance**: Tool updates automatically when the SDK is updated
@@ -228,7 +228,7 @@ export const toolsSchemas = {
 };
 ```
 
-With the Meeting BaaS SDK 0.3.0, this manual work is no longer necessary. You can:
+With the Meeting BaaS SDK 0.3.2, this manual work is no longer necessary. You can:
 
 ### 1. Access Tool Parameters and Schemas Directly
 

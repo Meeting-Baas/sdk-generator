@@ -322,6 +322,24 @@ try {
   }
   console.log("✓ registerTools function export found");
 
+  // NEW: Check for allSchemas object
+  if (!toolsExport.allSchemas || typeof toolsExport.allSchemas !== "object") {
+    console.error("Missing allSchemas object in tools export!");
+    process.exit(1);
+  }
+  console.log(
+    `✓ allSchemas export found with ${
+      Object.keys(toolsExport.allSchemas).length
+    } schemas`
+  );
+
+  // NEW: Check for schema utility functions
+  if (typeof toolsExport.getSchemaByName !== "function") {
+    console.error("Missing getSchemaByName function in tools export!");
+    process.exit(1);
+  }
+  console.log("✓ getSchemaByName function export found");
+
   // Check for at least one tool
   const toolNames = toolsExport.allTools.map((tool) => tool.name).sort();
   if (toolNames.length === 0) {
@@ -332,7 +350,8 @@ try {
   console.log("\nTools export (@meeting-baas/sdk/tools) includes these tools:");
   toolNames.forEach((name) => console.log(` - ${name}`));
 
-  // Find specific required tools mentioned in the npm page
+  // NEW: Test individual schema exports for required tools
+  console.log("\nVerifying schema exports for required tools:");
   const requiredTools = [
     "default-api-join",
     "default-api-get-meeting-data",
@@ -341,6 +360,43 @@ try {
     "calendars-api-schedule-record-event",
   ];
 
+  // Test schema exports
+  for (const toolName of requiredTools) {
+    const schemaVarName = toolName.replace(/-/g, "_") + "_schema";
+
+    // Check if schema exists directly
+    if (!toolsExport[schemaVarName]) {
+      console.error(`Missing schema export: ${schemaVarName}`);
+      process.exit(1);
+    }
+
+    // Check schema is correctly structured
+    const schema = toolsExport[schemaVarName];
+    if (!schema.type || !schema.properties || !Array.isArray(schema.required)) {
+      console.error(`Invalid schema structure for ${schemaVarName}`);
+      process.exit(1);
+    }
+
+    // Check schema is in allSchemas
+    if (!toolsExport.allSchemas[toolName]) {
+      console.error(`Schema missing from allSchemas: ${toolName}`);
+      process.exit(1);
+    }
+
+    // Check schema can be retrieved via utility
+    const retrievedSchema = toolsExport.getSchemaByName(toolName);
+    if (!retrievedSchema) {
+      console.error(
+        `Failed to retrieve schema via getSchemaByName: ${toolName}`
+      );
+      process.exit(1);
+    }
+
+    console.log(`✓ Schema verified for ${toolName}`);
+  }
+  console.log("✓ All required schemas are present and properly structured");
+
+  // Find specific required tools mentioned in the npm page
   const missingTools = requiredTools.filter(
     (tool) => !toolNames.includes(tool)
   );
@@ -480,38 +536,56 @@ try {
   console.log("```typescript");
   console.log("// Import specific tools");
   console.log(
-    "import { default_api_join_tool, default_api_get_meeting_data_tool } from '@meeting-baas/sdk/tools';"
+    "import { default_api_join_tool, default_api_join_schema } from '@meeting-baas/sdk/tools';"
   );
   console.log("import { registerTool } from 'your-mpc-server';");
   console.log("");
   console.log("// Register with your MPC server");
   console.log("registerTool(default_api_join_tool);");
-  console.log("registerTool(default_api_get_meeting_data_tool);");
+  console.log("");
+  console.log("// Validate parameters using the schema");
+  console.log("function validateParams(params) {");
+  console.log("  const required = default_api_join_schema.required;");
+  console.log("  for (const field of required) {");
+  console.log("    if (params[field] === undefined) {");
+  console.log("      throw new Error(`Missing required field: ${field}`);");
+  console.log("    }");
+  console.log("  }");
+  console.log("  return true;");
+  console.log("}");
   console.log("```");
 
   // 2. Register all tools at once
   console.log("\n2. Register all tools at once:");
   console.log("```typescript");
   console.log(
-    "import { allTools, registerTools } from '@meeting-baas/sdk/tools';"
+    "import { allTools, allSchemas, registerTools } from '@meeting-baas/sdk/tools';"
   );
   console.log("import { registerTool } from 'your-mpc-server';");
   console.log("");
   console.log("// Register all tools with a single function");
   console.log("registerTools(allTools, registerTool);");
+  console.log("");
+  console.log("// Get schema for a specific tool");
+  console.log("const joinSchema = allSchemas['default-api-join'];");
   console.log("```");
 
   // 3. One-step setup with API key
   console.log("\n3. Quick setup with API key:");
   console.log("```typescript");
   console.log(
-    "import { allTools, setupBaasTools } from '@meeting-baas/sdk/tools';"
+    "import { allTools, getSchemaByName, setupBaasTools } from '@meeting-baas/sdk/tools';"
   );
   console.log("import { registerTool } from 'your-mpc-server';");
   console.log("");
   console.log("// Create a client and register tools in one step");
   console.log(
     "const client = setupBaasTools(allTools, registerTool, 'your-api-key');"
+  );
+  console.log("");
+  console.log("// Get a schema by tool name");
+  console.log(
+    "const getMeetingDataSchema = getSchemaByName('default-api-get-meeting-data');"
   );
   console.log("```");
 
@@ -649,6 +723,50 @@ try {
     console.log("\\n✓ registerTools function found");
   } else {
     console.error(\`❌ registerTools is not a function! Type: \${typeof toolsExport.registerTools}\`);
+  }
+  
+  // Check for schemas
+  console.log("\\n📋 CHECKING FOR SCHEMA EXPORTS:");
+  
+  // Check for allSchemas
+  if (toolsExport.allSchemas) {
+    console.log(\`Found allSchemas object with \${Object.keys(toolsExport.allSchemas).length} schemas\`);
+    
+    // Sample the first schema
+    const schemaKeys = Object.keys(toolsExport.allSchemas);
+    if (schemaKeys.length > 0) {
+      const firstSchemaKey = schemaKeys[0];
+      console.log(\`Sample schema for '\${firstSchemaKey}':\`);
+      console.log(JSON.stringify(toolsExport.allSchemas[firstSchemaKey], null, 2));
+    }
+  } else {
+    console.error("❌ allSchemas object not found in export!");
+  }
+  
+  // Check for getSchemaByName function
+  if (typeof toolsExport.getSchemaByName === "function") {
+    console.log("✓ getSchemaByName function found");
+    
+    // Try to use the function
+    if (toolsExport.allTools && toolsExport.allTools.length > 0) {
+      const firstToolName = toolsExport.allTools[0].name;
+      const schema = toolsExport.getSchemaByName(firstToolName);
+      console.log(\`Retrieved schema for '\${firstToolName}' using getSchemaByName: \${Boolean(schema)}\`);
+    }
+  } else {
+    console.error("❌ getSchemaByName function not found!");
+  }
+  
+  // Check for individual schema exports
+  if (toolsExport.allTools && toolsExport.allTools.length > 0) {
+    const firstToolName = toolsExport.allTools[0].name;
+    const schemaVarName = firstToolName.replace(/-/g, "_") + "_schema";
+    
+    if (toolsExport[schemaVarName]) {
+      console.log(\`✓ Found individual schema export: \${schemaVarName}\`);
+    } else {
+      console.error(\`❌ Missing individual schema export for \${firstToolName} (\${schemaVarName})\`);
+    }
   }
   
   console.log("\\n✅ Debug complete");
