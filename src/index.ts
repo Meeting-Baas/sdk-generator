@@ -11,4 +11,4 @@ export * as MpcTools from "./mpc/tools";
 export * as MpcTypes from "./mpc/types";
 
 // Export SDK version
-export const SDK_VERSION = "0.3.0";
+export const SDK_VERSION = "0.3.1";

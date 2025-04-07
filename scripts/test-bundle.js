@@ -158,11 +158,11 @@ try {
 
   // Find specific required tools mentioned in the npm page
   const requiredTools = [
-    "default-api.join",
-    "default-api.get-meeting-data",
-    "default-api.delete-data",
-    "calendars-api.list-calendars",
-    "calendars-api.schedule-record-event",
+    "default-api-join",
+    "default-api-get-meeting-data",
+    "default-api-delete-data",
+    "calendars-api-list-calendars",
+    "calendars-api-schedule-record-event",
   ];
 
   const missingTools = requiredTools.filter(
@@ -273,7 +273,7 @@ try {
   // Group tools by API category for better organization
   const toolsByCategory = {};
   toolNames.forEach((name) => {
-    const category = name.split(".")[0]; // e.g., "default-api", "calendars-api"
+    const category = name.split("-")[0]; // e.g., "default", "calendars"
     if (!toolsByCategory[category]) {
       toolsByCategory[category] = [];
     }
@@ -290,7 +290,7 @@ try {
 
       toolsByCategory[category].sort().forEach((name) => {
         // Convert tool name to valid JavaScript identifier (for import examples)
-        const jsName = name.replace(/\./g, "_").replace(/-/g, "_") + "_tool";
+        const jsName = name.replace(/-/g, "_") + "_tool";
         console.log(`  - ${name}`);
         console.log(`    import { ${jsName} } from '@meeting-baas/sdk/tools';`);
       });

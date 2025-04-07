@@ -130,6 +130,7 @@ function generateSimpleStubToolDefinition(methodName: string): string {
 
   // Convert camelCase to snake_case for the tool name
   const toolName = methodName
+    .replace(/\./g, "_")
     .replace(/([A-Z])/g, "_$1")
     .toLowerCase()
     .replace(/^_/, "");
@@ -429,6 +430,7 @@ async function writeToolDefinitions(
   // Write each tool definition to a separate file
   for (const [method, code] of Object.entries(toolDefinitions)) {
     const fileName = method
+      .replace(/\./g, "_")
       .replace(/([A-Z])/g, "_$1")
       .toLowerCase()
       .replace(/^_/, "");
@@ -467,10 +469,12 @@ ${Object.keys(toolDefinitions)
   .map((method) => {
     const toolName =
       method
+        .replace(/\./g, "_")
         .replace(/([A-Z])/g, "_$1")
         .toLowerCase()
         .replace(/^_/, "") + "_tool";
     const fileName = method
+      .replace(/\./g, "_")
       .replace(/([A-Z])/g, "_$1")
       .toLowerCase()
       .replace(/^_/, "");
@@ -482,6 +486,7 @@ ${Object.keys(toolDefinitions)
 ${Object.keys(toolDefinitions)
   .map((method) => {
     const snakeCaseName = method
+      .replace(/\./g, "_")
       .replace(/([A-Z])/g, "_$1")
       .toLowerCase()
       .replace(/^_/, "");
@@ -495,6 +500,7 @@ export const allTools: ToolDefinition[] = [
     .map((method) => {
       const toolName =
         method
+          .replace(/\./g, "_")
           .replace(/([A-Z])/g, "_$1")
           .toLowerCase()
           .replace(/^_/, "") + "_tool";
@@ -527,6 +533,7 @@ export type ToolParameters = {
   ${Object.keys(toolDefinitions)
     .map((method) => {
       const snakeCaseName = method
+        .replace(/\./g, "_")
         .replace(/([A-Z])/g, "_$1")
         .toLowerCase()
         .replace(/^_/, "");
