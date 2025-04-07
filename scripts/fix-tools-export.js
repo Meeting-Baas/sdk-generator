@@ -190,7 +190,11 @@ try {
       toolsJsContent +
       `\n\n// Added by fix-tools-export.js\n` +
       `// Re-exporting allTools\n` +
-      `exports.allTools = ${importVar}.allTools;\n\n` +
+      `exports.allTools = ${importVar}.allTools;\n` +
+      `// Re-exporting allSchemas\n` +
+      `exports.allSchemas = ${importVar}.allSchemas;\n` +
+      `// Re-exporting getSchemaByName\n` +
+      `exports.getSchemaByName = ${importVar}.getSchemaByName;\n\n` +
       `// Re-exporting any schemas that might exist\n` +
       `// Common schema naming patterns\n` +
       `for (const key in ${importVar}) {\n` +
@@ -216,6 +220,8 @@ try {
 // Added by fix-tools-export.js
 const toolsIndex = require('./tools/index');
 exports.allTools = toolsIndex.allTools;
+exports.allSchemas = toolsIndex.allSchemas;
+exports.getSchemaByName = toolsIndex.getSchemaByName;
 
 // Re-export any schemas that might exist
 for (const key in toolsIndex) {

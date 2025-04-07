@@ -78,6 +78,21 @@ This step:
 - Requires `ANTHROPIC_API_KEY` in `.env`
 - Generates TypeScript tool files in `dist/generated-tools/`
 - Creates tool definitions for each SDK method
+- **Extracts schemas from the OpenAPI spec** for parameter validation
+
+#### Schema Extraction
+
+The tools generator extracts schemas from the OpenAPI specification to:
+
+1. Generate accurate parameter definitions for MPC tools
+2. Create JSON schemas for runtime validation
+3. Support full type information including enums and complex objects
+
+The extraction process:
+
+- Maps OpenAPI types to JSON Schema types
+- Preserves enum values, descriptions, and required fields
+- Generates validation schemas that match the API contract
 
 ### 4. Bundle Build
 
@@ -93,6 +108,7 @@ This step:
 - Regenerates all MPC tools (calling the Anthropic API)
 - Compiles all tools to JavaScript
 - Creates the necessary exports in the `dist/` directory
+- Bundles parameter schemas and validation utilities
 
 ### 5. Bundle Without Regenerating Tools
 
@@ -105,6 +121,7 @@ node scripts/prepare-bundle.js
 This script:
 
 - Takes existing TypeScript tool definitions from `dist/generated-tools/`
+- Extracts parameter schemas and validation rules
 - Compiles them to JavaScript
 - Creates the bundled exports without regenerating the tools
 
@@ -153,6 +170,22 @@ pnpm tools:generate
 
 # 2. Create the bundle (without regenerating)
 node scripts/prepare-bundle.js
+```
+
+#### Schema Validation Workflow
+
+When adding or updating schema validation:
+
+```bash
+# 1. Modify schema-extractor.ts if needed
+# 2. Generate tools with updated schemas
+pnpm tools:generate
+
+# 3. Create the bundle
+node scripts/prepare-bundle.js
+
+# 4. Test validation
+pnpm bundle:test
 ```
 
 #### Quick Build for Publishing
@@ -209,24 +242,39 @@ The SDK includes an automatic MPC tool generation system that creates Claude Plu
 
 1. **Template-Based Generation**: The SDK uses example templates in `src/tools-generator/example-tool-templates.ts` to inform the tool generation process.
 
-2. **AI-Powered Generation**: When you run `pnpm tools:generate`, the system:
+2. **Schema Extraction**: The generator extracts schemas from the OpenAPI spec via `schema-extractor.ts`.
+
+   - Automatically converts OpenAPI parameters to tool parameters
+   - Preserves type information, enums, and validation constraints
+   - Generates JSON schemas for runtime validation
+
+3. **AI-Powered Generation**: When you run `pnpm tools:generate`, the system:
 
    - Analyzes all methods in the BaasClient SDK
    - Calls the Anthropic API with method signatures and example templates
    - Generates properly formatted MPC tool definitions for each SDK method
    - Writes these generated tools to the output directory (`dist/generated-tools`)
 
-3. **Generated Tool Structure**: Each generated tool includes:
+4. **Generated Tool Structure**: Each generated tool includes:
 
    - Properly defined parameters (with types, descriptions, and required flags)
    - Parameter conversion between snake_case (tool) and camelCase (SDK)
    - User-friendly formatting for complex responses
    - Comprehensive error handling
+   - Schema definitions for validation
 
-4. **Distribution**: All generated tools are:
+5. **Schema Validation**: The package includes validation utilities:
+
+   - JSON Schema definitions for all tool parameters
+   - Zod-based validation for type checking
+   - Functions to validate parameters before API calls
+   - Error reporting for invalid parameters
+
+6. **Distribution**: All generated tools are:
    - Built automatically during the bundling process
    - Included in the published package
    - Available via the `/tools` export path: `import { join_meeting_tool } from "@meeting-baas/sdk/tools"`
+   - Schema information available via `allSchemas` and `getSchemaByName`
 
 ### Testing MPC Tools
 
@@ -237,9 +285,63 @@ You can test the generated and bundled tools using:
 pnpm bundle:test
 
 # Or create a simple test script
-echo 'const { allTools } = require("./dist/tools"); console.log(`Loaded ${allTools.length} tools`);' > test.js
+echo 'const { allTools, allSchemas } = require("./dist/tools"); console.log(`Loaded ${allTools.length} tools with ${Object.keys(allSchemas).length} schemas`);' > test.js
 node test.js
 ```
+
+### Using Schema Validation
+
+The SDK provides schema validation utilities that can be used to validate parameters before calling API methods:
+
+```javascript
+const { allSchemas, validateParameters } = require("@meeting-baas/sdk/tools");
+
+// Get the schema for a specific tool
+const joinMeetingSchema = allSchemas["join-meeting"];
+
+// Validate parameters
+const params = {
+  api_key: "your-api-key",
+  bot_name: "My Bot",
+  meeting_url: "https://meet.google.com/abc-def-ghi",
+  // Missing required parameter: reserved
+};
+
+const validation = validateParameters(params, joinMeetingSchema);
+if (!validation.success) {
+  console.error("Parameter validation failed:", validation.errors);
+} else {
+  console.log("Parameters are valid");
+}
+```
+
+## Implementing Schema Extraction
+
+To implement or update the schema extraction:
+
+1. **Understand the OpenAPI Structure**:
+
+   - The SDK is generated from an OpenAPI spec
+   - The spec contains complete schema information for all endpoints
+
+2. **Create/Modify Schema Extractor**:
+
+   - Create `src/tools-generator/schema-extractor.ts` if it doesn't exist
+   - Implement functions to extract parameter types from the OpenAPI-generated SDK
+
+3. **Update Tools Generator**:
+
+   - Modify `src/tools-generator/index.ts` to use the schema extractor
+   - Update the tool generation templates to include schema information
+
+4. **Update Bundle Preparation**:
+
+   - Ensure `scripts/prepare-bundle.js` extracts schemas from generated tools
+   - Generate proper JSON schemas for validation
+
+5. **Add Validation Utilities**:
+   - Create `src/mpc/validation.ts` with Zod-based validation utilities
+   - Implement functions to validate parameters against schemas
 
 ## Contributing
 
@@ -266,7 +368,9 @@ src/
 ├── baas/           # BaaS client implementation
 ├── generated/      # Generated OpenAPI client
 ├── mpc/            # MPC tools and types
+│   └── validation.ts # Schema validation utilities
 ├── tools-generator/ # MPC tools generation
+│   └── schema-extractor.ts # OpenAPI schema extraction
 └── index.ts        # Main entry point
 
 dist/

@@ -114,14 +114,55 @@ exports.getSchemaByName = function(name) {
       // Replace dots with underscores for valid JS identifiers
       const safeVarName = toolName.replace(/\./g, "_");
 
-      // Create a valid camelCase function name for the execute function
-      const parts = safeVarName.split("_");
-      const functionName =
-        parts[0] +
-        parts
-          .slice(1)
-          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-          .join("");
+      // Read the TypeScript file to extract parameter definitions
+      const tsFilePath = path.join(GENERATED_TOOLS_DIR, file);
+      const tsContent = fs.readFileSync(tsFilePath, "utf8");
+
+      // Extract the schema definition from the file
+      const schemaMatch = tsContent.match(
+        /const\s+jsonSchema\s*=\s*({[\s\S]*?});/
+      );
+      let schemaObject = {
+        type: "object",
+        properties: { api_key: { type: "string" } },
+        required: ["api_key"],
+      };
+
+      if (schemaMatch && schemaMatch[1]) {
+        try {
+          // This is a safe way to evaluate the schema object
+          schemaObject = eval(`(${schemaMatch[1]})`);
+        } catch (error) {
+          console.warn(`Error parsing schema for ${toolName}: ${error}`);
+        }
+      }
+
+      // Extract parameters array from the file
+      const paramsMatch = tsContent.match(
+        /createTool\s*\(\s*["'][-\w]+["']\s*,\s*["'].*?["']\s*,\s*\[([\s\S]*?)\]\s*\)/
+      );
+      let parametersCode = "[]"; // Default empty array
+      if (paramsMatch && paramsMatch[1]) {
+        parametersCode = `[${paramsMatch[1]}]`;
+      }
+
+      // Format the schema as a string for inclusion in the JS file
+      const schemaPropsStr = JSON.stringify(schemaObject.properties, null, 2)
+        .replace(/"([^"]+)":/g, "$1:") // Convert "name": to name:
+        .replace(/^{/, "{\n    ") // Add indent after opening brace
+        .replace(/}$/, "\n  }") // Add indent before closing brace
+        .replace(/\n/g, "\n    "); // Add additional indent to all lines
+
+      // Format required fields array
+      const requiredFieldsStr = JSON.stringify(
+        schemaObject.required || [],
+        null,
+        2
+      )
+        .replace(/\[/, "[\n    ") // Add indent after opening bracket
+        .replace(/\]/, "\n  ]") // Add indent before closing bracket
+        .replace(/\n/g, "\n    ") // Add additional indent to all lines
+        .replace(/",/g, '",\n    '); // Add newline after each entry
 
       // Create a stub for tool definition
       const toolJs = `/**
@@ -140,17 +181,14 @@ const { MpcTools } = require('../index');
 const ${safeVarName}_tool = MpcTools.createTool(
   "${toolName.replace(/_/g, "-")}",
   "Generated tool for ${toolName.replace(/_/g, " ")}",
-  []
+  ${parametersCode}
 );
 
 // Create schema for validation
 const ${safeVarName}_schema = {
   type: "object",
-  properties: {
-    api_key: { type: "string" }
-    // Add other parameters as needed
-  },
-  required: ["api_key"]
+  properties: ${schemaPropsStr},
+  required: ${requiredFieldsStr}
 };
 
 // Export the tool and schema
@@ -158,7 +196,9 @@ exports.${safeVarName}_tool = ${safeVarName}_tool;
 exports.${safeVarName}_schema = ${safeVarName}_schema;
 
 // Export the execution function
-exports.execute${functionName} = async function(args, context, baasClient) {
+exports.execute${
+        safeVarName.charAt(0).toUpperCase() + safeVarName.slice(1)
+      } = async function(args, context, baasClient) {
   try {
     return \`This is a stub implementation for ${toolName}. Please check the documentation for proper usage.\`;
   } catch (error) {

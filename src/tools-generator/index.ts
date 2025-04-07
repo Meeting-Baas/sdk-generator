@@ -16,6 +16,7 @@ import {
   WebhooksApi,
 } from "../generated/baas";
 import { loadEnv } from "./load-env";
+import { extractMethodParameters } from "./schema-extractor";
 
 // Load environment variables from .env file if present
 loadEnv();
@@ -207,6 +208,33 @@ async function generateToolDefinition(
   // Get method info to provide to the LLM
   const methodInfo = getMethodInfo(methodName);
   const endpointInfo = getEndpointInfo(methodName);
+
+  // Extract method class name and operation name
+  const parts = methodName.split(".");
+  const apiClass = parts[0];
+  const operationName = parts[1];
+
+  // Extract parameters and schemas from the OpenAPI spec
+  let parameters = [];
+  let jsonSchema = null;
+
+  try {
+    const extracted = extractMethodParameters(apiClass, operationName);
+    parameters = extracted.parameters;
+    jsonSchema = extracted.jsonSchema;
+  } catch (error) {
+    console.warn(`Error extracting parameters for ${methodName}: ${error}`);
+    // Fall back to empty parameters
+    parameters = [];
+    jsonSchema = {
+      type: "object",
+      properties: { api_key: { type: "string" } },
+      required: ["api_key"],
+    };
+  }
+
+  // Convert parameters to a string for the template
+  const parametersCode = JSON.stringify(parameters, null, 2);
 
   // If no API key available, generate a stub tool instead
   if (!config.anthropicApiKey) {
@@ -590,8 +618,18 @@ export type ToolParameters = {
 
 // Main function
 async function main() {
+  let hasErrors = false;
+
   try {
     console.log("Starting MPC tools generator...");
+
+    // Check if tmp/openapi.json exists
+    const openApiSpecPath = path.resolve(__dirname, "../../tmp/openapi.json");
+    if (!fs.existsSync(openApiSpecPath)) {
+      console.error(`Error: OpenAPI spec not found at ${openApiSpecPath}`);
+      console.error("Make sure to run pnpm openapi:generate first.");
+      process.exit(1);
+    }
 
     // Get all API instances
     const config = new Configuration({ apiKey: "dummy-key" });
@@ -617,6 +655,11 @@ async function main() {
       ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
     ];
 
+    if (allMethods.length === 0) {
+      console.error("Error: No API methods found to convert to tools.");
+      process.exit(1);
+    }
+
     console.log(
       `This will generate MPC tools for ${allMethods.length} Meeting BaaS API methods:`
     );
@@ -641,11 +684,43 @@ async function main() {
     console.log("Generating tool definitions...");
     const toolDefinitions = await generateAllToolDefinitions();
 
+    if (Object.keys(toolDefinitions).length === 0) {
+      console.error("Error: No tool definitions were generated.");
+      process.exit(1);
+    }
+
+    // Validate tool definitions have schemas
+    for (const [method, toolDef] of Object.entries(toolDefinitions)) {
+      // Check if the schema is included
+      if (!toolDef.includes("_schema")) {
+        console.warn(`Warning: No schema found for ${method}`);
+        hasErrors = true;
+      }
+    }
+
     console.log("Writing tool definitions to files...");
     await writeToolDefinitions(toolDefinitions);
 
+    // Check if output directory and index exists
+    const outputDir = path.resolve(__dirname, "../../dist/generated-tools");
+    if (!fs.existsSync(outputDir)) {
+      console.error(`Error: Output directory ${outputDir} was not created.`);
+      process.exit(1);
+    }
+
+    const indexPath = path.join(outputDir, "index.ts");
+    if (!fs.existsSync(indexPath)) {
+      console.error(`Error: Index file ${indexPath} was not created.`);
+      process.exit(1);
+    }
+
     console.log("Tool generation complete!");
     console.log(`Generated ${Object.keys(toolDefinitions).length} MPC tools`);
+
+    if (hasErrors) {
+      console.warn("Tool generation completed with warnings.");
+      process.exit(1);
+    }
   } catch (error) {
     console.error("Error generating tools:", error);
     process.exit(1);

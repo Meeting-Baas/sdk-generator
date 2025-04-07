@@ -322,7 +322,7 @@ try {
   }
   console.log("✓ registerTools function export found");
 
-  // NEW: Check for allSchemas object
+  // Check for allSchemas object
   if (!toolsExport.allSchemas || typeof toolsExport.allSchemas !== "object") {
     console.error("Missing allSchemas object in tools export!");
     process.exit(1);
@@ -333,7 +333,7 @@ try {
     } schemas`
   );
 
-  // NEW: Check for schema utility functions
+  // Check for schema utility functions
   if (typeof toolsExport.getSchemaByName !== "function") {
     console.error("Missing getSchemaByName function in tools export!");
     process.exit(1);
@@ -350,7 +350,7 @@ try {
   console.log("\nTools export (@meeting-baas/sdk/tools) includes these tools:");
   toolNames.forEach((name) => console.log(` - ${name}`));
 
-  // NEW: Test individual schema exports for required tools
+  // Test individual schema exports for required tools
   console.log("\nVerifying schema exports for required tools:");
   const requiredTools = [
     "default-api-join",
@@ -390,6 +390,42 @@ try {
         `Failed to retrieve schema via getSchemaByName: ${toolName}`
       );
       process.exit(1);
+    }
+
+    // Validate schema properties match tool parameters
+    const tool = toolsExport.allTools.find((t) => t.name === toolName);
+    if (tool && tool.parameters) {
+      const parameterNames = tool.parameters.map((p) => p.name);
+      const schemaProperties = Object.keys(schema.properties);
+
+      // Check if all parameter names exist in schema properties
+      const missingProps = parameterNames.filter(
+        (name) => !schemaProperties.includes(name)
+      );
+      if (missingProps.length > 0) {
+        console.error(
+          `Schema properties missing for tool ${toolName}: ${missingProps.join(
+            ", "
+          )}`
+        );
+        process.exit(1);
+      }
+
+      // Check if all required params are marked as required in schema
+      const requiredParams = tool.parameters
+        .filter((p) => p.required)
+        .map((p) => p.name);
+      const missingRequired = requiredParams.filter(
+        (name) => !schema.required.includes(name)
+      );
+      if (missingRequired.length > 0) {
+        console.error(
+          `Required fields missing in schema for tool ${toolName}: ${missingRequired.join(
+            ", "
+          )}`
+        );
+        process.exit(1);
+      }
     }
 
     console.log(`✓ Schema verified for ${toolName}`);
