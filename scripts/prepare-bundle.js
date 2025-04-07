@@ -118,25 +118,6 @@ exports.getSchemaByName = function(name) {
       const tsFilePath = path.join(GENERATED_TOOLS_DIR, file);
       const tsContent = fs.readFileSync(tsFilePath, "utf8");
 
-      // Extract the schema definition from the file
-      const schemaMatch = tsContent.match(
-        /const\s+jsonSchema\s*=\s*({[\s\S]*?});/
-      );
-      let schemaObject = {
-        type: "object",
-        properties: { api_key: { type: "string" } },
-        required: ["api_key"],
-      };
-
-      if (schemaMatch && schemaMatch[1]) {
-        try {
-          // This is a safe way to evaluate the schema object
-          schemaObject = eval(`(${schemaMatch[1]})`);
-        } catch (error) {
-          console.warn(`Error parsing schema for ${toolName}: ${error}`);
-        }
-      }
-
       // Extract parameters array from the file
       const paramsMatch = tsContent.match(
         /createTool\s*\(\s*["'][-\w]+["']\s*,\s*["'].*?["']\s*,\s*\[([\s\S]*?)\]\s*\)/
@@ -144,6 +125,113 @@ exports.getSchemaByName = function(name) {
       let parametersCode = "[]"; // Default empty array
       if (paramsMatch && paramsMatch[1]) {
         parametersCode = `[${paramsMatch[1]}]`;
+      }
+
+      // Extract parameter names and required status for schema generation
+      const paramNameRegex = /create\w+Parameter\s*\(\s*["']([^"']+)["']/g;
+      const paramRequiredRegex =
+        /create\w+Parameter\s*\(\s*["'][^"']+["'][^,]*,[^,]*,[^,]*,\s*(true|false)/g;
+
+      const paramNames = [];
+      const requiredParams = [];
+
+      // Extract parameter names
+      let match;
+      while ((match = paramNameRegex.exec(tsContent)) !== null) {
+        paramNames.push(match[1]);
+      }
+
+      // Extract required status
+      let requiredIndex = 0;
+      while ((match = paramRequiredRegex.exec(tsContent)) !== null) {
+        if (match[1] === "true" && requiredIndex < paramNames.length) {
+          requiredParams.push(paramNames[requiredIndex]);
+        }
+        requiredIndex++;
+      }
+
+      // Ensure we have at least the api_key parameter
+      if (paramNames.length === 0) {
+        paramNames.push("api_key");
+      }
+      if (requiredParams.length === 0) {
+        requiredParams.push("api_key");
+      }
+
+      // Build properties for schema
+      const schemaProperties = {};
+      paramNames.forEach((name) => {
+        schemaProperties[name] = { type: "string" };
+      });
+
+      // Special cases for default_api tools
+      const specialCases = {
+        default_api_join: {
+          params: ["api_key", "meeting_url", "bot_name", "reserved"],
+          types: { reserved: "boolean" },
+        },
+        default_api_get_meeting_data: {
+          params: ["api_key", "bot_id"],
+          types: {},
+        },
+        default_api_delete_data: {
+          params: ["api_key", "bot_id"],
+          types: {},
+        },
+        default_api_leave: {
+          params: ["api_key", "bot_id"],
+          types: {},
+        },
+        calendars_api_schedule_record_event: {
+          params: ["api_key", "event_uuid", "bot_name", "all_occurrences"],
+          types: { all_occurrences: "boolean" },
+        },
+      };
+
+      // Check if this tool needs special handling
+      if (specialCases[toolName]) {
+        const caseInfo = specialCases[toolName];
+
+        // Add any missing parameters
+        for (const param of caseInfo.params) {
+          if (!paramNames.includes(param)) {
+            const type = caseInfo.types[param] || "string";
+            schemaProperties[param] = { type };
+          }
+
+          // Ensure they're marked as required
+          if (!requiredParams.includes(param)) {
+            requiredParams.push(param);
+          }
+        }
+
+        console.log(`Added special handling for ${toolName}`);
+      }
+
+      // Override with existing schema if available
+      let schemaObject = {
+        type: "object",
+        properties: schemaProperties,
+        required: requiredParams,
+      };
+
+      // Extract the schema definition from the file
+      const schemaMatch = tsContent.match(
+        /const\s+jsonSchema\s*=\s*({[\s\S]*?});/
+      );
+
+      // Try to use the schema from the file if it exists
+      if (schemaMatch && schemaMatch[1]) {
+        try {
+          // This is a safe way to evaluate the schema object
+          const extractedSchema = eval(`(${schemaMatch[1]})`);
+
+          // Override our generated schema with the extracted one
+          schemaObject = extractedSchema;
+          console.log(`Found schema in file for ${toolName}`);
+        } catch (error) {
+          console.warn(`Error parsing schema for ${toolName}: ${error}`);
+        }
       }
 
       // Format the schema as a string for inclusion in the JS file

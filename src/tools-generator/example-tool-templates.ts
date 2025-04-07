@@ -3,6 +3,7 @@
  *
  * These templates are used by the tools generator to understand the structure
  * and patterns of MPC tools. The code generation LLM will use these as a reference.
+ * THE LLM MUST INCLUDE SCHEMAS FOR ALL TOOLS
  */
 
 import { BaasClient } from "../baas/client";
@@ -109,6 +110,40 @@ export const join_meeting_tool: ToolDefinition = MpcTools.createTool(
   ]
 );
 
+// Add JSON schema for validation
+export const join_meeting_schema = {
+  type: "object",
+  properties: {
+    api_key: { type: "string" },
+    bot_name: { type: "string" },
+    meeting_url: { type: "string" },
+    reserved: { type: "boolean" },
+    webhook_url: { type: "string" },
+    bot_image: { type: "string" },
+    entry_message: { type: "string" },
+    recording_mode: {
+      type: "string",
+      enum: ["speaker_view", "gallery_view", "audio_only"],
+    },
+    speech_to_text: {
+      type: "object",
+      properties: {
+        provider: {
+          type: "string",
+          enum: ["Gladia", "Runpod", "Default"],
+        },
+        api_key: { type: "string" },
+      },
+    },
+    start_time: { type: "number" },
+    extra: {
+      type: "object",
+      additionalProperties: true,
+    },
+  },
+  required: ["api_key", "bot_name", "meeting_url", "reserved"],
+};
+
 // Example of a tool execution function
 export async function executeJoinMeeting(
   args: any,
@@ -159,6 +194,16 @@ export const leave_meeting_tool: ToolDefinition = MpcTools.createTool(
     ),
   ]
 );
+
+// Add JSON schema for validation
+export const leave_meeting_schema = {
+  type: "object",
+  properties: {
+    api_key: { type: "string" },
+    bot_id: { type: "string" },
+  },
+  required: ["api_key", "bot_id"],
+};
 
 // Example of a tool execution function
 export async function executeLeaveMeeting(
@@ -319,6 +364,38 @@ export const schedule_record_event_tool: ToolDefinition = MpcTools.createTool(
   ]
 );
 
+// Add JSON schema for validation
+export const schedule_record_event_schema = {
+  type: "object",
+  properties: {
+    api_key: { type: "string" },
+    event_uuid: { type: "string" },
+    bot_name: { type: "string" },
+    webhook_url: { type: "string" },
+    bot_image: { type: "string" },
+    recording_mode: {
+      type: "string",
+      enum: ["speaker_view", "gallery_view", "audio_only"],
+    },
+    speech_to_text: {
+      type: "object",
+      properties: {
+        provider: {
+          type: "string",
+          enum: ["Gladia", "Runpod", "Default"],
+        },
+        api_key: { type: "string" },
+      },
+    },
+    all_occurrences: { type: "boolean" },
+    extra: {
+      type: "object",
+      additionalProperties: true,
+    },
+  },
+  required: ["api_key", "event_uuid", "bot_name"],
+};
+
 // Example of a complex tool execution function with formatted response
 export async function executeScheduleRecordEvent(
   args: any,
@@ -415,6 +492,16 @@ export const get_meeting_data_tool: ToolDefinition = MpcTools.createTool(
     ),
   ]
 );
+
+// Add JSON schema for validation
+export const get_meeting_data_schema = {
+  type: "object",
+  properties: {
+    api_key: { type: "string" },
+    bot_id: { type: "string" },
+  },
+  required: ["api_key", "bot_id"],
+};
 
 // Example of handling complex response data in a human-readable format
 export async function executeGetMeetingData(
