@@ -5,12 +5,12 @@
   "modelPropertyNaming": "camelCase",
   "enumPropertyNaming": "camelCase",
   "withSeparateModelsAndApi": true,
-  "apiPackage": "generated/baas/api",
-  "modelPackage": "generated/baas/models",
+  "apiPackage": "api",
+  "modelPackage": "models",
   "useSingleRequestParameter": true,
   "withInterfaces": true,
   "stringEnums": true,
-  "outputDir": "src/generated",
+  "outputDir": "src/generated/baas",
   "generateClientFromSpec": true,
   "clientPackage": "baas"
 }

@@ -2,8 +2,8 @@
 // This file exports the core SDK functionality
 
 // Re-export BaaS functionality
-export { BaasClient } from "./baas/client";
-export * as BaasTypes from "./generated/baas/generated/baas/models";
+export { BaasClient } from "./generated/baas/api/client";
+export * as BaasTypes from "./generated/baas/models";
 
 // Re-export MPC functionality
 export { MpcClient } from "./mpc";
