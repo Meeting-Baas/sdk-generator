@@ -3,7 +3,7 @@
 
 // Re-export BaaS functionality
 export { BaasClient } from "./baas/client";
-export * as BaasTypes from "./generated/baas/models";
+export * as BaasTypes from "./generated/baas/generated/baas/models";
 
 // Re-export MPC functionality
 export { MpcClient } from "./mpc";
