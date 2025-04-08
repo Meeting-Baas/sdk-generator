@@ -24,26 +24,6 @@ function transformProperties(obj) {
   return transformed;
 }
 
-// Function to recursively copy directory
-function copyDir(src, dest) {
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-  
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    
-    if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
-}
-
 // Read and transform the generated API files
 const apiDir = path.join(__dirname, '../src/generated/baas/api');
 const files = fs.readdirSync(apiDir);
@@ -155,17 +135,4 @@ export class BaasClient {
 // Write client file
 fs.writeFileSync(path.join(apiDir, 'client.ts'), clientContent);
 
-// Move files to correct location
-const srcDir = path.join(__dirname, '../src/generated/baas');
-const destDir = path.join(__dirname, '../src/baas');
-
-// Create baas directory if it doesn't exist
-if (!fs.existsSync(destDir)) {
-  fs.mkdirSync(destDir, { recursive: true });
-}
-
-// Copy files
-copyDir(srcDir, destDir);
-
 console.log('Post-generation transformations completed');
-console.log('Files moved to correct location');
