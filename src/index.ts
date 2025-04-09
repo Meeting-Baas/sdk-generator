@@ -2,8 +2,23 @@
 // This file exports the core SDK functionality
 
 // Re-export BaaS functionality
-export { BaasClient } from "./generated/baas/api/client";
-export * as BaasTypes from "./generated/baas/models";
+import { CalendarsApi, DefaultApi } from './generated/baas/api';
+import { Configuration } from './generated/baas/configuration';
+
+// Re-export all API methods and types from the generated code
+export * from './generated/baas/api';
+export * from './generated/baas/models';
+export * from './generated/baas/configuration';
+
+// Create and export a single instance of the API clients
+const config = new Configuration();
+export const calendarsApi = new CalendarsApi(config);
+export const defaultApi = new DefaultApi(config);
+
+// Export a convenience function to create a new configuration
+export const createConfig = (options?: Partial<Configuration>) => {
+  return new Configuration(options);
+};
 
 // Re-export MPC functionality
 export { MpcClient } from "./mpc";
