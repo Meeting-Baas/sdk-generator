@@ -98,7 +98,7 @@ const methodParamSchemas: Record<string, Record<string, ParameterDefinition>> = 
       name: "speakerName",
       description: "Filter bots by speaker name",
       required: false,
-      schema: {
+        schema: {
         type: "string",
         description: "Filter bots by speaker name"
       }
