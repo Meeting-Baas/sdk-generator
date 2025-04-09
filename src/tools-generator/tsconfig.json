@@ -8,12 +8,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "../../dist/tools-generator",
-    "rootDir": ".",
+    "rootDir": "..",
     "baseUrl": ".",
     "paths": {
       "*": ["*", "../*"]
     }
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../generated/**/*"],
   "exclude": ["node_modules"]
 }

@@ -365,20 +365,38 @@ We welcome contributions to the Meeting BaaS SDK! Please feel free to submit iss
 
 ```
 src/
-├── baas/           # BaaS client implementation
 ├── generated/      # Generated OpenAPI client
-├── mpc/            # MPC tools and types
+│   └── baas/      # BaaS specific generated code
+│       ├── api/   # Generated API classes
+│       │   ├── calendars-api.ts
+│       │   ├── default-api.ts
+│       │   └── client.ts    # Auto-generated unified client
+│       ├── models/ # Generated model types
+│       ├── base.ts
+│       ├── common.ts
+│       └── configuration.ts
+├── mpc/           # MPC tools and types
 │   └── validation.ts # Schema validation utilities
 ├── tools-generator/ # MPC tools generation
 │   └── schema-extractor.ts # OpenAPI schema extraction
-└── index.ts        # Main entry point
+└── index.ts       # Main entry point
 
 dist/
-├── index.js        # CommonJS bundle
-├── index.mjs       # ES Module bundle
-├── tools.js        # CommonJS tools bundle
-├── tools.mjs       # ES Module tools bundle
+├── index.js       # CommonJS bundle
+├── index.mjs      # ES Module bundle
+├── tools.js       # CommonJS tools bundle
+├── tools.mjs      # ES Module tools bundle
 └── generated-tools/ # Generated TypeScript tool definitions
+
+scripts/
+├── fetch-openapi.js     # Fetches latest OpenAPI spec
+├── post-generate.js     # Post-generation processing
+└── prepare-bundle.js    # Bundle preparation
+
+Import paths:
+├── "@meeting-baas/sdk"          # Main SDK (BaasClient)
+├── "@meeting-baas/sdk/tools"    # MPC tools
+└── "@meeting-baas/sdk/bundle"   # Complete bundle
 ```
 
 ## License

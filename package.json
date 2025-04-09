@@ -1,52 +1,38 @@
 {
   "name": "@meeting-baas/sdk",
-  "version": "0.3.3",
+  "version": "0.3.7",
   "description": "Official SDK for Meeting BaaS API - https://meetingbaas.com",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "bin": {
-    "meeting-baas": "dist/cli.js"
-  },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./tools": {
-      "import": "./dist/tools.mjs",
-      "require": "./dist/tools.js",
-      "types": "./dist/tools.d.ts"
-    },
-    "./bundle": {
-      "import": "./dist/bundle.mjs",
-      "require": "./dist/bundle.js",
-      "types": "./dist/bundle.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.mjs",
+    "dist/index.d.ts",
+    "dist/index.d.mts",
+    "dist/baas",
     "README.md",
-    "DEVELOPMENT.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean && node scripts/copy-generated.js",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "openapi:generate": "openapi-generator-cli generate -i tmp/openapi.json -g typescript-axios -o src/generated/baas -c openapi-generator-config.json --skip-validate-spec",
+    "openapi:fetch": "node scripts/fetch-openapi.js",
+    "openapi:generate": "pnpm openapi:fetch && openapi-generator-cli generate -i tmp/openapi.json -g typescript-axios -o src/generated/baas -c openapi-generator-config.json --skip-validate-spec && node scripts/post-generate.js",
     "openapi:clean": "rm -rf src/generated/baas",
     "openapi:rebuild": "pnpm openapi:clean && pnpm openapi:generate && pnpm build",
-    "tools:generate": "ts-node src/tools-generator/index.ts",
-    "tools:register": "ts-node src/tools-generator/register-tools.ts",
-    "tools:rebuild": "pnpm build && pnpm tools:generate",
-    "bundle:build": "pnpm build && pnpm tools:generate && node scripts/prepare-bundle.js",
-    "bundle:test": "node scripts/test-bundle.js",
     "docs:generate": "node scripts/generate-docs.js",
-    "prepublishOnly": "pnpm bundle:test",
-    "prepare-release": "pnpm lint && pnpm bundle:build && pnpm docs:generate"
+    "prepublishOnly": "pnpm lint && pnpm build",
+    "prepare-release": "pnpm lint && pnpm docs:generate"
   },
   "publishConfig": {
     "access": "public"

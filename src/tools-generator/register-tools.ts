@@ -7,7 +7,7 @@
 
 import fs from "fs";
 import path from "path";
-import { BaasClient } from "../baas/client";
+import { BaasClient } from "../generated/baas/api/client";
 import { ToolDefinition } from "../mpc/types";
 import { loadEnv } from "./load-env";
 

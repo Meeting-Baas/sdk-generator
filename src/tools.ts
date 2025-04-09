@@ -15,7 +15,7 @@ export {
 } from "./tools-generator/register-tools";
 
 // Export the client for convenience
-export { BaasClient } from "./baas/client";
+export { BaasClient } from "./generated/baas/api/client";
 
 // Export tool types for TypeScript users
 export type { ToolDefinition } from "./mpc/types";
