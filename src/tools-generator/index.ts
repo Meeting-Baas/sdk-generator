@@ -17,6 +17,7 @@ import {
 import { loadEnv } from "./load-env";
 import { extractMethodParameters } from "./schema-extractor";
 import { BaasClient } from '../generated/baas/api/client';
+import { ParameterDefinition } from "../mpc/types";
 
 // Load environment variables from .env file if present
 loadEnv();
@@ -215,12 +216,12 @@ async function generateToolDefinition(
   const operationName = parts[1];
 
   // Extract parameters and schemas from the OpenAPI spec
-  let parameters = [];
-  let jsonSchema = null;
+  let parameters: ParameterDefinition[] = [];
+  let jsonSchema: Record<string, unknown> | null = null;
 
   try {
-    const extracted = extractMethodParameters(apiClass, operationName);
-    parameters = extracted.parameters;
+    const extracted = extractMethodParameters(methodName);
+    parameters = extracted.toolParameters;
     jsonSchema = extracted.jsonSchema;
   } catch (error) {
     console.warn(`Error extracting parameters for ${methodName}: ${error}`);

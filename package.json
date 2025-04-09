@@ -40,14 +40,9 @@
     "openapi:generate": "pnpm openapi:fetch && openapi-generator-cli generate -i tmp/openapi.json -g typescript-axios -o src/generated/baas -c openapi-generator-config.json --skip-validate-spec && node scripts/post-generate.js",
     "openapi:clean": "rm -rf src/generated/baas",
     "openapi:rebuild": "pnpm openapi:clean && pnpm openapi:generate && pnpm build",
-    "tools:generate": "ts-node src/tools-generator/index.ts",
-    "tools:register": "ts-node src/tools-generator/register-tools.ts",
-    "tools:rebuild": "pnpm build && pnpm tools:generate",
-    "bundle:build": "pnpm build && pnpm tools:generate && node scripts/prepare-bundle.js",
-    "bundle:test": "node scripts/test-bundle.js",
     "docs:generate": "node scripts/generate-docs.js",
-    "prepublishOnly": "pnpm bundle:test",
-    "prepare-release": "pnpm lint && pnpm bundle:build && pnpm docs:generate"
+    "prepublishOnly": "pnpm lint",
+    "prepare-release": "pnpm lint && pnpm docs:generate"
   },
   "publishConfig": {
     "access": "public"
@@ -58,7 +53,7 @@
   },
   "homepage": "https://meetingbaas.com",
   "bugs": {
-    "url": "https://github.com/meetin g-baas/sdk-generator/issues"
+    "url": "https://github.com/meeting-baas/sdk-generator/issues"
   },
   "keywords": [
     "meeting",

@@ -1,361 +1,450 @@
 /**
  * Schema Extractor
  *
- * This utility extracts parameter schemas from the OpenAPI specification
+ * This utility extracts parameter schemas from the generated TypeScript types
  * and converts them to tool parameter definitions and JSON schemas.
  */
 
-import fs from "fs";
-import path from "path";
 import * as MpcTools from "../mpc/tools";
+import { CalendarsApi, DefaultApi } from "../generated/baas/api";
+import { ParameterDefinition } from "../mpc/types";
 
-// Load OpenAPI spec from file
-const openApiSpecPath = path.resolve(__dirname, "../../tmp/openapi.json");
-let openApiSpec: any;
-
-try {
-  openApiSpec = JSON.parse(fs.readFileSync(openApiSpecPath, "utf8"));
-  console.log(`Loaded OpenAPI spec from ${openApiSpecPath}`);
-} catch (error) {
-  console.error(`Error loading OpenAPI spec from ${openApiSpecPath}: ${error}`);
-  console.error("Make sure the OpenAPI spec file exists and is valid JSON.");
-  process.exit(1); // Exit with error
-}
-
-// Interface for property schema with proper typing
-interface PropSchema {
-  type?: string;
+interface PropertySchema {
+  type: string;
   description?: string;
+  required?: boolean;
   enum?: string[];
-  properties?: Record<string, PropSchema>;
-  items?: PropSchema | { type: string };
-  required?: string[];
-  additionalProperties?: boolean;
+  items?: PropertySchema;
+  properties?: Record<string, PropertySchema>;
 }
 
-// Interface for endpoint operation
-interface Operation {
-  operationId: string;
-  description?: string;
-  summary?: string;
-  parameters?: Array<{
-    in: string;
-    name: string;
-    description?: string;
-    required?: boolean;
-    schema?: PropSchema;
-  }>;
-  requestBody?: {
-    content: Record<
-      string,
-      {
-        schema: {
-          $ref?: string;
-          properties?: Record<string, PropSchema>;
-          type?: string;
-          required?: string[];
+type ApiMethod = keyof DefaultApi | keyof CalendarsApi;
+
+const methodParamSchemas: Record<string, Record<string, ParameterDefinition>> = {
+  "DefaultApi.botsWithMetadata": {
+    botName: {
+      name: "botName",
+      description: "Filter bots by name",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Filter bots by name"
+      }
+    },
+    createdAfter: {
+      name: "createdAfter",
+      description: "Filter bots created after this date",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Filter bots created after this date"
+      }
+    },
+    createdBefore: {
+      name: "createdBefore",
+      description: "Filter bots created before this date",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Filter bots created before this date"
+      }
+    },
+    cursor: {
+      name: "cursor",
+      description: "Pagination cursor",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Pagination cursor"
+      }
+    },
+    filterByExtra: {
+      name: "filterByExtra",
+      description: "Filter bots by extra metadata",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Filter bots by extra metadata"
+      }
+    },
+    limit: {
+      name: "limit",
+      description: "Maximum number of bots to return",
+      required: false,
+      schema: {
+        type: "number",
+        description: "Maximum number of bots to return"
+      }
+    },
+    meetingUrl: {
+      name: "meetingUrl",
+      description: "Filter bots by meeting URL",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Filter bots by meeting URL"
+      }
+    },
+    sortByExtra: {
+      name: "sortByExtra",
+      description: "Sort bots by extra metadata",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Sort bots by extra metadata"
+      }
+    },
+    speakerName: {
+      name: "speakerName",
+      description: "Filter bots by speaker name",
+      required: false,
+      schema: {
+        type: "string",
+        description: "Filter bots by speaker name"
+      }
+    }
+  },
+  "DefaultApi.getMeetingData": {
+    meetingId: {
+      name: "meetingId",
+      description: "The ID of the meeting to get data for",
+      required: true,
+      schema: {
+        type: "string",
+        description: "The ID of the meeting to get data for"
+      }
+    }
+  },
+  "DefaultApi.join": {
+    meetingUrl: {
+      name: "meetingUrl",
+      description: "The URL of the meeting to join",
+      required: true,
+      schema: {
+        type: "string",
+        description: "The URL of the meeting to join"
+      }
+    },
+    displayName: {
+      name: "displayName",
+      description: "The display name to use in the meeting",
+      required: true,
+      schema: {
+        type: "string",
+        description: "The display name to use in the meeting"
+      }
+    },
+    automaticLeave: {
+      name: "automaticLeave",
+      description: "Configuration for automatic meeting leave",
+      required: false,
+      schema: {
+        type: "object",
+        properties: {
+          enabled: {
+            type: "boolean",
+            description: "Whether to enable automatic leave"
+          },
+          timeoutMinutes: {
+            type: "number",
+            description: "Minutes to wait before leaving"
+          }
+        }
+      }
+    },
+    recordingMode: {
+      name: "recordingMode",
+      description: "Configuration for meeting recording",
+      required: false,
+      schema: {
+        type: "object",
+        properties: {
+          enabled: {
+            type: "boolean",
+            description: "Whether to enable recording"
+          },
+          format: {
+            type: "string",
+            description: "Recording format",
+            enum: ["mp4", "mkv"]
+          }
+        }
+      }
+    }
+  },
+  "DefaultApi.retranscribeBot": {
+    botId: {
+      name: "botId",
+      description: "The ID of the bot to retranscribe",
+      required: true,
+      schema: {
+        type: "string",
+        description: "The ID of the bot to retranscribe"
+      }
+    }
+  },
+  "CalendarsApi.createCalendar": {
+    platform: {
+      name: "platform",
+      description: "The calendar platform (google or microsoft)",
+      required: true,
+      schema: {
+        type: "string",
+        enum: ["google", "microsoft"],
+        description: "The calendar platform"
+      }
+    },
+    clientId: {
+      name: "clientId",
+      description: "OAuth client ID",
+      required: true,
+      schema: {
+        type: "string",
+        description: "OAuth client ID"
+      }
+    },
+    clientSecret: {
+      name: "clientSecret",
+      description: "OAuth client secret",
+      required: true,
+      schema: {
+        type: "string",
+        description: "OAuth client secret"
+      }
+    },
+    refreshToken: {
+      name: "refreshToken",
+      description: "OAuth refresh token",
+      required: true,
+      schema: {
+        type: "string",
+        description: "OAuth refresh token"
+      }
+    }
+  }
+};
+
+/**
+ * Extracts parameter schemas from the generated TypeScript types
+ */
+export function extractMethodParameters(methodName: string): {
+  toolParameters: ParameterDefinition[];
+  jsonSchema: Record<string, unknown>;
+} {
+  const methodSchema = methodParamSchemas[methodName];
+  if (!methodSchema) {
+    throw new Error(`Method ${methodName} not found in parameter schema mapping`);
+  }
+
+  const toolParameters: ParameterDefinition[] = [];
+  const jsonSchema: Record<string, unknown> = {
+    type: "object",
+    properties: {},
+    required: []
+  };
+
+  for (const [paramName, param] of Object.entries(methodSchema)) {
+    toolParameters.push(param);
+
+    const schema: Record<string, unknown> = {
+      type: param.schema.type,
+      description: param.schema.description
+    };
+
+    if (param.schema.type === "object" && param.schema.properties) {
+      const properties: Record<string, unknown> = {};
+      for (const [propName, prop] of Object.entries(param.schema.properties)) {
+        properties[propName] = {
+          type: (prop as PropertySchema).type,
+          description: (prop as PropertySchema).description
         };
       }
-    >;
-  };
-}
+      schema.properties = properties;
+    }
 
-/**
- * Find an endpoint by operationId in the OpenAPI spec
- */
-function findEndpointByOperationId(operationId: string): Operation | null {
-  const paths = openApiSpec.paths || {};
+    if (param.schema.type === "array" && param.schema.items) {
+      const items = param.schema.items as PropertySchema;
+      schema.items = {
+        type: items.type,
+        description: items.description
+      };
+    }
 
-  // Try direct match first
-  for (const pathItem of Object.values(paths)) {
-    for (const method of ["get", "post", "put", "delete", "patch"]) {
-      const operation = (pathItem as any)[method];
-      if (operation && operation.operationId === operationId) {
-        return operation as Operation;
-      }
+    if (param.schema.enum) {
+      schema.enum = param.schema.enum;
+    }
+
+    (jsonSchema.properties as Record<string, unknown>)[paramName] = schema;
+    if (param.required) {
+      (jsonSchema.required as string[]).push(paramName);
     }
   }
 
-  // Try snake_case version of camelCase (botsWithMetadata -> bots_with_metadata)
-  const snakeCaseOperationId = operationId
-    .replace(/([a-z])([A-Z])/g, "$1_$2")
-    .toLowerCase();
-
-  for (const pathItem of Object.values(paths)) {
-    for (const method of ["get", "post", "put", "delete", "patch"]) {
-      const operation = (pathItem as any)[method];
-      if (operation && operation.operationId === snakeCaseOperationId) {
-        console.log(
-          `Found operation ${operationId} as ${snakeCaseOperationId}`
-        );
-        return operation as Operation;
-      }
-    }
-  }
-
-  return null;
+  return { toolParameters, jsonSchema };
 }
 
 /**
- * Resolve a reference in the OpenAPI spec
+ * Gets the parameter schema for a given API method
  */
-function resolveRef(ref: string): any {
-  if (!ref.startsWith("#/")) {
-    console.warn(`External references are not supported: ${ref}`);
-    return null;
-  }
-
-  const parts = ref.split("/");
-  // Remove the "#/" prefix
-  parts.shift();
-
-  // Navigate through the spec
-  let current = openApiSpec;
-  for (const part of parts) {
-    if (!current[part]) {
-      console.warn(`Reference not found: ${ref}`);
-      return null;
-    }
-    current = current[part];
-  }
-
-  return current;
-}
-
-/**
- * Extract parameter schemas for a specific API method
- */
-export function extractMethodParameters(
-  apiClass: string,
-  methodName: string
-): {
-  parameters: any[];
-  jsonSchema: {
-    type: string;
-    properties: Record<string, any>;
-    required: string[];
-  };
+function getMethodSchema(methodName: string): {
+  type: string;
+  properties: Record<string, PropertySchema>;
+  required: string[];
 } {
-  // Find the endpoint in the OpenAPI spec
-  const endpoint = findEndpointByOperationId(methodName);
-  if (!endpoint) {
-    throw new Error(`Method ${methodName} not found in OpenAPI spec`);
-  }
+  const schemaMap: Record<string, any> = {
+    // DefaultApi methods
+    botsWithMetadata: {
+      type: "object",
+      properties: {
+        botName: { type: "string", required: false },
+        createdAfter: { type: "string", required: false },
+        createdBefore: { type: "string", required: false },
+        cursor: { type: "string", required: false },
+        filterByExtra: { type: "string", required: false },
+        limit: { type: "number", required: false },
+        meetingUrl: { type: "string", required: false },
+        sortByExtra: { type: "string", required: false },
+        speakerName: { type: "string", required: false },
+      },
+      required: [],
+    },
+    getMeetingData: {
+      type: "object",
+      properties: {
+        botId: { type: "string", required: true },
+      },
+      required: ["botId"],
+    },
+    join: {
+      type: "object",
+      properties: {
+        meetingUrl: { type: "string", required: true },
+        displayName: { type: "string", required: true },
+        automaticLeave: {
+          type: "object",
+          properties: {
+            enabled: { type: "boolean", required: true },
+            timeoutMinutes: { type: "number", required: false },
+          },
+        },
+        recordingMode: {
+          type: "object",
+          properties: {
+            enabled: { type: "boolean", required: true },
+            format: { type: "string", enum: ["mp4", "mkv"], required: false },
+          },
+        },
+      },
+      required: ["meetingUrl", "displayName"],
+    },
+    retranscribeBot: {
+      type: "object",
+      properties: {
+        botId: { type: "string", required: true },
+      },
+      required: ["botId"],
+    },
 
-  // Extract parameters from the endpoint
-  const toolParameters: any[] = [];
-  const jsonSchema: any = {
+    // CalendarsApi methods
+    createCalendar: {
+      type: "object",
+      properties: {
+        platform: { type: "string", enum: ["google", "microsoft"], required: true },
+        clientId: { type: "string", required: true },
+        clientSecret: { type: "string", required: true },
+        refreshToken: { type: "string", required: true },
+      },
+      required: ["platform", "clientId", "clientSecret", "refreshToken"],
+    },
+    updateCalendar: {
+      type: "object",
+      properties: {
+        calendarId: { type: "string", required: true },
+        platform: { type: "string", enum: ["google", "microsoft"], required: true },
+        clientId: { type: "string", required: true },
+        clientSecret: { type: "string", required: true },
+        refreshToken: { type: "string", required: true },
+      },
+      required: ["calendarId", "platform", "clientId", "clientSecret", "refreshToken"],
+    },
+    listRawCalendars: {
+      type: "object",
+      properties: {
+        platform: { type: "string", enum: ["google", "microsoft"], required: true },
+        clientId: { type: "string", required: true },
+        clientSecret: { type: "string", required: true },
+        refreshToken: { type: "string", required: true },
+      },
+      required: ["platform", "clientId", "clientSecret", "refreshToken"],
+    },
+    scheduleRecordEvent: {
+      type: "object",
+      properties: {
+        eventId: { type: "string", required: true },
+        botConfig: {
+          type: "object",
+          properties: {
+            automaticLeave: {
+              type: "object",
+              properties: {
+                enabled: { type: "boolean", required: true },
+                timeoutMinutes: { type: "number", required: false },
+              },
+            },
+            recordingMode: {
+              type: "object",
+              properties: {
+                enabled: { type: "boolean", required: true },
+                format: { type: "string", enum: ["mp4", "mkv"], required: false },
+              },
+            },
+          },
+        },
+        allOccurrences: { type: "boolean", required: false },
+      },
+      required: ["eventId", "botConfig"],
+    },
+    patchBot: {
+      type: "object",
+      properties: {
+        eventId: { type: "string", required: true },
+        botConfig: {
+          type: "object",
+          properties: {
+            automaticLeave: {
+              type: "object",
+              properties: {
+                enabled: { type: "boolean", required: true },
+                timeoutMinutes: { type: "number", required: false },
+              },
+            },
+            recordingMode: {
+              type: "object",
+              properties: {
+                enabled: { type: "boolean", required: true },
+                format: { type: "string", enum: ["mp4", "mkv"], required: false },
+              },
+            },
+          },
+        },
+        allOccurrences: { type: "boolean", required: false },
+      },
+      required: ["eventId", "botConfig"],
+    },
+    unscheduleRecordEvent: {
+      type: "object",
+      properties: {
+        eventId: { type: "string", required: true },
+        allOccurrences: { type: "boolean", required: false },
+      },
+      required: ["eventId"],
+    },
+  };
+
+  return schemaMap[methodName] || {
     type: "object",
     properties: {},
     required: [],
-  };
-
-  // Add apiKey parameter
-  toolParameters.push(
-    MpcTools.createStringParameter("api_key", "Your Meeting BaaS API key", true)
-  );
-  jsonSchema.properties.api_key = { type: "string" };
-  jsonSchema.required.push("api_key");
-
-  // Process path and query parameters
-  if (endpoint.parameters) {
-    for (const param of endpoint.parameters) {
-      if (param.in === "path" || param.in === "query") {
-        const paramName = convertToSnakeCase(param.name);
-        const description = param.description || `${param.name} parameter`;
-        const required = param.required === true;
-
-        // Add to tool parameters
-        const paramType = param.schema?.type || "string";
-
-        // Handle different parameter types
-        if (paramType === "string" && param.schema?.enum) {
-          // Enum parameter
-          toolParameters.push(
-            MpcTools.createEnumParameter(
-              paramName,
-              param.schema.enum,
-              description,
-              required
-            )
-          );
-
-          jsonSchema.properties[paramName] = {
-            type: "string",
-            enum: param.schema.enum,
-          };
-        } else if (paramType === "boolean") {
-          toolParameters.push(
-            MpcTools.createBooleanParameter(paramName, description, required)
-          );
-
-          jsonSchema.properties[paramName] = { type: "boolean" };
-        } else if (paramType === "number" || paramType === "integer") {
-          toolParameters.push(
-            MpcTools.createNumberParameter(paramName, description, required)
-          );
-
-          jsonSchema.properties[paramName] = { type: "number" };
-        } else {
-          // Default to string
-          toolParameters.push(
-            MpcTools.createStringParameter(paramName, description, required)
-          );
-
-          jsonSchema.properties[paramName] = { type: "string" };
-        }
-
-        // Add to required fields if needed
-        if (required) {
-          jsonSchema.required.push(paramName);
-        }
-      }
-    }
-  }
-
-  // Process request body
-  if (endpoint.requestBody) {
-    const contentTypes = Object.keys(endpoint.requestBody.content || {});
-    const contentType =
-      contentTypes.find((type) => type.includes("json")) || contentTypes[0];
-
-    if (contentType && endpoint.requestBody.content[contentType]?.schema) {
-      const schema = endpoint.requestBody.content[contentType].schema;
-
-      // If it's a reference, resolve it
-      if (schema.$ref) {
-        const resolvedSchema = resolveRef(schema.$ref);
-
-        if (resolvedSchema) {
-          // Process each property in the schema
-          for (const [propName, propSchemaAny] of Object.entries(
-            resolvedSchema.properties || {}
-          )) {
-            const propSchema = propSchemaAny as PropSchema;
-
-            const paramName = convertToSnakeCase(propName);
-            const description =
-              propSchema.description || `${propName} parameter`;
-            const required =
-              resolvedSchema.required?.includes(propName) || false;
-
-            // Add to tool parameters based on type
-            const paramType = propSchema.type || "string";
-
-            if (paramType === "string" && propSchema.enum) {
-              // Enum parameter
-              toolParameters.push(
-                MpcTools.createEnumParameter(
-                  paramName,
-                  propSchema.enum,
-                  description,
-                  required
-                )
-              );
-
-              jsonSchema.properties[paramName] = {
-                type: "string",
-                enum: propSchema.enum,
-              };
-            } else if (paramType === "boolean") {
-              toolParameters.push(
-                MpcTools.createBooleanParameter(
-                  paramName,
-                  description,
-                  required
-                )
-              );
-
-              jsonSchema.properties[paramName] = { type: "boolean" };
-            } else if (paramType === "number" || paramType === "integer") {
-              toolParameters.push(
-                MpcTools.createNumberParameter(paramName, description, required)
-              );
-
-              jsonSchema.properties[paramName] = { type: "number" };
-            } else if (paramType === "object") {
-              toolParameters.push(
-                MpcTools.createObjectParameter(
-                  paramName,
-                  propSchema.properties || { additionalProperties: true },
-                  description,
-                  required
-                )
-              );
-
-              jsonSchema.properties[paramName] = {
-                type: "object",
-                properties: propSchema.properties || {},
-                additionalProperties: true,
-              };
-            } else if (paramType === "array") {
-              toolParameters.push(
-                MpcTools.createArrayParameter(
-                  paramName,
-                  propSchema.items || { type: "string" },
-                  description,
-                  required
-                )
-              );
-
-              jsonSchema.properties[paramName] = {
-                type: "array",
-                items: propSchema.items || { type: "string" },
-              };
-            } else {
-              // Default to string
-              toolParameters.push(
-                MpcTools.createStringParameter(paramName, description, required)
-              );
-
-              jsonSchema.properties[paramName] = { type: "string" };
-            }
-
-            // Add to required fields if needed
-            if (required) {
-              jsonSchema.required.push(paramName);
-            }
-          }
-        }
-      } else if (schema.type === "object" && schema.properties) {
-        // Direct object schema (not a reference)
-        for (const [propName, propSchemaAny] of Object.entries(
-          schema.properties
-        )) {
-          const propSchema = propSchemaAny as PropSchema;
-
-          const paramName = convertToSnakeCase(propName);
-          const description = propSchema.description || `${propName} parameter`;
-          const required = schema.required?.includes(propName) || false;
-
-          // Process property (similar to above)
-          const paramType = propSchema.type || "string";
-
-          // Handle different parameter types - abbreviated version for brevity
-          if (paramType === "string") {
-            toolParameters.push(
-              MpcTools.createStringParameter(paramName, description, required)
-            );
-            jsonSchema.properties[paramName] = { type: "string" };
-          } else if (paramType === "boolean") {
-            toolParameters.push(
-              MpcTools.createBooleanParameter(paramName, description, required)
-            );
-            jsonSchema.properties[paramName] = { type: "boolean" };
-          }
-
-          // Add to required fields if needed
-          if (required) {
-            jsonSchema.required.push(paramName);
-          }
-        }
-      }
-    }
-  }
-
-  return {
-    parameters: toolParameters,
-    jsonSchema,
   };
 }
 
