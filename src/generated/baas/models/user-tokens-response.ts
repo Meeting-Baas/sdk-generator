@@ -25,7 +25,7 @@ export interface UserTokensResponse {
      * @type {string}
      * @memberof UserTokensResponse
      */
-    'available_tokens': string;
+    'availableTokens': string;
     /**
      * 
      * @type {string}
@@ -37,6 +37,6 @@ export interface UserTokensResponse {
      * @type {string}
      * @memberof UserTokensResponse
      */
-    'total_tokens_purchased': string;
+    'totalTokensPurchased': string;
 }
 

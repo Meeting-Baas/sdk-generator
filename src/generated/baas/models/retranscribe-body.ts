@@ -28,7 +28,7 @@ export interface RetranscribeBody {
      * @type {string}
      * @memberof RetranscribeBody
      */
-    'bot_uuid': string;
+    'botUuid': string;
     /**
      * 
      * @type {SpeechToText}

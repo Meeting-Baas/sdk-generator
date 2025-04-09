@@ -30,18 +30,18 @@ export interface JoinRequestScheduled {
      * @type {number}
      * @memberof JoinRequestScheduled
      */
-    'bot_param_id': number;
+    'botParamId': number;
     /**
      * 
      * @type {string}
      * @memberof JoinRequestScheduled
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * 
      * @type {ScheduleOrigin}
      * @memberof JoinRequestScheduled
      */
-    'schedule_origin': ScheduleOrigin;
+    'scheduleOrigin': ScheduleOrigin;
 }
 

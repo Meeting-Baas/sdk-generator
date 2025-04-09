@@ -7,44 +7,35 @@
 
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require('child_process');
 
 // Paths
 const SRC_GENERATED_DIR = path.resolve(__dirname, "../src/generated");
 const DIST_GENERATED_DIR = path.resolve(__dirname, "../dist/generated");
 
-// Make sure the dist generated directory exists
-if (!fs.existsSync(DIST_GENERATED_DIR)) {
-  fs.mkdirSync(DIST_GENERATED_DIR, { recursive: true });
-}
+// Clean dist directory first
+console.log('Cleaning dist directory...');
+execSync('rm -rf dist/*', { stdio: 'inherit' });
 
-// Copy the generated files
-function copyGeneratedFiles() {
-  console.log("Copying generated files...");
+// Copy generated files to dist/baas
+console.log('Copying generated files to dist/baas...');
+execSync('mkdir -p dist/baas', { stdio: 'inherit' });
+execSync('cp -r src/generated/baas/* dist/baas/', { stdio: 'inherit' });
 
-  try {
-    // Copy the entire generated directory
-    const copyDir = (src, dest) => {
-      const entries = fs.readdirSync(src, { withFileTypes: true });
+// Clean up unnecessary files
+console.log('Cleaning up unnecessary files...');
+const filesToRemove = [
+  'dist/baas/README.md',
+  'dist/baas/git_push.sh',
+  'dist/baas/package.json',
+  'dist/baas/tsconfig.json',
+  'dist/baas/tsconfig.esm.json'
+];
 
-      for (const entry of entries) {
-        const srcPath = path.join(src, entry.name);
-        const destPath = path.join(dest, entry.name);
-
-        if (entry.isDirectory()) {
-          fs.mkdirSync(destPath, { recursive: true });
-          copyDir(srcPath, destPath);
-        } else {
-          fs.copyFileSync(srcPath, destPath);
-        }
-      }
-    };
-
-    copyDir(SRC_GENERATED_DIR, DIST_GENERATED_DIR);
-    console.log("Generated files copied successfully");
-  } catch (error) {
-    console.error("Error copying generated files:", error);
-    process.exit(1);
+filesToRemove.forEach(file => {
+  if (fs.existsSync(file)) {
+    fs.unlinkSync(file);
   }
-}
+});
 
-copyGeneratedFiles(); 
+console.log('Done!'); 

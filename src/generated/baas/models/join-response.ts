@@ -25,6 +25,6 @@ export interface JoinResponse {
      * @type {string}
      * @memberof JoinResponse
      */
-    'bot_id': string;
+    'botId': string;
 }
 

@@ -43,7 +43,7 @@ export interface Event {
      * @type {string}
      * @memberof Event
      */
-    'calendar_uuid': string;
+    'calendarUuid': string;
     /**
      * Indicates whether this event has been deleted
      * @type {boolean}
@@ -55,37 +55,37 @@ export interface Event {
      * @type {string}
      * @memberof Event
      */
-    'end_time': string;
+    'endTime': string;
     /**
      * The unique identifier of the event from the calendar provider (Google, Microsoft)
      * @type {string}
      * @memberof Event
      */
-    'google_id': string;
+    'googleId': string;
     /**
      * Indicates whether the current user is the organizer of this event
      * @type {boolean}
      * @memberof Event
      */
-    'is_organizer': boolean;
+    'isOrganizer': boolean;
     /**
      * Indicates whether this event is part of a recurring series
      * @type {boolean}
      * @memberof Event
      */
-    'is_recurring': boolean;
+    'isRecurring': boolean;
     /**
      * The timestamp when this event was last updated
      * @type {string}
      * @memberof Event
      */
-    'last_updated_at': string;
+    'lastUpdatedAt': string;
     /**
      * The URL that can be used to join the meeting (if available)
      * @type {string}
      * @memberof Event
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * The title/name of the calendar event
      * @type {string}
@@ -109,7 +109,7 @@ export interface Event {
      * @type {string}
      * @memberof Event
      */
-    'start_time': string;
+    'startTime': string;
     /**
      * 
      * @type {string}

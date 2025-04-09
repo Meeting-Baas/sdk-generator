@@ -24,8 +24,37 @@ function transformProperties(obj) {
   return transformed;
 }
 
+// Function to transform snake_case to camelCase in a string
+function transformSnakeToCamel(content) {
+  // Transform property names in interfaces and types
+  content = content.replace(/'([a-z_]+)':/g, (match, p1) => {
+    const camelCase = toCamelCase(p1);
+    return `'${camelCase}':`;
+  });
+
+  // Transform property names in object literals
+  content = content.replace(/(\w+)_(\w+):/g, (match, p1, p2) => {
+    return `${p1}${p2.charAt(0).toUpperCase()}${p2.slice(1)}:`;
+  });
+
+  // Transform property access
+  content = content.replace(/\.([a-z_]+)/g, (match, p1) => {
+    const camelCase = toCamelCase(p1);
+    return `.${camelCase}`;
+  });
+
+  // Transform type references
+  content = content.replace(/type: '([a-z_]+)'/g, (match, p1) => {
+    const camelCase = toCamelCase(p1);
+    return `type: '${camelCase}'`;
+  });
+
+  return content;
+}
+
 // Read and transform the generated API files
 const apiDir = path.join(__dirname, '../src/generated/baas/api');
+const modelDir = path.join(__dirname, '../src/generated/baas/models');
 const files = fs.readdirSync(apiDir);
 
 // First pass: collect all API classes
@@ -41,8 +70,18 @@ files.forEach(file => {
   });
 });
 
-// Second pass: transform snake_case to camelCase in method names
-// but preserve certain constant names
+// Transform model files to use camelCase
+const modelFiles = fs.readdirSync(modelDir);
+modelFiles.forEach(file => {
+  if (!file.endsWith('.ts')) return;
+  
+  const filePath = path.join(modelDir, file);
+  let content = fs.readFileSync(filePath, 'utf8');
+  content = transformSnakeToCamel(content);
+  fs.writeFileSync(filePath, content);
+});
+
+// Transform API files to use camelCase
 files.forEach(file => {
   if (!file.endsWith('.ts')) return;
   
@@ -52,23 +91,16 @@ files.forEach(file => {
   // First fix the constant names in both imports and usage
   content = content.replace(/\bDUMMY_BASEURL\b/g, 'DUMMY_BASE_URL');
   content = content.replace(/\bBASEPATH\b/g, 'BASE_PATH');
+  content = content.replace(/\bBASE_PATH\b/g, 'basePath');
+  
+  // Fix the createRequestFunction calls to handle undefined basePath
+  content = content.replace(
+    /createRequestFunction\(([^)]+)\)\(axios, ([^)]+)\)/g,
+    'createRequestFunction($1)(axios, $2 || \'\')'
+  );
   
   // Then transform snake_case to camelCase in method names and parameters
-  // but skip lines containing import statements
-  const lines = content.split('\n');
-  const transformedLines = lines.map(line => {
-    if (line.trim().startsWith('import ')) {
-      return line;
-    }
-    return line.replace(/(\w+)_(\w+)/g, (match, p1, p2) => {
-      // Skip certain constants
-      if (match === 'DUMMY_BASE_URL' || match === 'BASE_PATH') {
-        return match;
-      }
-      return p1 + p2.charAt(0).toUpperCase() + p2.slice(1);
-    });
-  });
-  content = transformedLines.join('\n');
+  content = transformSnakeToCamel(content);
   
   fs.writeFileSync(filePath, content);
 });
@@ -81,6 +113,8 @@ baseFiles.forEach(file => {
     let content = fs.readFileSync(filePath, 'utf8');
     content = content.replace(/\bDUMMY_BASEURL\b/g, 'DUMMY_BASE_URL');
     content = content.replace(/\bBASEPATH\b/g, 'BASE_PATH');
+    content = content.replace(/\bBASE_PATH\b/g, 'basePath');
+    content = transformSnakeToCamel(content);
     fs.writeFileSync(filePath, content);
   }
 });

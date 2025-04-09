@@ -34,7 +34,7 @@ export interface BotWithParams {
      * @type {number}
      * @memberof BotWithParams
      */
-    'account_id': number;
+    'accountId': number;
     /**
      * 
      * @type {string}
@@ -46,19 +46,19 @@ export interface BotWithParams {
      * @type {string}
      * @memberof BotWithParams
      */
-    'bot_name': string;
+    'botName': string;
     /**
      * 
      * @type {number}
      * @memberof BotWithParams
      */
-    'bot_param_id': number;
+    'botParamId': number;
     /**
      * 
      * @type {string}
      * @memberof BotWithParams
      */
-    'created_at': string;
+    'createdAt': string;
     /**
      * 
      * @type {string}
@@ -76,7 +76,7 @@ export interface BotWithParams {
      * @type {string}
      * @memberof BotWithParams
      */
-    'ended_at': string | null;
+    'endedAt': string | null;
     /**
      * 
      * @type {string}
@@ -112,7 +112,7 @@ export interface BotWithParams {
      * @type {string}
      * @memberof BotWithParams
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * 
      * @type {string}
@@ -196,7 +196,7 @@ export interface BotWithParams {
      * @type {string}
      * @memberof BotWithParams
      */
-    'webhook_url': string;
+    'webhookUrl': string;
 }
 
 

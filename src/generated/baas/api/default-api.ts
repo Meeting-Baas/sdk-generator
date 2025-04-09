@@ -20,7 +20,7 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { basePath, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
 import type { DeleteResponse } from '../models';
 // @ts-ignore
@@ -51,13 +51,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {string | null} [filterByExtra] Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the &#x60;extra&#x60; JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \&quot;field:value\&quot; - Multiple conditions: \&quot;field1:value1,field2:value2\&quot;  Examples: - \&quot;customerId:12345\&quot; - Only bots with this customer ID - \&quot;status:active,project:sales\&quot; - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
          * @param {number} [limit] Maximum number of bots to return in a single request.  Limits the number of results returned in a single API call. This parameter helps control response size and page length.  Default: 10 Minimum: 1 Maximum: 50
          * @param {string | null} [meetingUrl] Filter bots by meeting URL containing this string.  Performs a case-insensitive partial match on the bot\&#39;s meeting URL. Use this to find bots associated with specific meeting platforms or particular meeting IDs.  Example: \&quot;zoom.us\&quot; would match all Zoom meetings
-         * @param {string | null} [sortByExtra] Sort the results by a field in the extra JSON payload.  This parameter performs in-memory sorting on the &#x60;extra&#x60; JSON field, similar to a SQL ORDER BY clause. It changes the order of results but not which results are included.  Format specifications: - Default (ascending): \&quot;field\&quot; - Explicit direction: \&quot;field:asc\&quot; or \&quot;field:desc\&quot;  Examples: - \&quot;customerId\&quot; - Sort by customerId (ascending) - \&quot;priority:desc\&quot; - Sort by priority (descending)  Notes: - Applied after all filtering - String comparison is used for sorting - Bots with the field come before bots without it - Can be combined with filter_byExtra
+         * @param {string | null} [sortByExtra] Sort the results by a field in the extra JSON payload.  This parameter performs in-memory sorting on the &#x60;extra&#x60; JSON field, similar to a SQL ORDER BY clause. It changes the order of results but not which results are included.  Format specifications: - Default (ascending): \&quot;field\&quot; - Explicit direction: \&quot;field:asc\&quot; or \&quot;field:desc\&quot;  Examples: - \&quot;customer_id\&quot; - Sort by customer_id (ascending) - \&quot;priority:desc\&quot; - Sort by priority (descending)  Notes: - Applied after all filtering - String comparison is used for sorting - Bots with the field come before bots without it - Can be combined with filter_by_extra
          * @param {string | null} [speakerName] NOTE: this is a preview feature and not yet available  Filter bots by speaker name containing this string.  Performs a case-insensitive partial match on the speakers in the meeting. Useful for finding meetings that included a specific person.  Example: \&quot;John\&quot; would match meetings with speakers like \&quot;John Smith\&quot; or \&quot;John Doe\&quot;
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         botsWithMetadata: async (botName?: string | null, createdAfter?: string | null, createdBefore?: string | null, cursor?: string | null, filterByExtra?: string | null, limit?: number, meetingUrl?: string | null, sortByExtra?: string | null, speakerName?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/bots/bots_withMetadata`;
+            const localVarPath = `/bots/bots_with_metadata`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -73,15 +73,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             await setApiKeyToObject(localVarHeaderParameter, "x-meeting-baas-api-key", configuration)
 
             if (botName !== undefined) {
-                localVarQueryParameter['botName'] = botName;
+                localVarQueryParameter['bot_name'] = botName;
             }
 
             if (createdAfter !== undefined) {
-                localVarQueryParameter['createdAfter'] = createdAfter;
+                localVarQueryParameter['created_after'] = createdAfter;
             }
 
             if (createdBefore !== undefined) {
-                localVarQueryParameter['createdBefore'] = createdBefore;
+                localVarQueryParameter['created_before'] = createdBefore;
             }
 
             if (cursor !== undefined) {
@@ -89,7 +89,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
             if (filterByExtra !== undefined) {
-                localVarQueryParameter['filter_byExtra'] = filterByExtra;
+                localVarQueryParameter['filter_by_extra'] = filterByExtra;
             }
 
             if (limit !== undefined) {
@@ -97,15 +97,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
             if (meetingUrl !== undefined) {
-                localVarQueryParameter['meetingUrl'] = meetingUrl;
+                localVarQueryParameter['meeting_url'] = meetingUrl;
             }
 
             if (sortByExtra !== undefined) {
-                localVarQueryParameter['sort_byExtra'] = sortByExtra;
+                localVarQueryParameter['sort_by_extra'] = sortByExtra;
             }
 
             if (speakerName !== undefined) {
-                localVarQueryParameter['speakerName'] = speakerName;
+                localVarQueryParameter['speaker_name'] = speakerName;
             }
 
 
@@ -126,7 +126,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         deleteData: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/bots/{uuid}/deleteData`;
+            const localVarPath = `/bots/{uuid}/delete_data`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -162,7 +162,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getMeetingData: async (botId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'botId' is not null or undefined
             assertParamExists('getMeetingData', 'botId', botId)
-            const localVarPath = `/bots/meetingData`;
+            const localVarPath = `/bots/meeting_data`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -178,7 +178,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             await setApiKeyToObject(localVarHeaderParameter, "x-meeting-baas-api-key", configuration)
 
             if (botId !== undefined) {
-                localVarQueryParameter['botId'] = botId;
+                localVarQueryParameter['bot_id'] = botId;
             }
 
 
@@ -323,7 +323,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {string | null} [filterByExtra] Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the &#x60;extra&#x60; JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \&quot;field:value\&quot; - Multiple conditions: \&quot;field1:value1,field2:value2\&quot;  Examples: - \&quot;customerId:12345\&quot; - Only bots with this customer ID - \&quot;status:active,project:sales\&quot; - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
          * @param {number} [limit] Maximum number of bots to return in a single request.  Limits the number of results returned in a single API call. This parameter helps control response size and page length.  Default: 10 Minimum: 1 Maximum: 50
          * @param {string | null} [meetingUrl] Filter bots by meeting URL containing this string.  Performs a case-insensitive partial match on the bot\&#39;s meeting URL. Use this to find bots associated with specific meeting platforms or particular meeting IDs.  Example: \&quot;zoom.us\&quot; would match all Zoom meetings
-         * @param {string | null} [sortByExtra] Sort the results by a field in the extra JSON payload.  This parameter performs in-memory sorting on the &#x60;extra&#x60; JSON field, similar to a SQL ORDER BY clause. It changes the order of results but not which results are included.  Format specifications: - Default (ascending): \&quot;field\&quot; - Explicit direction: \&quot;field:asc\&quot; or \&quot;field:desc\&quot;  Examples: - \&quot;customerId\&quot; - Sort by customerId (ascending) - \&quot;priority:desc\&quot; - Sort by priority (descending)  Notes: - Applied after all filtering - String comparison is used for sorting - Bots with the field come before bots without it - Can be combined with filter_byExtra
+         * @param {string | null} [sortByExtra] Sort the results by a field in the extra JSON payload.  This parameter performs in-memory sorting on the &#x60;extra&#x60; JSON field, similar to a SQL ORDER BY clause. It changes the order of results but not which results are included.  Format specifications: - Default (ascending): \&quot;field\&quot; - Explicit direction: \&quot;field:asc\&quot; or \&quot;field:desc\&quot;  Examples: - \&quot;customer_id\&quot; - Sort by customer_id (ascending) - \&quot;priority:desc\&quot; - Sort by priority (descending)  Notes: - Applied after all filtering - String comparison is used for sorting - Bots with the field come before bots without it - Can be combined with filter_by_extra
          * @param {string | null} [speakerName] NOTE: this is a preview feature and not yet available  Filter bots by speaker name containing this string.  Performs a case-insensitive partial match on the speakers in the meeting. Useful for finding meetings that included a specific person.  Example: \&quot;John\&quot; would match meetings with speakers like \&quot;John Smith\&quot; or \&quot;John Doe\&quot;
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -332,7 +332,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.botsWithMetadata(botName, createdAfter, createdBefore, cursor, filterByExtra, limit, meetingUrl, sortByExtra, speakerName, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.botsWithMetadata']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
@@ -344,7 +344,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteData(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteData']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Get meeting recording and metadata
@@ -357,7 +357,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMeetingData(botId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getMeetingData']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Have a bot join a meeting, now or in the future
@@ -370,7 +370,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.join(joinRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.join']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Leave
@@ -382,7 +382,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.leave(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.leave']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Transcribe or retranscribe a bot\'s audio using the Default or your provided Speech to Text Provider
@@ -395,7 +395,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.retranscribeBot(retranscribeBody, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.retranscribeBot']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
@@ -590,7 +590,7 @@ export interface DefaultApiBotsWithMetadataRequest {
     readonly meetingUrl?: string | null
 
     /**
-     * Sort the results by a field in the extra JSON payload.  This parameter performs in-memory sorting on the &#x60;extra&#x60; JSON field, similar to a SQL ORDER BY clause. It changes the order of results but not which results are included.  Format specifications: - Default (ascending): \&quot;field\&quot; - Explicit direction: \&quot;field:asc\&quot; or \&quot;field:desc\&quot;  Examples: - \&quot;customerId\&quot; - Sort by customerId (ascending) - \&quot;priority:desc\&quot; - Sort by priority (descending)  Notes: - Applied after all filtering - String comparison is used for sorting - Bots with the field come before bots without it - Can be combined with filter_byExtra
+     * Sort the results by a field in the extra JSON payload.  This parameter performs in-memory sorting on the &#x60;extra&#x60; JSON field, similar to a SQL ORDER BY clause. It changes the order of results but not which results are included.  Format specifications: - Default (ascending): \&quot;field\&quot; - Explicit direction: \&quot;field:asc\&quot; or \&quot;field:desc\&quot;  Examples: - \&quot;customer_id\&quot; - Sort by customer_id (ascending) - \&quot;priority:desc\&quot; - Sort by priority (descending)  Notes: - Applied after all filtering - String comparison is used for sorting - Bots with the field come before bots without it - Can be combined with filter_by_extra
      * @type {string}
      * @memberof DefaultApiBotsWithMetadata
      */

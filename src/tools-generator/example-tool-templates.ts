@@ -24,128 +24,89 @@ import {
 import * as MpcTools from "../mpc/tools";
 import { ToolDefinition } from "../mpc/types";
 import { Configuration } from "../generated/baas/configuration";
+import { Tool } from '../types/tool';
 
 // Define a generic calendar event type for example purposes
 interface CalendarEvent {
   uuid: string;
   name: string;
-  start_time: number | string;
-  end_time: number | string;
-  meeting_url?: string;
-  calendar_uuid?: string;
-  bot_param?: any;
+  startTime: number | string;
+  endTime: number | string;
+  meetingUrl?: string;
+  calendarUuid?: string;
+  botParam?: any;
 }
 
 // Example 1: Simple tool with a single parameter
-export const join_meeting_tool: ToolDefinition = MpcTools.createTool(
-  "join_meeting",
-  "Have a bot join a meeting and start recording",
-  [
-    MpcTools.createStringParameter(
-      "api_key",
-      "Your Meeting BaaS API key",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "bot_name",
-      "The display name of the bot in the meeting",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "meeting_url",
-      "The URL of the meeting to join (Zoom, Google Meet, or Microsoft Teams)",
-      true
-    ),
-    MpcTools.createBooleanParameter(
-      "reserved",
-      "Whether to reserve a bot (true) or use one from the pool (false)",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "webhook_url",
-      "Optional URL to receive webhook notifications about the bot",
-      false
-    ),
-    MpcTools.createStringParameter(
-      "bot_image",
-      "Optional URL to an image for the bot avatar",
-      false
-    ),
-    MpcTools.createStringParameter(
-      "entry_message",
-      "Optional message for the bot to send upon joining",
-      false
-    ),
-    MpcTools.createEnumParameter(
-      "recording_mode",
-      ["speaker_view", "gallery_view", "audio_only"],
-      "Which recording mode to use (defaults to speaker_view)",
-      false
-    ),
-    MpcTools.createObjectParameter(
-      "speech_to_text",
-      {
-        provider: {
-          type: "string",
-          enum: ["Gladia", "Runpod", "Default"],
-          description: "Which speech-to-text provider to use",
-        },
-        api_key: {
-          type: "string",
-          description: "API key for the speech-to-text provider (if required)",
-        },
+export const joinMeetingTool: Tool = {
+  name: 'joinMeeting',
+  description: 'Join a meeting with a bot',
+  parameters: {
+    type: 'object',
+    properties: {
+      meetingUrl: {
+        type: 'string',
+        description: 'The URL of the meeting to join'
       },
-      "Speech-to-text configuration (optional)",
-      false
-    ),
-    MpcTools.createNumberParameter(
-      "start_time",
-      "Optional UNIX timestamp (in ms) of when the meeting starts",
-      false
-    ),
-    MpcTools.createObjectParameter(
-      "extra",
-      {
-        additionalProperties: true,
+      botName: {
+        type: 'string',
+        description: 'The name of the bot to use'
       },
-      "Optional additional metadata for the meeting",
-      false
-    ),
-  ]
-);
+      botConfig: {
+        type: 'object',
+        description: 'Configuration for the bot',
+        properties: {
+          language: {
+            type: 'string',
+            description: 'The language the bot should use'
+          },
+          voice: {
+            type: 'string',
+            description: 'The voice to use for the bot'
+          },
+          behavior: {
+            type: 'string',
+            description: 'The behavior mode for the bot'
+          }
+        }
+      }
+    },
+    required: ['meetingUrl', 'botName']
+  }
+};
 
 // Add JSON schema for validation
-export const join_meeting_schema = {
+export const joinMeetingSchema = {
   type: "object",
   properties: {
-    api_key: { type: "string" },
-    bot_name: { type: "string" },
-    meeting_url: { type: "string" },
+    apiKey: { type: "string" },
+    botName: { type: "string" },
+    meetingUrl: { type: "string" },
     reserved: { type: "boolean" },
-    webhook_url: { type: "string" },
-    bot_image: { type: "string" },
-    entry_message: { type: "string" },
-    recording_mode: {
+    webhookUrl: { type: "string" },
+    botImage: { type: "string" },
+    entryMessage: { type: "string" },
+    recordingMode: {
       type: "string",
       enum: ["speaker_view", "gallery_view", "audio_only"],
     },
-    speech_to_text: {
+    speechToText: {
       type: "object",
       properties: {
         provider: {
           type: "string",
           enum: ["Gladia", "Runpod", "Default"],
         },
-        api_key: { type: "string" },
+        apiKey: { type: "string" },
       },
     },
-    start_time: { type: "number" },
+    startTime: { type: "number" },
     extra: {
       type: "object",
       additionalProperties: true,
     },
   },
-  required: ["api_key", "bot_name", "meeting_url", "reserved"],
+  required: ["apiKey", "botName", "meetingUrl", "reserved"],
 };
 
 // Example of a tool execution function
@@ -156,20 +117,20 @@ export async function executeJoinMeeting(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key
+      apiKey: args.apiKey
     });
 
     // Convert from snake_case tool parameters to camelCase SDK parameters
     const result = await client.joinMeeting({
-      bot_name: args.bot_name,
-      meeting_url: args.meeting_url,
+      botName: args.botName,
+      meetingUrl: args.meetingUrl,
       reserved: args.reserved,
-      webhook_url: args.webhook_url,
-      bot_image: args.bot_image,
-      entry_message: args.entry_message,
-      recording_mode: args.recording_mode as RecordingMode,
-      speech_to_text: args.speech_to_text as SpeechToText,
-      start_time: args.start_time,
+      webhookUrl: args.webhookUrl,
+      botImage: args.botImage,
+      entryMessage: args.entryMessage,
+      recordingMode: args.recordingMode,
+      speechToText: args.speechToText,
+      startTime: args.startTime,
       extra: args.extra
     });
 
@@ -182,31 +143,25 @@ export async function executeJoinMeeting(
 }
 
 // Example 2: Simple tool with a string parameter
-export const leave_meeting_tool: ToolDefinition = MpcTools.createTool(
-  "leave_meeting",
-  "Have a bot leave a meeting it has joined",
+export const leaveMeetingTool: ToolDefinition = MpcTools.createTool(
+  "leave-meeting",
+  "Leaves a meeting",
   [
     MpcTools.createStringParameter(
-      "api_key",
-      "Your Meeting BaaS API key",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "bot_id",
-      "The ID of the bot to remove from the meeting",
+      "apiKey",
+      "API key for authentication",
       true
     ),
   ]
 );
 
 // Add JSON schema for validation
-export const leave_meeting_schema = {
+export const leaveMeetingSchema = {
   type: "object",
   properties: {
-    api_key: { type: "string" },
-    bot_id: { type: "string" },
+    apiKey: { type: "string" },
   },
-  required: ["api_key", "bot_id"],
+  required: ["apiKey"],
 };
 
 // Example of a tool execution function
@@ -217,7 +172,7 @@ export async function executeLeaveMeeting(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key
+      apiKey: args.apiKey
     });
 
     const result = await client.leaveMeeting();
@@ -235,43 +190,42 @@ export async function executeLeaveMeeting(
 }
 
 // Example 3: Calendar integration tool with multiple parameters
-export const create_calendar_tool: ToolDefinition = MpcTools.createTool(
-  "create_calendar",
-  "Integrate a calendar using OAuth credentials",
-  [
-    MpcTools.createStringParameter(
-      "api_key",
-      "Your Meeting BaaS API key",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "oauth_client_id",
-      "OAuth client ID from Google Cloud Console or Microsoft Azure",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "oauth_client_secret",
-      "OAuth client secret from Google Cloud Console or Microsoft Azure",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "oauth_refresh_token",
-      "OAuth refresh token obtained after the user grants calendar access",
-      true
-    ),
-    MpcTools.createEnumParameter(
-      "platform",
-      ["Google", "Microsoft"],
-      "The calendar provider platform",
-      true
-    ),
-    MpcTools.createStringParameter(
-      "raw_calendar_id",
-      "Optional ID of a specific calendar to integrate",
-      false
-    ),
-  ]
-);
+export const createCalendarTool: Tool = {
+  name: 'createCalendar',
+  description: 'Create a new calendar',
+  parameters: {
+    type: 'object',
+    properties: {
+      oauthCredentials: {
+        type: 'object',
+        description: 'OAuth credentials for calendar access',
+        properties: {
+          clientId: {
+            type: 'string',
+            description: 'OAuth client ID'
+          },
+          clientSecret: {
+            type: 'string',
+            description: 'OAuth client secret'
+          },
+          redirectUri: {
+            type: 'string',
+            description: 'OAuth redirect URI'
+          }
+        }
+      },
+      platform: {
+        type: 'string',
+        description: 'The calendar platform (e.g. google, microsoft)'
+      },
+      calendarName: {
+        type: 'string',
+        description: 'The name of the calendar to create'
+      }
+    },
+    required: ['oauthCredentials', 'platform', 'calendarName']
+  }
+};
 
 // Example of a tool execution function
 export async function executeCreateCalendar(
@@ -281,15 +235,15 @@ export async function executeCreateCalendar(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     const result = await client.createCalendar({
-      oauth_client_id: args.oauth_client_id,
-      oauth_client_secret: args.oauth_client_secret,
-      oauth_refresh_token: args.oauth_refresh_token,
+      oauthClientId: args.oauthClientId,
+      oauthClientSecret: args.oauthClientSecret,
+      oauthRefreshToken: args.oauthRefreshToken,
       platform: args.platform as Provider,
-      raw_calendar_id: args.raw_calendar_id,
+      raw_calendar_id: args.rawCalendarId,
     });
 
     return `Calendar successfully integrated!\n\nDetails:\nName: ${result.calendar.name}\nEmail: ${result.calendar.email}\nUUID: ${result.calendar.uuid}`;
@@ -301,50 +255,50 @@ export async function executeCreateCalendar(
 }
 
 // Example 4: Complex tool for scheduling recordings for calendar events
-export const schedule_record_event_tool: ToolDefinition = MpcTools.createTool(
+export const scheduleRecordEventTool: ToolDefinition = MpcTools.createTool(
   "schedule_record_event",
   "Schedule a bot to record a specific calendar event",
   [
     MpcTools.createStringParameter(
-      "api_key",
+      "apiKey",
       "Your Meeting BaaS API key",
       true
     ),
     MpcTools.createStringParameter(
-      "event_uuid",
+      "eventUuid",
       "The UUID of the calendar event to record",
       true
     ),
     MpcTools.createStringParameter(
-      "bot_name",
+      "botName",
       "The display name of the bot in the meeting",
       true
     ),
     MpcTools.createStringParameter(
-      "webhook_url",
+      "webhookUrl",
       "Optional URL to receive webhook notifications about the bot",
       false
     ),
     MpcTools.createStringParameter(
-      "bot_image",
+      "botImage",
       "Optional URL to an image for the bot avatar",
       false
     ),
     MpcTools.createEnumParameter(
-      "recording_mode",
+      "recordingMode",
       ["speaker_view", "gallery_view", "audio_only"],
       "Which recording mode to use (defaults to speaker_view)",
       false
     ),
     MpcTools.createObjectParameter(
-      "speech_to_text",
+      "speechToText",
       {
         provider: {
           type: "string",
           enum: ["Gladia", "Runpod", "Default"],
           description: "Which speech-to-text provider to use",
         },
-        api_key: {
+        apiKey: {
           type: "string",
           description: "API key for the speech-to-text provider (if required)",
         },
@@ -353,7 +307,7 @@ export const schedule_record_event_tool: ToolDefinition = MpcTools.createTool(
       false
     ),
     MpcTools.createBooleanParameter(
-      "all_occurrences",
+      "allOccurrences",
       "Whether to schedule recording for all occurrences of a recurring event",
       false
     ),
@@ -369,35 +323,35 @@ export const schedule_record_event_tool: ToolDefinition = MpcTools.createTool(
 );
 
 // Add JSON schema for validation
-export const schedule_record_event_schema = {
+export const scheduleRecordEventSchema = {
   type: "object",
   properties: {
-    api_key: { type: "string" },
-    event_uuid: { type: "string" },
-    bot_name: { type: "string" },
-    webhook_url: { type: "string" },
-    bot_image: { type: "string" },
-    recording_mode: {
+    apiKey: { type: "string" },
+    eventUuid: { type: "string" },
+    botName: { type: "string" },
+    webhookUrl: { type: "string" },
+    botImage: { type: "string" },
+    recordingMode: {
       type: "string",
       enum: ["speaker_view", "gallery_view", "audio_only"],
     },
-    speech_to_text: {
+    speechToText: {
       type: "object",
       properties: {
         provider: {
           type: "string",
           enum: ["Gladia", "Runpod", "Default"],
         },
-        api_key: { type: "string" },
+        apiKey: { type: "string" },
       },
     },
-    all_occurrences: { type: "boolean" },
+    allOccurrences: { type: "boolean" },
     extra: {
       type: "object",
       additionalProperties: true,
     },
   },
-  required: ["api_key", "event_uuid", "bot_name"],
+  required: ["apiKey", "eventUuid", "botName"],
 };
 
 // Example of a complex tool execution function with formatted response
@@ -408,32 +362,32 @@ export async function executeScheduleRecordEvent(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Prepare bot parameters for the API
     const botParams: BotParam2 = {
-      bot_name: args.bot_name,
-      webhook_url: args.webhook_url || undefined,
-      bot_image: args.bot_image || undefined,
-      recording_mode: (args.recording_mode as RecordingMode) || undefined,
+      botName: args.botName,
+      webhook_url: args.webhookUrl || undefined,
+      bot_image: args.botImage || undefined,
+      recording_mode: (args.recordingMode as RecordingMode) || undefined,
       extra: args.extra || {},
     };
 
     // Add speech to text if provided
-    if (args.speech_to_text) {
+    if (args.speechToText) {
       botParams.speech_to_text = {
-        provider: args.speech_to_text.provider as SpeechToTextProvider,
-        api_key: args.speech_to_text.api_key,
+        provider: args.speechToText.provider as SpeechToTextProvider,
+        api_key: args.speechToText.apiKey,
       };
     }
 
     // Call the SDK method - assuming the client has this method
     // This is an example for the AI model - the actual method name or parameters may differ
     const events = (await (client as any).scheduleRecordEvent(
-      args.event_uuid,
+      args.eventUuid,
       botParams,
-      args.all_occurrences
+      args.allOccurrences
     )) as Event[];
 
     // Format a user-friendly response
@@ -446,11 +400,11 @@ export async function executeScheduleRecordEvent(
       return `Successfully scheduled recording for event "${event.name}"
       
 Event details:
-- Start time: ${new Date(event.start_time).toLocaleString()}
-- End time: ${new Date(event.end_time).toLocaleString()}
-- Meeting URL: ${event.meeting_url || "Not available"}
-- Calendar: ${event.calendar_uuid}
-- Bot name: ${args.bot_name}
+- Start time: ${new Date(event.startTime).toLocaleString()}
+- End time: ${new Date(event.endTime).toLocaleString()}
+- Meeting URL: ${event.meetingUrl || "Not available"}
+- Calendar: ${event.calendarUuid}
+- Bot name: ${args.botName}
 
 The bot will automatically join this meeting at the scheduled time.`;
     } else {
@@ -464,13 +418,13 @@ ${events
   .map(
     (event: Event, i: number) =>
       `${i + 1}. "${event.name}" on ${new Date(
-        event.start_time
+        event.startTime
       ).toLocaleString()}`
   )
   .join("\n")}
 
 ${events.length > 3 ? `...and ${events.length - 3} more occurrences.\n` : ""}
-All recordings will use bot name: ${args.bot_name}`;
+All recordings will use bot name: ${args.botName}`;
     }
   } catch (error) {
     return `Error scheduling event recording: ${
@@ -480,31 +434,31 @@ All recordings will use bot name: ${args.bot_name}`;
 }
 
 // Example 5: API endpoint that returns complex data
-export const get_meeting_data_tool: ToolDefinition = MpcTools.createTool(
-  "get_meeting_data",
-  "Retrieve meeting recording, transcription and metadata for a bot",
+export const getMeetingDataTool: ToolDefinition = MpcTools.createTool(
+  "get-meeting-data",
+  "Gets data for a specific meeting",
   [
     MpcTools.createStringParameter(
-      "api_key",
-      "Your Meeting BaaS API key",
+      "apiKey",
+      "API key for authentication",
       true
     ),
     MpcTools.createStringParameter(
-      "bot_id",
-      "The ID of the bot to retrieve data for",
+      "botId",
+      "ID of the bot to get data for",
       true
-    ),
+    )
   ]
 );
 
 // Add JSON schema for validation
-export const get_meeting_data_schema = {
+export const getMeetingDataSchema = {
   type: "object",
   properties: {
-    api_key: { type: "string" },
-    bot_id: { type: "string" },
+    apiKey: { type: "string" },
+    botId: { type: "string" },
   },
-  required: ["api_key", "bot_id"],
+  required: ["apiKey", "botId"],
 };
 
 // Example of handling complex response data in a human-readable format
@@ -515,10 +469,10 @@ export async function executeGetMeetingData(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
-    const data = await client.getMeetingData(args.bot_id);
+    const data = await client.getMeetingData(args.botId);
 
     if (!data) {
       return "No meeting data found for this bot ID.";
@@ -526,11 +480,11 @@ export async function executeGetMeetingData(
 
     // Format the transcripts for better readability
     const transcriptSummary =
-      data.bot_data.transcripts.length > 0
-        ? data.bot_data.transcripts
+      data.botData.transcripts.length > 0
+        ? data.botData.transcripts
             .map((transcript: Transcript, i: number) => {
               return `${i + 1}. ${transcript.speaker} (${formatTime(
-                transcript.start_time
+                transcript.startTime
               )}): "${transcript.words.map((w: Word) => w.text).join(" ")}"`;
             })
             .join("\n\n")
@@ -539,27 +493,27 @@ export async function executeGetMeetingData(
 
     // Add ellipsis if transcripts were truncated
     const transcriptEllipsis =
-      data.bot_data.transcripts.length > 0 && transcriptSummary.length >= 1000
+      data.botData.transcripts.length > 0 && transcriptSummary.length >= 1000
         ? "\n\n... (transcript truncated)"
         : "";
 
-    return `Meeting Data for Bot ID: ${args.bot_id}
+    return `Meeting Data for Bot ID: ${args.botId}
 
 Recording URL: ${data.mp4 || "Not available"}
 Duration: ${formatDuration(data.duration)}
-Deleted: ${data.content_deleted ? "Yes" : "No"}
+Deleted: ${data.contentDeleted ? "Yes" : "No"}
 
 Bot Details:
-- Name: ${data.bot_data.bot.bot_name}
-- Meeting URL: ${data.bot_data.bot.meeting_url}
-- Created: ${new Date(data.bot_data.bot.created_at).toLocaleString()}
+- Name: ${data.botData.bot.botName}
+- Meeting URL: ${data.botData.bot.meetingUrl}
+- Created: ${new Date(data.botData.bot.createdAt).toLocaleString()}
 - Ended: ${
-      data.bot_data.bot.ended_at
-        ? new Date(data.bot_data.bot.ended_at).toLocaleString()
+      data.botData.bot.endedAt
+        ? new Date(data.botData.bot.endedAt).toLocaleString()
         : "Still active or information not available"
     }
 
-Transcripts (${data.bot_data.transcripts.length} segments):
+Transcripts (${data.botData.transcripts.length} segments):
 ${transcriptSummary}${transcriptEllipsis}`;
   } catch (error) {
     return `Error retrieving meeting data: ${
@@ -569,17 +523,17 @@ ${transcriptSummary}${transcriptEllipsis}`;
 }
 
 // Example 6: Get meeting transcript with formatted output
-export const get_meeting_transcript_tool: ToolDefinition = MpcTools.createTool(
+export const getMeetingTranscriptTool: ToolDefinition = MpcTools.createTool(
   "get_meeting_transcript",
   "Get a meeting transcript with speaker names and content grouped by speaker",
   [
     MpcTools.createStringParameter(
-      "api_key",
+      "apiKey",
       "Your Meeting BaaS API key",
       true
     ),
     MpcTools.createStringParameter(
-      "bot_id",
+      "botId",
       "The ID of the bot/meeting to retrieve transcript for",
       true
     ),
@@ -594,26 +548,26 @@ export async function executeGetMeetingTranscript(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Get meeting data from the API
-    const response = await client.getMeetingData(args.bot_id);
+    const response = await client.getMeetingData(args.botId);
 
     // Check for valid response structure
-    if (!response || !response.bot_data) {
+    if (!response || !response.botData) {
       return "Error: Invalid response structure from API.";
     }
 
     // Extract meeting information
     const meetingInfo = {
-      name: response.bot_data.bot?.bot_name || "Unknown Meeting",
-      url: response.bot_data.bot?.meeting_url || "Unknown URL",
+      name: response.botData.bot?.botName || "Unknown Meeting",
+      url: response.botData.bot?.meetingUrl || "Unknown URL",
       duration: response.duration || 0,
     };
 
     // Extract transcripts from the response
-    const transcripts = response.bot_data.transcripts || [];
+    const transcripts = response.botData.transcripts || [];
 
     // If no transcripts, provide info about the meeting
     if (transcripts.length === 0) {
@@ -686,18 +640,18 @@ export async function executeGetMeetingTranscript(
 }
 
 // Example 7: Search in meeting transcript for keywords or phrases
-export const search_meeting_transcript_tool: ToolDefinition =
+export const searchMeetingTranscriptTool: ToolDefinition =
   MpcTools.createTool(
     "search_meeting_transcript",
     "Search through a meeting transcript for specific keywords or phrases",
     [
       MpcTools.createStringParameter(
-        "api_key",
+        "apiKey",
         "Your Meeting BaaS API key",
         true
       ),
       MpcTools.createStringParameter(
-        "bot_id",
+        "botId",
         "The ID of the bot/meeting to search in",
         true
       ),
@@ -707,12 +661,12 @@ export const search_meeting_transcript_tool: ToolDefinition =
         true
       ),
       MpcTools.createBooleanParameter(
-        "case_sensitive",
+        "caseSensitive",
         "Whether the search should be case sensitive (defaults to false)",
         false
       ),
       MpcTools.createNumberParameter(
-        "context_seconds",
+        "contextSeconds",
         "Number of seconds of context to include before and after matches (defaults to 10)",
         false
       ),
@@ -727,25 +681,25 @@ export async function executeSearchMeetingTranscript(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Get meeting data from the API
-    const response = await client.getMeetingData(args.bot_id);
+    const response = await client.getMeetingData(args.botId);
 
     // Check if we have a valid meeting with transcripts
-    if (!response || !response.bot_data || !response.bot_data.transcripts) {
+    if (!response || !response.botData || !response.botData.transcripts) {
       return "No transcript found for this meeting.";
     }
 
-    const transcripts = response.bot_data.transcripts;
+    const transcripts = response.botData.transcripts;
     if (transcripts.length === 0) {
       return "This meeting has no transcript segments to search through.";
     }
 
     // Prepare the search
-    const query = args.case_sensitive ? args.query : args.query.toLowerCase();
-    const contextSeconds = args.context_seconds || 10;
+    const query = args.caseSensitive ? args.query : args.query.toLowerCase();
+    const contextSeconds = args.contextSeconds || 10;
     const matches: any[] = [];
 
     // Search through all transcript segments
@@ -763,18 +717,18 @@ export async function executeSearchMeetingTranscript(
       const segmentText = segment.words
         .map((word: Word) => word.text)
         .join(" ");
-      const textToSearch = args.case_sensitive
+      const textToSearch = args.caseSensitive
         ? segmentText
         : segmentText.toLowerCase();
 
       // Check if this segment contains the query
       if (textToSearch.includes(query)) {
         matches.push({
-          timestamp: segment.start_time,
+          timestamp: segment.startTime,
           speaker: segment.speaker,
           text: segmentText,
           // Include any other metadata that might be useful
-          segment_start: segment.start_time,
+          segment_start: segment.startTime,
           segment_end: segment.end_time,
         });
       }
@@ -789,7 +743,7 @@ export async function executeSearchMeetingTranscript(
     matches.sort((a, b) => a.timestamp - b.timestamp);
 
     // Format the results
-    const meetingName = response.bot_data.bot?.bot_name || "Unknown Meeting";
+    const meetingName = response.botData.bot?.botName || "Unknown Meeting";
     const formattedMatches = matches
       .map((match, index) => {
         // Format timestamp as mm:ss
@@ -813,17 +767,17 @@ export async function executeSearchMeetingTranscript(
 }
 
 // Example 8: List upcoming meetings from a calendar
-export const list_upcoming_meetings_tool: ToolDefinition = MpcTools.createTool(
+export const listUpcomingMeetingsTool: ToolDefinition = MpcTools.createTool(
   "list_upcoming_meetings",
   "List upcoming meetings from a calendar",
   [
     MpcTools.createStringParameter(
-      "api_key",
+      "apiKey",
       "Your Meeting BaaS API key",
       true
     ),
     MpcTools.createStringParameter(
-      "calendar_id",
+      "calendarId",
       "UUID of the calendar to query",
       true
     ),
@@ -849,7 +803,7 @@ export async function executeListUpcomingMeetings(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Set default values
@@ -859,7 +813,7 @@ export async function executeListUpcomingMeetings(
     // Get events from the calendar
     // Note: This is a mock implementation - the actual client may not have this exact method
     // Use type assertion to avoid TypeScript errors in this example
-    const response = await (client as any).listEvents(args.calendar_id, {
+    const response = await (client as any).listEvents(args.calendarId, {
       status: status,
       limit: limit,
     });
@@ -876,12 +830,12 @@ export async function executeListUpcomingMeetings(
     const meetingList = meetings
       .map((meeting: CalendarEvent) => {
         const startTime =
-          typeof meeting.start_time === "number"
-            ? new Date(meeting.start_time).toLocaleString()
-            : new Date(meeting.start_time as string).toLocaleString();
-        const hasBot = meeting.bot_param ? "🤖 Bot scheduled" : "";
-        const meetingLink = meeting.meeting_url
-          ? `Link: ${meeting.meeting_url}`
+          typeof meeting.startTime === "number"
+            ? new Date(meeting.startTime).toLocaleString()
+            : new Date(meeting.startTime as string).toLocaleString();
+        const hasBot = meeting.botParam ? "🤖 Bot scheduled" : "";
+        const meetingLink = meeting.meetingUrl
+          ? `Link: ${meeting.meetingUrl}`
           : "";
 
         return `- ${meeting.name} [${startTime}] ${hasBot} ${meetingLink} [ID: ${meeting.uuid}]`;
@@ -906,22 +860,22 @@ export async function executeListUpcomingMeetings(
 }
 
 // Example 9: Find key moments in a meeting
-export const find_key_moments_tool: ToolDefinition = MpcTools.createTool(
+export const findKeyMomentsTool: ToolDefinition = MpcTools.createTool(
   "find_key_moments",
   "Automatically find and share key moments and topics from a meeting recording",
   [
     MpcTools.createStringParameter(
-      "api_key",
+      "apiKey",
       "Your Meeting BaaS API key",
       true
     ),
     MpcTools.createStringParameter(
-      "bot_id",
+      "botId",
       "ID of the bot that recorded the meeting",
       true
     ),
     MpcTools.createStringParameter(
-      "meeting_title",
+      "meetingTitle",
       "Title of the meeting (optional)",
       false
     ),
@@ -932,7 +886,7 @@ export const find_key_moments_tool: ToolDefinition = MpcTools.createTool(
       false
     ),
     MpcTools.createNumberParameter(
-      "max_moments",
+      "maxMoments",
       "Maximum number of key moments to find (defaults to 5)",
       false
     ),
@@ -953,29 +907,29 @@ export async function executeFindKeyMoments(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Get the meeting data
-    const response = await client.getMeetingData(args.bot_id);
+    const response = await client.getMeetingData(args.botId);
 
     // Check if we have a valid response
-    if (!response?.bot_data?.bot) {
-      return `Could not find meeting data for the provided bot ID: ${args.bot_id}`;
+    if (!response?.botData?.bot) {
+      return `Could not find meeting data for the provided bot ID: ${args.botId}`;
     }
 
     const meetingTitle =
-      args.meeting_title ||
-      response.bot_data.bot.bot_name ||
+      args.meetingTitle ||
+      response.botData.bot.botName ||
       "Meeting Recording";
-    const transcripts = response.bot_data.transcripts || [];
+    const transcripts = response.botData.transcripts || [];
 
     if (transcripts.length === 0) {
       return `No transcript found for meeting "${meetingTitle}". Cannot extract key moments without a transcript.`;
     }
 
     // Set default values
-    const maxMoments = args.max_moments || 5;
+    const maxMoments = args.maxMoments || 5;
     const granularity = args.granularity || "medium";
 
     // Analyze transcripts to find key moments
@@ -984,7 +938,7 @@ export async function executeFindKeyMoments(
 
     // Sort transcripts chronologically
     const sortedTranscripts = [...transcripts].sort(
-      (a, b) => Number(a.start_time) - Number(b.start_time)
+      (a, b) => Number(a.startTime) - Number(b.startTime)
     );
 
     // Find potential key moments based on simple heuristics
@@ -999,7 +953,7 @@ export async function executeFindKeyMoments(
     if (sortedTranscripts.length > 0) {
       const firstTranscript = sortedTranscripts[0];
       keyMoments.push({
-        timestamp: Number(firstTranscript.start_time),
+        timestamp: Number(firstTranscript.startTime),
         speaker: firstTranscript.speaker,
         description: "Meeting start",
         text: firstTranscript.words?.map((w: Word) => w.text).join(" ") || "",
@@ -1029,7 +983,7 @@ export async function executeFindKeyMoments(
 
       if (containsImportantTerm) {
         keyMoments.push({
-          timestamp: Number(transcript.start_time),
+          timestamp: Number(transcript.startTime),
           speaker: transcript.speaker,
           description: "Important discussion point",
           text: text,
@@ -1041,7 +995,7 @@ export async function executeFindKeyMoments(
     if (sortedTranscripts.length > 1) {
       const lastTranscript = sortedTranscripts[sortedTranscripts.length - 1];
       keyMoments.push({
-        timestamp: Number(lastTranscript.start_time),
+        timestamp: Number(lastTranscript.startTime),
         speaker: lastTranscript.speaker,
         description: "Meeting conclusion",
         text: lastTranscript.words?.map((w: Word) => w.text).join(" ") || "",
@@ -1080,17 +1034,17 @@ Speaker: ${moment.speaker}
 }
 
 // Example 10: Delete meeting data
-export const delete_meeting_data_tool: ToolDefinition = MpcTools.createTool(
+export const deleteMeetingDataTool: ToolDefinition = MpcTools.createTool(
   "delete_meeting_data",
   "Delete transcription, log files, and video recording, along with all data associated with a bot",
   [
     MpcTools.createStringParameter(
-      "api_key",
+      "apiKey",
       "Your Meeting BaaS API key",
       true
     ),
     MpcTools.createStringParameter(
-      "bot_id",
+      "botId",
       "The ID of the bot to delete data for",
       true
     ),
@@ -1105,12 +1059,12 @@ export async function executeDeleteMeetingData(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Call the delete endpoint - this is a mock implementation
     // Use type assertion to avoid TypeScript errors in this example
-    const response = await (client as any).deleteData(args.bot_id);
+    const response = await (client as any).deleteData(args.botId);
 
     // Handle the response based on the status
     const statusMessages: Record<string, string> = {
@@ -1156,10 +1110,10 @@ export async function executeDeleteMeetingData(
 }
 
 // Example 11: List calendars
-export const list_calendars_tool: ToolDefinition = MpcTools.createTool(
+export const listCalendarsTool: ToolDefinition = MpcTools.createTool(
   "list_calendars",
   "List all calendars integrated with Meeting BaaS",
-  [MpcTools.createStringParameter("api_key", "Your Meeting BaaS API key", true)]
+  [MpcTools.createStringParameter("apiKey", "Your Meeting BaaS API key", true)]
 );
 
 // Example of listing calendars
@@ -1170,7 +1124,7 @@ export async function executeListCalendars(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.apiKey,
     });
 
     // Call the API to list calendars - this is a mock implementation
@@ -1214,151 +1168,3 @@ function formatDuration(seconds: number): string {
     return `${minutes}m ${remainingSeconds}s`;
   }
 }
-
-// Example of a simple tool that joins a meeting
-export const joinMeetingTool: ToolDefinition = MpcTools.createTool(
-  'join-meeting',
-  'Joins a meeting with a bot',
-  [
-    MpcTools.createStringParameter(
-      'apiKey',
-      'API key for authentication',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'meetingUrl',
-      'URL of the meeting to join',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'botName',
-      'Name of the bot to use',
-      true
-    ),
-    MpcTools.createBooleanParameter(
-      'reserved',
-      'Whether to use a reserved bot',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'webhookUrl',
-      'Optional webhook URL for notifications',
-      false
-    ),
-    MpcTools.createStringParameter(
-      'botImage',
-      'Optional URL for bot avatar image',
-      false
-    ),
-    MpcTools.createStringParameter(
-      'entryMessage',
-      'Optional message to send when joining',
-      false
-    ),
-    MpcTools.createEnumParameter(
-      'recordingMode',
-      ['speaker_view', 'gallery_view', 'audio_only'],
-      'Optional recording mode',
-      false
-    ),
-    MpcTools.createObjectParameter(
-      'speechToText',
-      {
-        provider: {
-          type: 'string',
-          enum: ['Gladia', 'Runpod', 'Default'],
-          description: 'Which speech-to-text provider to use',
-        },
-        api_key: {
-          type: 'string',
-          description: 'API key for the speech-to-text provider (if required)',
-        },
-      },
-      'Optional speech-to-text configuration',
-      false
-    ),
-    MpcTools.createNumberParameter(
-      'startTime',
-      'Optional start time in milliseconds',
-      false
-    ),
-    MpcTools.createObjectParameter(
-      'extra',
-      {
-        additionalProperties: true,
-      },
-      'Optional extra data',
-      false
-    )
-  ]
-);
-
-// Example of a tool that leaves a meeting
-export const leaveMeetingTool: ToolDefinition = MpcTools.createTool(
-  'leave-meeting',
-  'Leaves a meeting',
-  [
-    MpcTools.createStringParameter(
-      'apiKey',
-      'API key for authentication',
-      true
-    )
-  ]
-);
-
-// Example of a tool that creates a calendar
-export const createCalendarTool: ToolDefinition = MpcTools.createTool(
-  'create-calendar',
-  'Creates a new calendar integration',
-  [
-    MpcTools.createStringParameter(
-      'apiKey',
-      'API key for authentication',
-      true
-    ),
-    MpcTools.createEnumParameter(
-      'platform',
-      ['Google', 'Microsoft'],
-      'Calendar platform (Google or Microsoft)',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'oauthClientId',
-      'OAuth client ID',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'oauthClientSecret',
-      'OAuth client secret',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'oauthRefreshToken',
-      'OAuth refresh token',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'rawCalendarId',
-      'Optional raw calendar ID',
-      false
-    )
-  ]
-);
-
-// Example of a tool that gets meeting data
-export const getMeetingDataTool: ToolDefinition = MpcTools.createTool(
-  'get-meeting-data',
-  'Gets data for a specific meeting',
-  [
-    MpcTools.createStringParameter(
-      'apiKey',
-      'API key for authentication',
-      true
-    ),
-    MpcTools.createStringParameter(
-      'botId',
-      'ID of the bot to get data for',
-      true
-    )
-  ]
-);

@@ -25,13 +25,13 @@ export interface Version {
      * @type {string}
      * @memberof Version
      */
-    'build_date': string;
+    'buildDate': string;
     /**
      * 
      * @type {string}
      * @memberof Version
      */
-    'build_timestamp': string;
+    'buildTimestamp': string;
     /**
      * 
      * @type {string}

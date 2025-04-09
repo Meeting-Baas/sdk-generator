@@ -25,13 +25,13 @@ export interface Word {
      * @type {number}
      * @memberof Word
      */
-    'bot_id': number;
+    'botId': number;
     /**
      * 
      * @type {number}
      * @memberof Word
      */
-    'end_time': number;
+    'endTime': number;
     /**
      * 
      * @type {number}
@@ -43,7 +43,7 @@ export interface Word {
      * @type {number}
      * @memberof Word
      */
-    'start_time': number;
+    'startTime': number;
     /**
      * 
      * @type {string}

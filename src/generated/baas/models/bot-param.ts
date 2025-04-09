@@ -40,7 +40,7 @@ export interface BotParam {
      * @type {string}
      * @memberof BotParam
      */
-    'bot_name': string;
+    'botName': string;
     /**
      * 
      * @type {string}
@@ -112,7 +112,7 @@ export interface BotParam {
      * @type {string}
      * @memberof BotParam
      */
-    'webhook_url': string;
+    'webhookUrl': string;
 }
 
 

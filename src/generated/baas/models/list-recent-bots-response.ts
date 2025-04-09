@@ -28,7 +28,7 @@ export interface ListRecentBotsResponse {
      * @type {string}
      * @memberof ListRecentBotsResponse
      */
-    'last_updated': string;
+    'lastUpdated': string;
     /**
      * Cursor for fetching the next page, null if no more results
      * @type {string}
@@ -40,6 +40,6 @@ export interface ListRecentBotsResponse {
      * @type {Array<RecentBotEntry>}
      * @memberof ListRecentBotsResponse
      */
-    'recent_bots': Array<RecentBotEntry>;
+    'recentBots': Array<RecentBotEntry>;
 }
 

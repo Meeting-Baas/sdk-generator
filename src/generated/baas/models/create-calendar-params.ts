@@ -28,19 +28,19 @@ export interface CreateCalendarParams {
      * @type {string}
      * @memberof CreateCalendarParams
      */
-    'oauth_client_id': string;
+    'oauthClientId': string;
     /**
      * 
      * @type {string}
      * @memberof CreateCalendarParams
      */
-    'oauth_client_secret': string;
+    'oauthClientSecret': string;
     /**
      * 
      * @type {string}
      * @memberof CreateCalendarParams
      */
-    'oauth_refresh_token': string;
+    'oauthRefreshToken': string;
     /**
      * 
      * @type {Provider}

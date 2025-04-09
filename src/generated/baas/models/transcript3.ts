@@ -25,7 +25,7 @@ export interface Transcript3 {
      * @type {number}
      * @memberof Transcript3
      */
-    'bot_id': number;
+    'botId': number;
     /**
      * 
      * @type {number}
@@ -55,7 +55,7 @@ export interface Transcript3 {
      * @type {number}
      * @memberof Transcript3
      */
-    'start_time': number;
+    'startTime': number;
     /**
      * 
      * @type {number}

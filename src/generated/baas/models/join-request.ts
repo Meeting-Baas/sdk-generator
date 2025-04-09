@@ -51,7 +51,7 @@ export interface JoinRequest {
      * @type {string}
      * @memberof JoinRequest
      */
-    'bot_name': string;
+    'botName': string;
     /**
      * We prevent multiple bots with same API key joining a meeting within 5 mins, unless overridden by deduplication_key.
      * @type {string}
@@ -75,7 +75,7 @@ export interface JoinRequest {
      * @type {string}
      * @memberof JoinRequest
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * 
      * @type {JoinRequestRecordingMode}

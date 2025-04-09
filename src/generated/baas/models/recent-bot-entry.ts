@@ -31,13 +31,13 @@ export interface RecentBotEntry {
      * @type {boolean}
      * @memberof RecentBotEntry
      */
-    'content_deleted': boolean;
+    'contentDeleted': boolean;
     /**
      * Creation timestamp of the bot
      * @type {string}
      * @memberof RecentBotEntry
      */
-    'created_at': string;
+    'createdAt': string;
     /**
      * Duration of the bot session in seconds (if completed)
      * @type {number}
@@ -73,7 +73,7 @@ export interface RecentBotEntry {
      * @type {string}
      * @memberof RecentBotEntry
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * Name of the bot
      * @type {string}

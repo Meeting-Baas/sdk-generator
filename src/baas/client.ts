@@ -17,7 +17,7 @@ export class BaasClient extends GeneratedBaasClient {
    */
   async joinMeeting(params: JoinRequest): Promise<string> {
     const response = await this.defaultApi.join({ joinRequest: params });
-    return response.data.bot_id;
+    return response.data.botId;
   }
 
   /**

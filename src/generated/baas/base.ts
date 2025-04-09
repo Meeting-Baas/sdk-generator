@@ -19,7 +19,7 @@ import type { Configuration } from './configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 
-export const BASE_PATH = "https://api.meetingbaas.com".replace(/\/+$/, "");
+export const basePath = "https://api.meetingbaas.com".replace(/\/+$/, "");
 
 /**
  *
@@ -50,7 +50,7 @@ export interface RequestArgs {
 export class BaseAPI {
     protected configuration: Configuration | undefined;
 
-    constructor(configuration?: Configuration, protected basePath: string = BASE_PATH, protected axios: AxiosInstance = globalAxios) {
+    constructor(configuration?: Configuration, protected basePath: string = basePath, protected axios: AxiosInstance = globalAxios) {
         if (configuration) {
             this.configuration = configuration;
             this.basePath = configuration.basePath ?? basePath;

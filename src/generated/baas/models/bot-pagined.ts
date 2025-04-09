@@ -34,6 +34,6 @@ export interface BotPagined {
      * @type {boolean}
      * @memberof BotPagined
      */
-    'has_more': boolean;
+    'hasMore': boolean;
 }
 

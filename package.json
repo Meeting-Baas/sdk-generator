@@ -5,35 +5,25 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "bin": {
-    "meeting-baas": "dist/cli.js"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./tools": {
-      "types": "./dist/tools.d.ts",
-      "import": "./dist/tools.mjs",
-      "require": "./dist/tools.js"
-    },
-    "./bundle": {
-      "types": "./dist/bundle.d.ts",
-      "import": "./dist/bundle.mjs",
-      "require": "./dist/bundle.js"
     }
   },
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.mjs",
+    "dist/index.d.ts",
+    "dist/index.d.mts",
+    "dist/baas",
     "README.md",
-    "DEVELOPMENT.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup && node scripts/copy-generated.js",
-    "dev": "tsup --watch",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean && node scripts/copy-generated.js",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "openapi:fetch": "node scripts/fetch-openapi.js",
@@ -41,7 +31,7 @@
     "openapi:clean": "rm -rf src/generated/baas",
     "openapi:rebuild": "pnpm openapi:clean && pnpm openapi:generate && pnpm build",
     "docs:generate": "node scripts/generate-docs.js",
-    "prepublishOnly": "pnpm lint",
+    "prepublishOnly": "pnpm lint && pnpm build",
     "prepare-release": "pnpm lint && pnpm docs:generate"
   },
   "publishConfig": {

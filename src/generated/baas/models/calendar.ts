@@ -31,7 +31,7 @@ export interface Calendar {
      * @type {string}
      * @memberof Calendar
      */
-    'google_id': string;
+    'googleId': string;
     /**
      * 
      * @type {string}

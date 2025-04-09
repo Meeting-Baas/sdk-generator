@@ -31,7 +31,7 @@ export interface QueryListEvent {
      * @type {string}
      * @memberof QueryListEvent
      */
-    'calendar_id': string;
+    'calendarId': string;
     /**
      * Optional cursor for pagination This value is included in the `next` field of the previous response
      * @type {string}

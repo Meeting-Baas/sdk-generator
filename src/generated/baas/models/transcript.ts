@@ -28,7 +28,7 @@ export interface Transcript {
      * @type {number}
      * @memberof Transcript
      */
-    'bot_id': number;
+    'botId': number;
     /**
      * 
      * @type {number}
@@ -58,7 +58,7 @@ export interface Transcript {
      * @type {number}
      * @memberof Transcript
      */
-    'start_time': number;
+    'startTime': number;
     /**
      * 
      * @type {number}

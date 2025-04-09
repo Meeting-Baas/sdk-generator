@@ -25,19 +25,19 @@ export interface Bot2 {
      * @type {number}
      * @memberof Bot2
      */
-    'account_id': number;
+    'accountId': number;
     /**
      * 
      * @type {number}
      * @memberof Bot2
      */
-    'bot_param_id': number;
+    'botParamId': number;
     /**
      * 
      * @type {string}
      * @memberof Bot2
      */
-    'created_at': string;
+    'createdAt': string;
     /**
      * 
      * @type {boolean}
@@ -49,7 +49,7 @@ export interface Bot2 {
      * @type {string}
      * @memberof Bot2
      */
-    'ended_at': string | null;
+    'endedAt': string | null;
     /**
      * 
      * @type {string}
@@ -73,7 +73,7 @@ export interface Bot2 {
      * @type {string}
      * @memberof Bot2
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * 
      * @type {string}

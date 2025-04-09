@@ -25,6 +25,6 @@ export interface GetMeetingDataQuery {
      * @type {string}
      * @memberof GetMeetingDataQuery
      */
-    'bot_id': string;
+    'botId': string;
 }
 

@@ -45,7 +45,7 @@ export interface ListRecentBotsQuery {
      */
     'cursor'?: string | null;
     /**
-     * Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the `extra` JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \"field:value\" - Multiple conditions: \"field1:value1,field2:value2\"  Examples: - \"customer_id:12345\" - Only bots with this customer ID - \"status:active,project:sales\" - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
+     * Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the `extra` JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \"field:value\" - Multiple conditions: \"field1:value1,field2:value2\"  Examples: - \"customerId:12345\" - Only bots with this customer ID - \"status:active,project:sales\" - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
      * @type {string}
      * @memberof ListRecentBotsQuery
      */

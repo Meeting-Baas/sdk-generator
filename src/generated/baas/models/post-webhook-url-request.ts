@@ -25,6 +25,6 @@ export interface PostWebhookUrlRequest {
      * @type {string}
      * @memberof PostWebhookUrlRequest
      */
-    'webhook_url': string;
+    'webhookUrl': string;
 }
 

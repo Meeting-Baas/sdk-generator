@@ -25,12 +25,12 @@ export interface SystemTime {
      * @type {number}
      * @memberof SystemTime
      */
-    'nanos_since_epoch': number;
+    'nanosSinceEpoch': number;
     /**
      * 
      * @type {number}
      * @memberof SystemTime
      */
-    'secs_since_epoch': number;
+    'secsSinceEpoch': number;
 }
 

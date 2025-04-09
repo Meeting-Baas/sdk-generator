@@ -28,7 +28,7 @@ export interface DailyTokenConsumption {
      * @type {TokenConsumptionByService}
      * @memberof DailyTokenConsumption
      */
-    'consumption_by_service': TokenConsumptionByService;
+    'consumptionByService': TokenConsumptionByService;
     /**
      * 
      * @type {string}

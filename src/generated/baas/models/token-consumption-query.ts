@@ -25,12 +25,12 @@ export interface TokenConsumptionQuery {
      * @type {string}
      * @memberof TokenConsumptionQuery
      */
-    'end_date': string;
+    'endDate': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionQuery
      */
-    'start_date': string;
+    'startDate': string;
 }
 

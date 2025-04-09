@@ -25,13 +25,13 @@ export interface RecognizerWord {
      * @type {number}
      * @memberof RecognizerWord
      */
-    'end_time': number;
+    'endTime': number;
     /**
      * 
      * @type {number}
      * @memberof RecognizerWord
      */
-    'start_time': number;
+    'startTime': number;
     /**
      * 
      * @type {string}

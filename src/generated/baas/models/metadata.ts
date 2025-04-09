@@ -28,13 +28,13 @@ export interface Metadata {
      * @type {BotData}
      * @memberof Metadata
      */
-    'bot_data': BotData;
+    'botData': BotData;
     /**
      * Indicates whether the recording has been deleted
      * @type {boolean}
      * @memberof Metadata
      */
-    'content_deleted': boolean;
+    'contentDeleted': boolean;
     /**
      * Duration of the recording in seconds
      * @type {number}

@@ -25,6 +25,6 @@ export interface RetryWebhookQuery {
      * @type {string}
      * @memberof RetryWebhookQuery
      */
-    'bot_uuid': string;
+    'botUuid': string;
 }
 

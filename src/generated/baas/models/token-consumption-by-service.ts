@@ -31,54 +31,54 @@ export interface TokenConsumptionByService {
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'recording_tokens': string;
+    'recordingTokens': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'streaming_input_hour': string;
+    'streamingInputHour': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'streaming_input_tokens': string;
+    'streamingInputTokens': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'streaming_output_hour': string;
+    'streamingOutputHour': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'streaming_output_tokens': string;
+    'streamingOutputTokens': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'transcription_byok_hour': string;
+    'transcriptionByokHour': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'transcription_byok_tokens': string;
+    'transcriptionByokTokens': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'transcription_hour': string;
+    'transcriptionHour': string;
     /**
      * 
      * @type {string}
      * @memberof TokenConsumptionByService
      */
-    'transcription_tokens': string;
+    'transcriptionTokens': string;
 }
 

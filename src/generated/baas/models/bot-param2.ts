@@ -40,7 +40,7 @@ export interface BotParam2 {
      * @type {string}
      * @memberof BotParam2
      */
-    'bot_name': string;
+    'botName': string;
     /**
      * 
      * @type {string}

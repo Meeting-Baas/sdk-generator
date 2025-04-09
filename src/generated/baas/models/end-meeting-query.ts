@@ -25,6 +25,6 @@ export interface EndMeetingQuery {
      * @type {string}
      * @memberof EndMeetingQuery
      */
-    'bot_uuid': string;
+    'botUuid': string;
 }
 

@@ -34,7 +34,7 @@ export interface Account {
      * @type {SystemTime}
      * @memberof Account
      */
-    'created_at': SystemTime;
+    'createdAt': SystemTime;
     /**
      * 
      * @type {string}

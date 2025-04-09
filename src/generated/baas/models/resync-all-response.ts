@@ -31,6 +31,6 @@ export interface ResyncAllResponse {
      * @type {Array<string>}
      * @memberof ResyncAllResponse
      */
-    'synced_calendars': Array<string>;
+    'syncedCalendars': Array<string>;
 }
 

@@ -25,7 +25,7 @@ export interface FailedRecordRequest {
      * @type {string}
      * @memberof FailedRecordRequest
      */
-    'meeting_url': string;
+    'meetingUrl': string;
     /**
      * 
      * @type {string}

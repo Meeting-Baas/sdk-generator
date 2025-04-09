@@ -25,6 +25,6 @@ export interface EndMeetingTrampolineQuery {
      * @type {string}
      * @memberof EndMeetingTrampolineQuery
      */
-    'bot_uuid': string;
+    'botUuid': string;
 }
 

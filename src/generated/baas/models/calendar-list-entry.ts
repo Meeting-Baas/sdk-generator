@@ -37,6 +37,6 @@ export interface CalendarListEntry {
      * @type {boolean}
      * @memberof CalendarListEntry
      */
-    'is_primary': boolean;
+    'isPrimary': boolean;
 }
 

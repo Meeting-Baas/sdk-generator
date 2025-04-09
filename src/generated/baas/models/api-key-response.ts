@@ -25,6 +25,6 @@ export interface ApiKeyResponse {
      * @type {string}
      * @memberof ApiKeyResponse
      */
-    'api_key': string;
+    'apiKey': string;
 }
 

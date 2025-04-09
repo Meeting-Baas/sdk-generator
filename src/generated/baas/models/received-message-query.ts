@@ -25,6 +25,6 @@ export interface ReceivedMessageQuery {
      * @type {string}
      * @memberof ReceivedMessageQuery
      */
-    'session_id': string;
+    'sessionId': string;
 }
 
