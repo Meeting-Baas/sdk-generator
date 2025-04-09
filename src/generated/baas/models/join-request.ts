@@ -66,10 +66,10 @@ export interface JoinRequest {
     'entry_message'?: string;
     /**
      * Custom data object
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: any | undefined; }}
      * @memberof JoinRequest
      */
-    'extra'?: { [key: string]: any; };
+    'extra'?: { [key: string]: any | undefined; };
     /**
      * 
      * @type {string}

@@ -97,10 +97,10 @@ export interface BotWithParams {
     'event_id'?: number | null;
     /**
      * Custom data object
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: any | undefined; }}
      * @memberof BotWithParams
      */
-    'extra': { [key: string]: any; };
+    'extra': { [key: string]: any | undefined; };
     /**
      * 
      * @type {number}

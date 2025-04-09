@@ -93,10 +93,28 @@ files.forEach(file => {
   content = content.replace(/\bBASEPATH\b/g, 'BASE_PATH');
   content = content.replace(/\bBASE_PATH\b/g, 'basePath');
   
-  // Fix the createRequestFunction calls to handle undefined basePath
+  // Fix the function return statements to ensure basePath is always a string
   content = content.replace(
-    /createRequestFunction\(([^)]+)\)\(axios, ([^)]+)\)/g,
-    'createRequestFunction($1)(axios, $2 || \'\')'
+    /return \(axios, basePath\) => createRequestFunction\(([^)]+)\)\(axios, localVarOperationServerBasePath \|\| basePath\)/g,
+    'return (axios, basePath = \'\') => createRequestFunction($1)(axios, localVarOperationServerBasePath || basePath)'
+  );
+  
+  // Fix parameter types to handle undefined values
+  content = content.replace(
+    /(?:const|let|var)\s+(\w+)\s*:\s*string\s*\|\s*undefined/g,
+    '$1?: string'
+  );
+  
+  // Add null checks for string parameters
+  content = content.replace(
+    /(\w+)\s*=\s*(\w+)\s*\|\|\s*undefined/g,
+    '$1 = $2 || \'\''
+  );
+  
+  // Fix basePath parameter default value
+  content = content.replace(
+    /basePath: string = basePath/g,
+    'basePath: string = \'\''
   );
   
   // Then transform snake_case to camelCase in method names and parameters
@@ -114,6 +132,15 @@ baseFiles.forEach(file => {
     content = content.replace(/\bDUMMY_BASEURL\b/g, 'DUMMY_BASE_URL');
     content = content.replace(/\bBASEPATH\b/g, 'BASE_PATH');
     content = content.replace(/\bBASE_PATH\b/g, 'basePath');
+    
+    // Fix the specific circular reference in common.ts
+    if (file === 'common.ts') {
+      content = content.replace(
+        /return <T = unknown, R = AxiosResponse<T>>\(axios: AxiosInstance = globalAxios, basePath: string = basePath\) =>/g,
+        'return <T = unknown, R = AxiosResponse<T>>(axios: AxiosInstance = globalAxios, basePath: string = \'\') =>'
+      );
+    }
+    
     content = transformSnakeToCamel(content);
     fs.writeFileSync(filePath, content);
   }

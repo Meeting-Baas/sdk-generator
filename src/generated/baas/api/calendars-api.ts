@@ -553,7 +553,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createCalendar(createCalendarParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.createCalendar']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Permanently removes a calendar integration by its UUID, including all associated events and bot configurations. This operation cancels any active subscriptions with the calendar provider, stops all webhook notifications, and unschedules any pending recordings. All related resources are cleaned up in the database. This action cannot be undone, and subsequent requests to this calendar\'s UUID will return 404 Not Found errors.
@@ -565,7 +565,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCalendar(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.deleteCalendar']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves detailed information about a specific calendar integration by its UUID. Returns comprehensive calendar data including the calendar name, email address, provider details (Google, Microsoft), sync status, and other metadata. This endpoint is useful for displaying calendar information to users or verifying the status of a calendar integration before performing operations on its events.
@@ -577,7 +577,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCalendar(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.getCalendar']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves comprehensive details about a specific calendar event by its UUID. Returns complete event information including title, meeting link, start and end times, organizer status, recurrence information, and the full list of attendees with their names and email addresses. Also includes any associated bot parameters if recording is scheduled for this event. The raw calendar data from the provider is also included for advanced use cases.
@@ -589,7 +589,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getEvent(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.getEvent']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves all calendars that have been integrated with the system for the authenticated user. Returns a list of calendars with their names, email addresses, provider information, and sync status. This endpoint shows only calendars that have been formally connected through the create_calendar endpoint, not all available calendars from the provider.
@@ -601,7 +601,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listCalendars(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.listCalendars']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves a paginated list of calendar events with comprehensive filtering options. Supports filtering by organizer email, attendee email, date ranges (start_date_gte, start_date_lte), and event status. Results can be limited to upcoming events (default), past events, or all events. Each event includes full details such as meeting links, participants, and recording status. The response includes a \'next\' pagination cursor for retrieving additional results.
@@ -621,7 +621,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listEvents(calendarId, attendeeEmail, cursor, organizerEmail, startDateGte, startDateLte, status, updatedAtGte, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.listEvents']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves unprocessed calendar data directly from the provider (Google, Microsoft) using provided OAuth credentials. This endpoint is typically used during the initial setup process to allow users to select which calendars to integrate. Returns a list of available calendars with their unique IDs, email addresses, and primary status. This data is not persisted until a calendar is formally created using the create_calendar endpoint.
@@ -634,7 +634,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listRawCalendars(listRawCalendarsParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.listRawCalendars']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Updates the configuration of a bot already scheduled to record an event. Allows modification of recording settings, webhook URLs, and other bot parameters without canceling and recreating the scheduled recording. For recurring events, the \'all_occurrences\' parameter determines whether changes apply to all instances or just the specific occurrence. Returns the updated event(s) with the modified bot parameters.
@@ -648,7 +648,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.patchBot(botParam3, allOccurrences, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.patchBot']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Initiates a complete refresh of data for all connected calendars. This operation performs a deep sync with each calendar provider (Google, Microsoft) to ensure all events are up-to-date. Each calendar is processed individually, with success or failure tracked separately. Returns a comprehensive result object containing successfully synced calendar UUIDs and detailed error messages for any failures. This endpoint is useful for ensuring the system has the latest calendar data when inconsistencies are suspected.
@@ -660,7 +660,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.resyncAllCalendars(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.resyncAllCalendars']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Configures a bot to automatically join and record a specific calendar event at its scheduled time. The request body contains detailed bot configuration, including recording options, streaming settings, and webhook notification URLs. For recurring events, the \'all_occurrences\' parameter can be set to true to schedule recording for all instances of the recurring series, or false (default) to schedule only the specific instance. Returns the updated event(s) with the bot parameters attached.
@@ -674,7 +674,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.scheduleRecordEvent(botParam2, allOccurrences, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.scheduleRecordEvent']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Cancels a previously scheduled recording for a calendar event and releases associated bot resources. For recurring events, the \'all_occurrences\' parameter controls whether to unschedule from all instances of the recurring series or just the specific occurrence. This operation is idempotent and will not error if no bot was scheduled. Returns the updated event(s) with the bot parameters removed.
@@ -687,7 +687,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.unscheduleRecordEvent(allOccurrences, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.unscheduleRecordEvent']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Updates a calendar integration with new credentials or platform while maintaining the same UUID. This operation is performed as an atomic transaction to ensure data integrity. The system automatically unschedules existing bots to prevent duplicates, updates the calendar credentials, and triggers a full resync of all events. Useful when OAuth tokens need to be refreshed or when migrating a calendar between providers. Returns the updated calendar object with its new configuration.
@@ -700,7 +700,7 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateCalendar(updateCalendarParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.updateCalendar']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };

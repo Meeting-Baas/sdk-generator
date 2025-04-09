@@ -332,7 +332,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.botsWithMetadata(botName, createdAfter, createdBefore, cursor, filterByExtra, limit, meetingUrl, sortByExtra, speakerName, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.botsWithMetadata']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
@@ -344,7 +344,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteData(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteData']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Get meeting recording and metadata
@@ -357,7 +357,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMeetingData(botId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getMeetingData']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Have a bot join a meeting, now or in the future
@@ -370,7 +370,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.join(joinRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.join']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Leave
@@ -382,7 +382,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.leave(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.leave']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Transcribe or retranscribe a bot\'s audio using the Default or your provided Speech to Text Provider
@@ -395,7 +395,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.retranscribeBot(retranscribeBody, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.retranscribeBot']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };

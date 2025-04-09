@@ -52,10 +52,10 @@ export interface RecentBotEntry {
     'ended_at'?: string | null;
     /**
      * Custom data object
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: any | undefined; }}
      * @memberof RecentBotEntry
      */
-    'extra': { [key: string]: any; };
+    'extra': { [key: string]: any | undefined; };
     /**
      * Unique identifier of the bot
      * @type {string}

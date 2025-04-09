@@ -55,10 +55,10 @@ export interface BotParam2 {
     'enter_message'?: string | null;
     /**
      * Custom data object
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: any | undefined; }}
      * @memberof BotParam2
      */
-    'extra': { [key: string]: any; };
+    'extra': { [key: string]: any | undefined; };
     /**
      * 
      * @type {number}

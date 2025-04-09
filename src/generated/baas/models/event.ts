@@ -94,10 +94,10 @@ export interface Event {
     'name': string;
     /**
      * Custom data object
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: any | undefined; }}
      * @memberof Event
      */
-    'raw': { [key: string]: any; };
+    'raw': { [key: string]: any | undefined; };
     /**
      * For recurring events, the ID of the parent recurring event series (if applicable)
      * @type {string}

@@ -1,4 +1,4 @@
-## @meeting-baas/sdk@0.3.5
+## @meeting-baas/sdk@0.3.7
 
 This generator creates TypeScript/JavaScript client that utilizes [axios](https://github.com/axios/axios). The generated Node module can be used in the following environments:
 
@@ -36,7 +36,7 @@ navigate to the folder of your consuming project and run one of the following co
 _published:_
 
 ```
-npm install @meeting-baas/sdk@0.3.5 --save
+npm install @meeting-baas/sdk@0.3.7 --save
 ```
 
 _unPublished (not recommended):_

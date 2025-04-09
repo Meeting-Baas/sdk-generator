@@ -1,7 +1,7 @@
 {
   "supportsES6": true,
   "npmName": "@meeting-baas/sdk",
-  "npmVersion": "0.3.5",
+  "npmVersion": "0.3.7",
   "modelPropertyNaming": "camelCase",
   "enumPropertyNaming": "camelCase",
   "withSeparateModelsAndApi": true,
@@ -12,5 +12,10 @@
   "stringEnums": true,
   "outputDir": "src/generated/baas",
   "generateClientFromSpec": true,
-  "clientPackage": "baas"
+  "clientPackage": "baas",
+  "nullSafeAdditionalProps": true,
+  "ensureUniqueParams": true,
+  "paramNaming": "camelCase",
+  "supportsPatternProperties": true,
+  "legacyDiscriminatorBehavior": false
 }
