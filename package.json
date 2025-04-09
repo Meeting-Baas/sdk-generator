@@ -1,6 +1,6 @@
 {
   "name": "@meeting-baas/sdk",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Official SDK for Meeting BaaS API - https://meetingbaas.com",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -32,7 +32,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node scripts/copy-generated.js",
     "dev": "tsup --watch",
     "lint": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",

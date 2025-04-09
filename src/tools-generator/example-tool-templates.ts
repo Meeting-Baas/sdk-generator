@@ -6,7 +6,7 @@
  * THE LLM MUST INCLUDE SCHEMAS FOR ALL TOOLS
  */
 
-import { BaasClient } from "../baas/client";
+import { BaasClient } from '../baas/client';
 import {
   BotParam2,
   Calendar,
@@ -17,9 +17,13 @@ import {
   SpeechToTextProvider,
   Transcript,
   Word,
+  JoinRequest,
+  CreateCalendarParams,
+  Metadata
 } from "../generated/baas/models";
 import * as MpcTools from "../mpc/tools";
 import { ToolDefinition } from "../mpc/types";
+import { Configuration } from "../generated/baas/configuration";
 
 // Define a generic calendar event type for example purposes
 interface CalendarEvent {
@@ -152,21 +156,21 @@ export async function executeJoinMeeting(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.api_key
     });
 
     // Convert from snake_case tool parameters to camelCase SDK parameters
     const result = await client.joinMeeting({
-      botName: args.bot_name,
-      meetingUrl: args.meeting_url,
+      bot_name: args.bot_name,
+      meeting_url: args.meeting_url,
       reserved: args.reserved,
-      webhookUrl: args.webhook_url,
-      botImage: args.bot_image,
-      entryMessage: args.entry_message,
-      recordingMode: args.recording_mode as RecordingMode,
-      speechToText: args.speech_to_text as SpeechToText,
-      startTime: args.start_time,
-      extra: args.extra,
+      webhook_url: args.webhook_url,
+      bot_image: args.bot_image,
+      entry_message: args.entry_message,
+      recording_mode: args.recording_mode as RecordingMode,
+      speech_to_text: args.speech_to_text as SpeechToText,
+      start_time: args.start_time,
+      extra: args.extra
     });
 
     return `Successfully joined the meeting with bot ID: ${result}`;
@@ -213,10 +217,10 @@ export async function executeLeaveMeeting(
   try {
     // Create a client with the user's API key
     const client = new BaasClient({
-      apiKey: args.api_key,
+      apiKey: args.api_key
     });
 
-    const result = await client.leaveMeeting(args.bot_id);
+    const result = await client.leaveMeeting();
 
     if (result) {
       return `Bot has successfully left the meeting.`;
@@ -281,11 +285,11 @@ export async function executeCreateCalendar(
     });
 
     const result = await client.createCalendar({
-      oauthClientId: args.oauth_client_id,
-      oauthClientSecret: args.oauth_client_secret,
-      oauthRefreshToken: args.oauth_refresh_token,
+      oauth_client_id: args.oauth_client_id,
+      oauth_client_secret: args.oauth_client_secret,
+      oauth_refresh_token: args.oauth_refresh_token,
       platform: args.platform as Provider,
-      rawCalendarId: args.raw_calendar_id,
+      raw_calendar_id: args.raw_calendar_id,
     });
 
     return `Calendar successfully integrated!\n\nDetails:\nName: ${result.calendar.name}\nEmail: ${result.calendar.email}\nUUID: ${result.calendar.uuid}`;
@@ -1210,3 +1214,151 @@ function formatDuration(seconds: number): string {
     return `${minutes}m ${remainingSeconds}s`;
   }
 }
+
+// Example of a simple tool that joins a meeting
+export const joinMeetingTool: ToolDefinition = MpcTools.createTool(
+  'join-meeting',
+  'Joins a meeting with a bot',
+  [
+    MpcTools.createStringParameter(
+      'apiKey',
+      'API key for authentication',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'meetingUrl',
+      'URL of the meeting to join',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'botName',
+      'Name of the bot to use',
+      true
+    ),
+    MpcTools.createBooleanParameter(
+      'reserved',
+      'Whether to use a reserved bot',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'webhookUrl',
+      'Optional webhook URL for notifications',
+      false
+    ),
+    MpcTools.createStringParameter(
+      'botImage',
+      'Optional URL for bot avatar image',
+      false
+    ),
+    MpcTools.createStringParameter(
+      'entryMessage',
+      'Optional message to send when joining',
+      false
+    ),
+    MpcTools.createEnumParameter(
+      'recordingMode',
+      ['speaker_view', 'gallery_view', 'audio_only'],
+      'Optional recording mode',
+      false
+    ),
+    MpcTools.createObjectParameter(
+      'speechToText',
+      {
+        provider: {
+          type: 'string',
+          enum: ['Gladia', 'Runpod', 'Default'],
+          description: 'Which speech-to-text provider to use',
+        },
+        api_key: {
+          type: 'string',
+          description: 'API key for the speech-to-text provider (if required)',
+        },
+      },
+      'Optional speech-to-text configuration',
+      false
+    ),
+    MpcTools.createNumberParameter(
+      'startTime',
+      'Optional start time in milliseconds',
+      false
+    ),
+    MpcTools.createObjectParameter(
+      'extra',
+      {
+        additionalProperties: true,
+      },
+      'Optional extra data',
+      false
+    )
+  ]
+);
+
+// Example of a tool that leaves a meeting
+export const leaveMeetingTool: ToolDefinition = MpcTools.createTool(
+  'leave-meeting',
+  'Leaves a meeting',
+  [
+    MpcTools.createStringParameter(
+      'apiKey',
+      'API key for authentication',
+      true
+    )
+  ]
+);
+
+// Example of a tool that creates a calendar
+export const createCalendarTool: ToolDefinition = MpcTools.createTool(
+  'create-calendar',
+  'Creates a new calendar integration',
+  [
+    MpcTools.createStringParameter(
+      'apiKey',
+      'API key for authentication',
+      true
+    ),
+    MpcTools.createEnumParameter(
+      'platform',
+      ['Google', 'Microsoft'],
+      'Calendar platform (Google or Microsoft)',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'oauthClientId',
+      'OAuth client ID',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'oauthClientSecret',
+      'OAuth client secret',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'oauthRefreshToken',
+      'OAuth refresh token',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'rawCalendarId',
+      'Optional raw calendar ID',
+      false
+    )
+  ]
+);
+
+// Example of a tool that gets meeting data
+export const getMeetingDataTool: ToolDefinition = MpcTools.createTool(
+  'get-meeting-data',
+  'Gets data for a specific meeting',
+  [
+    MpcTools.createStringParameter(
+      'apiKey',
+      'API key for authentication',
+      true
+    ),
+    MpcTools.createStringParameter(
+      'botId',
+      'ID of the bot to get data for',
+      true
+    )
+  ]
+);

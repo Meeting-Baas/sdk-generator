@@ -13,10 +13,10 @@ import {
   CalendarsApi,
   Configuration,
   DefaultApi,
-  WebhooksApi,
 } from "../generated/baas";
 import { loadEnv } from "./load-env";
 import { extractMethodParameters } from "./schema-extractor";
+import { BaasClient } from '../generated/baas/api/client';
 
 // Load environment variables from .env file if present
 loadEnv();
@@ -422,7 +422,6 @@ async function generateAllToolDefinitions(): Promise<Record<string, string>> {
   const config = new Configuration({ apiKey: "dummy-key" });
   const defaultApi = new DefaultApi(config);
   const calendarsApi = new CalendarsApi(config);
-  const webhooksApi = new WebhooksApi(config);
 
   // Get methods from each API
   const botsMethods = getClassMethods(defaultApi).filter(
@@ -431,15 +430,11 @@ async function generateAllToolDefinitions(): Promise<Record<string, string>> {
   const calendarsMethods = getClassMethods(calendarsApi).filter(
     (method) => !method.startsWith("_")
   );
-  const webhooksMethods = getClassMethods(webhooksApi).filter(
-    (method) => !method.startsWith("_")
-  );
 
   // Combine all methods
   const allMethods = [
     ...botsMethods.map((m) => `DefaultApi.${m}`),
     ...calendarsMethods.map((m) => `CalendarsApi.${m}`),
-    ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
   ];
 
   // Get example tools for reference
@@ -484,7 +479,7 @@ async function writeToolDefinitions(
  */
 
 // Import the SDK using relative paths (for local development)
-import { BaasClient } from "../../src/baas/client";
+import { BaasClient } from "../../src/generated/baas/api/client";
 import * as MpcTools from "../../src/mpc/tools";
 import * as BaasTypes from "../../src/generated/baas/models";
 import { ToolDefinition } from "../../src/mpc/types";
@@ -635,7 +630,6 @@ async function main() {
     const config = new Configuration({ apiKey: "dummy-key" });
     const defaultApi = new DefaultApi(config);
     const calendarsApi = new CalendarsApi(config);
-    const webhooksApi = new WebhooksApi(config);
 
     // Get methods from each API
     const botsMethods = getClassMethods(defaultApi).filter(
@@ -644,15 +638,11 @@ async function main() {
     const calendarsMethods = getClassMethods(calendarsApi).filter(
       (method) => !method.startsWith("_")
     );
-    const webhooksMethods = getClassMethods(webhooksApi).filter(
-      (method) => !method.startsWith("_")
-    );
 
     // Combine all methods
     const allMethods = [
       ...botsMethods.map((m) => `DefaultApi.${m}`),
       ...calendarsMethods.map((m) => `CalendarsApi.${m}`),
-      ...webhooksMethods.map((m) => `WebhooksApi.${m}`),
     ];
 
     if (allMethods.length === 0) {
