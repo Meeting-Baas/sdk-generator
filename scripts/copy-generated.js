@@ -69,6 +69,7 @@ const tsconfig = {
     moduleResolution: "node",
     esModuleInterop: true,
     skipLibCheck: true,
+    declaration: true,
     outDir: path.resolve(__dirname, '../dist/baas')
   },
   include: ["src/generated/baas/**/*.ts"]
@@ -122,6 +123,16 @@ function processJsFiles(dir) {
       // Create a simple re-export
       fs.writeFileSync(
         mjsPath,
+        `export * from ${JSON.stringify(relativePath)};\n`
+      );
+    } else if (entry.name.endsWith(".d.ts")) {
+      // Also create .d.mts files for TypeScript ESM support
+      const dmtsPath = fullPath.replace(".d.ts", ".d.mts");
+      const relativePath = "./" + entry.name.replace(".d.ts", ".js");
+
+      // Create a simple re-export for types
+      fs.writeFileSync(
+        dmtsPath,
         `export * from ${JSON.stringify(relativePath)};\n`
       );
     }

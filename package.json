@@ -11,7 +11,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
-    "./dist/baas/*": "./dist/baas/*"
+    "./dist/baas/*": {
+      "types": "./dist/baas/*.d.ts",
+      "import": "./dist/baas/*.mjs",
+      "require": "./dist/baas/*.js"
+    }
   },
   "files": [
     "dist/index.js",
