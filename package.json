@@ -1,6 +1,6 @@
 {
   "name": "@meeting-baas/sdk",
-  "version": "0.3.9",
+  "version": "4.0.0",
   "description": "Official SDK for Meeting BaaS API - https://meetingbaas.com",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -10,7 +10,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    }
+    },
+    "./dist/baas/*": "./dist/baas/*"
   },
   "files": [
     "dist/index.js",
