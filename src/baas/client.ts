@@ -10,7 +10,7 @@ import {
   JoinRequest,
   Provider,
   RecordingMode,
-  SpeechToText,
+  SpeechToTextProvider,
 } from "../generated/baas/models";
 
 /**
@@ -66,7 +66,7 @@ export class BaasClient {
     deduplicationKey?: string;
     entryMessage?: string;
     recordingMode?: RecordingMode;
-    speechToText?: SpeechToText;
+    speechToText?: SpeechToTextProvider;
     startTime?: number;
     extra?: Record<string, any>;
   }): Promise<string> {
@@ -113,7 +113,9 @@ export class BaasClient {
    * @param botId The ID of the bot to delete data for
    * @returns Status of the deletion
    */
-  async deleteData(botId: string): Promise<{
+  async deleteData(
+    botId: string
+  ): Promise<{
     ok: boolean;
     status: string;
   }> {
@@ -241,7 +243,7 @@ export class BaasClient {
       deduplicationKey?: string;
       entryMessage?: string;
       recordingMode?: RecordingMode;
-      speechToText?: SpeechToText;
+      speechToText?: SpeechToTextProvider;
     },
     allOccurrences?: boolean
   ): Promise<any> {
@@ -350,7 +352,7 @@ export class BaasClient {
       deduplicationKey?: string;
       entryMessage?: string;
       recordingMode?: RecordingMode;
-      speechToText?: SpeechToText;
+      speechToText?: SpeechToTextProvider;
     },
     allOccurrences?: boolean
   ): Promise<any> {
@@ -467,7 +469,7 @@ export class BaasClient {
    */
   async retranscribeBot(options: {
     botId: string;
-    provider?: SpeechToText;
+    provider?: SpeechToTextProvider;
   }): Promise<void> {
     await this.botsApi.retranscribeBot({
       bot_uuid: options.botId,
