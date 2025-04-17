@@ -1,6 +1,6 @@
 {
   "name": "@meeting-baas/sdk",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "OpenAPI client for @meeting-baas/sdk",
   "author": "OpenAPI-Generator Contributors",
   "repository": {
