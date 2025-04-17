@@ -277,7 +277,7 @@ packages:
       }
     engines: { node: ">=12" }
 
-  "@jridgewell/gen-mapping@4.0.1":
+  "@jridgewell/gen-mapping@4.0.2":
     resolution:
       {
         integrity: sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==,
@@ -310,7 +310,7 @@ packages:
         integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==,
       }
 
-  "@jridgewell/trace-mapping@4.0.1":
+  "@jridgewell/trace-mapping@4.0.2":
     resolution:
       {
         integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==,
@@ -1011,7 +1011,7 @@ packages:
     engines: { node: ">=6.0" }
     hasBin: true
 
-  esprima@4.0.1:
+  esprima@4.0.2:
     resolution:
       {
         integrity: sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==,
@@ -1172,7 +1172,7 @@ packages:
         integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==,
       }
 
-  has-flag@4.0.1:
+  has-flag@4.0.2:
     resolution:
       {
         integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==,
@@ -2065,7 +2065,7 @@ snapshots:
 
   "@cspotcode/source-map-support@0.8.1":
     dependencies:
-      "@jridgewell/trace-mapping": 4.0.1
+      "@jridgewell/trace-mapping": 4.0.2
 
   "@esbuild/aix-ppc64@0.25.1":
     optional: true
@@ -2151,7 +2151,7 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  "@jridgewell/gen-mapping@4.0.1":
+  "@jridgewell/gen-mapping@4.0.2":
     dependencies:
       "@jridgewell/set-array": 1.2.1
       "@jridgewell/sourcemap-codec": 1.5.0
@@ -2168,7 +2168,7 @@ snapshots:
       "@jridgewell/resolve-uri": 3.1.2
       "@jridgewell/sourcemap-codec": 1.5.0
 
-  "@jridgewell/trace-mapping@4.0.1":
+  "@jridgewell/trace-mapping@4.0.2":
     dependencies:
       "@jridgewell/resolve-uri": 3.1.2
       "@jridgewell/sourcemap-codec": 1.5.0
@@ -2478,7 +2478,7 @@ snapshots:
     dependencies:
       ast-types: 0.13.4
       escodegen: 2.1.0
-      esprima: 4.0.1
+      esprima: 4.0.2
 
   delayed-stream@1.0.0: {}
 
@@ -2549,13 +2549,13 @@ snapshots:
 
   escodegen@2.1.0:
     dependencies:
-      esprima: 4.0.1
+      esprima: 4.0.2
       estraverse: 5.3.0
       esutils: 2.0.3
     optionalDependencies:
       source-map: 0.6.1
 
-  esprima@4.0.1: {}
+  esprima@4.0.2: {}
 
   estraverse@5.3.0: {}
 
@@ -2652,7 +2652,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  has-flag@4.0.1: {}
+  has-flag@4.0.2: {}
 
   has-symbols@1.1.0: {}
 
@@ -2992,7 +2992,7 @@ snapshots:
 
   sucrase@3.35.0:
     dependencies:
-      "@jridgewell/gen-mapping": 4.0.1
+      "@jridgewell/gen-mapping": 4.0.2
       commander: 4.1.1
       glob: 10.4.5
       lines-and-columns: 1.2.4
@@ -3002,11 +3002,11 @@ snapshots:
 
   supports-color@7.2.0:
     dependencies:
-      has-flag: 4.0.1
+      has-flag: 4.0.2
 
   supports-color@8.1.1:
     dependencies:
-      has-flag: 4.0.1
+      has-flag: 4.0.2
 
   thenify-all@1.6.0:
     dependencies:

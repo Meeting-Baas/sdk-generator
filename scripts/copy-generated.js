@@ -9,13 +9,11 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-// WARNING! - 2023-12-01
-// We've had issues with module resolution when clients try to use dist/baas/* directly.
-// Ensure all imports are properly compiled and paths are relative to the compiled output.
-// Previously we just copied TS files without proper compilation.
+console.log("Starting OpenAPI client compilation...");
 
 // Paths
-const SRC_GENERATED_DIR = path.resolve(__dirname, "../src/generated");
+const SRC_DIR = path.resolve(__dirname, "../src");
+const SRC_GENERATED_DIR = path.resolve(SRC_DIR, "generated/baas");
 const DIST_DIR = path.resolve(__dirname, "../dist");
 const DIST_BAAS_DIR = path.resolve(DIST_DIR, "baas");
 
@@ -30,134 +28,110 @@ if (!fs.existsSync(SRC_GENERATED_DIR)) {
   process.exit(1);
 }
 
-// Create tsconfig for compiling just the generated files
-const tempTsConfigPath = path.resolve(__dirname, "../temp-tsconfig.json");
+// Create a special webpack config for CommonJS compilation
+console.log("Creating dist/baas directory...");
+execSync(`mkdir -p ${DIST_BAAS_DIR}`, { stdio: "inherit" });
+
+// First, we'll compile the client directly using tsc with outDir option
+console.log("Compiling OpenAPI client with tsc...");
+
+// Create a simple package.json for the client in the baas directory
 fs.writeFileSync(
-  tempTsConfigPath,
+  path.join(DIST_BAAS_DIR, "package.json"),
   JSON.stringify(
     {
-      compilerOptions: {
-        target: "es2020",
-        module: "commonjs",
-        moduleResolution: "node",
-        declaration: true,
-        outDir: DIST_BAAS_DIR,
-        esModuleInterop: true,
-        forceConsistentCasingInFileNames: true,
-        strict: true,
-        skipLibCheck: true,
-      },
-      include: ["src/generated/baas/**/*.ts"],
+      name: "@meeting-baas/sdk-internal",
+      type: "commonjs",
+      private: true,
     },
     null,
     2
   )
 );
 
+// Create a simple script to compile the OpenAPI client
+const compileScript = `
+const { execSync } = require('child_process');
+const path = require('path');
+const fs = require('fs');
+
+// Ensure node_modules exists for tsc
+if (!fs.existsSync(path.resolve(__dirname, '../node_modules'))) {
+  console.log('Creating node_modules symlink...');
+  execSync('ln -s ../../node_modules node_modules', { cwd: path.resolve(__dirname) });
+}
+
+// Create a temporary tsconfig.json
+const tsconfig = {
+  compilerOptions: {
+    target: "es2020",
+    module: "commonjs",
+    moduleResolution: "node",
+    esModuleInterop: true,
+    skipLibCheck: true,
+    outDir: path.resolve(__dirname, '../dist/baas')
+  },
+  include: ["src/generated/baas/**/*.ts"]
+};
+
+fs.writeFileSync('temp-tsconfig.json', JSON.stringify(tsconfig, null, 2));
+
 try {
-  // Create the output directory
-  console.log("Creating output directory...");
-  execSync(`mkdir -p ${DIST_BAAS_DIR}`, { stdio: "inherit" });
-
-  // Compile the TypeScript files directly with tsc
-  console.log("Compiling generated files with tsc...");
-  execSync(`npx tsc -p ${tempTsConfigPath}`, { stdio: "inherit" });
-
-  // Also compile to ESM format
-  console.log("Compiling to ESM format...");
-  const esmTsConfigPath = path.resolve(__dirname, "../temp-tsconfig-esm.json");
-  fs.writeFileSync(
-    esmTsConfigPath,
-    JSON.stringify(
-      {
-        compilerOptions: {
-          target: "es2020",
-          module: "ESNext",
-          moduleResolution: "node",
-          declaration: true,
-          outDir: DIST_BAAS_DIR,
-          esModuleInterop: true,
-          forceConsistentCasingInFileNames: true,
-          strict: true,
-          skipLibCheck: true,
-        },
-        include: ["src/generated/baas/**/*.ts"],
-      },
-      null,
-      2
-    )
-  );
-
-  execSync(`npx tsc -p ${esmTsConfigPath}`, { stdio: "inherit" });
-
-  // Rename .js files to .mjs for ESM format
-  const jsFiles = [];
-  function findJsFiles(dir) {
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-      const fullPath = path.join(dir, file);
-      if (fs.statSync(fullPath).isDirectory()) {
-        findJsFiles(fullPath);
-      } else if (file.endsWith(".js")) {
-        jsFiles.push(fullPath);
-      }
-    }
+  // Compile the TypeScript files
+  execSync('npx tsc -p temp-tsconfig.json', { stdio: 'inherit' });
+} finally {
+  // Clean up
+  fs.unlinkSync('temp-tsconfig.json');
+  if (fs.existsSync(path.resolve(__dirname, 'node_modules'))) {
+    fs.unlinkSync(path.resolve(__dirname, 'node_modules'));
   }
+}
+`;
 
-  findJsFiles(DIST_BAAS_DIR);
+const compileScriptPath = path.resolve(__dirname, "compile-openapi.js");
+fs.writeFileSync(compileScriptPath, compileScript);
 
-  for (const jsFile of jsFiles) {
-    const content = fs.readFileSync(jsFile, "utf8");
-    const mjsFile = jsFile.replace(".js", ".mjs");
-
-    // Convert requires to imports in MJS files
-    let esmContent = content
-      .replace(
-        /const (.*) = require\(['"](.*)['"](?:, ['"](.*)['"])?\);/g,
-        (match, variable, module, named) => {
-          if (named) {
-            return `import { ${named} } from '${module}';`;
-          } else {
-            return `import ${variable} from '${module}';`;
-          }
-        }
-      )
-      .replace(/(?:module\.)?exports\.(.*) = (.*);/g, "export const $1 = $2;")
-      .replace(/(?:module\.)?exports = (.*);/g, "export default $1;");
-
-    fs.writeFileSync(mjsFile, esmContent);
-  }
+try {
+  execSync(`node ${compileScriptPath}`, { stdio: "inherit" });
 } catch (error) {
-  console.error("Error compiling generated files:", error);
+  console.error("Failed to compile OpenAPI client:", error);
   process.exit(1);
 } finally {
-  // Clean up temporary files
-  if (fs.existsSync(tempTsConfigPath)) {
-    fs.unlinkSync(tempTsConfigPath);
-  }
-  if (fs.existsSync(path.resolve(__dirname, "../temp-tsconfig-esm.json"))) {
-    fs.unlinkSync(path.resolve(__dirname, "../temp-tsconfig-esm.json"));
+  fs.unlinkSync(compileScriptPath);
+}
+
+console.log("Successfully compiled OpenAPI client!");
+
+// Create .mjs versions for ESM support by copying the .js files and updating
+// Path remapping is a safer approach than trying to parse and modify the JS files
+console.log("Creating ESM versions (.mjs)...");
+
+function processJsFiles(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      processJsFiles(fullPath);
+    } else if (entry.name.endsWith(".js")) {
+      // For each .js file, create a .mjs file that re-exports
+      const mjsPath = fullPath.replace(".js", ".mjs");
+      const relativePath = "./" + entry.name;
+
+      // Create a simple re-export
+      fs.writeFileSync(
+        mjsPath,
+        `export * from ${JSON.stringify(relativePath)};\n`
+      );
+    }
   }
 }
 
-// Clean up unnecessary files
-console.log("Cleaning up unnecessary files...");
-const filesToRemove = [
-  "dist/baas/README.md",
-  "dist/baas/git_push.sh",
-  "dist/baas/package.json",
-  "dist/baas/tsconfig.json",
-  "dist/baas/tsconfig.esm.json",
-];
-
-filesToRemove.forEach((file) => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
-});
+processJsFiles(DIST_BAAS_DIR);
 
 // Create a warning file to notify users not to import directly from dist/baas
-const warningPath = path.resolve(__dirname, "../dist/baas/WARNING.md");
+const warningPath = path.resolve(DIST_BAAS_DIR, "WARNING.md");
 fs.writeFileSync(
   warningPath,
   `# IMPORTANT: DO NOT IMPORT DIRECTLY FROM THIS DIRECTORY
