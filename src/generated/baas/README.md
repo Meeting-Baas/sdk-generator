@@ -36,7 +36,11 @@ navigate to the folder of your consuming project and run one of the following co
 _published:_
 
 ```
+<<<<<<< HEAD
 npm install @meeting-baas/sdk@0.3.9 --save
+=======
+npm install @meeting-baas/sdk@0.3.8 --save
+>>>>>>> 86c9665 (re-export subpaths ++ bump version)
 ```
 
 _unPublished (not recommended):_
