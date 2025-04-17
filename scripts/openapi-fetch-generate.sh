@@ -7,7 +7,7 @@ mkdir -p tmp
 
 # Fetch the OpenAPI spec
 echo "Fetching OpenAPI specification from api.gmeetbot.com..."
-curl -s https://api.gmeetbot.com/openapi.json > tmp/openapi-original.json
+curl -s https://api.meetingbaas.com/openapi.json > tmp/openapi-original.json
 
 # Format it for readability
 echo "Formatting OpenAPI specification..."
@@ -33,18 +33,18 @@ if [ "$1" == "--generate" ]; then
   echo ""
   echo "Generating SDK from the full OpenAPI specification..."
   echo "This may take a moment..."
-  
+
   # Add more verbose logging to the OpenAPI generator
   pnpm openapi:generate
-  
+
   echo ""
   echo "SDK generation complete!"
   echo "Generated files can be found in: src/generated/baas/"
-  
+
   # Count number of TypeScript files generated
   TS_FILE_COUNT=$(find src/generated/baas -type f -name "*.ts" | wc -l)
   echo "Generated $TS_FILE_COUNT TypeScript files"
-  
+
   # List the API files
   echo "Generated API files:"
   find src/generated/baas -type f -name "*.ts" | grep -v "models" | grep -v "base\|common\|configuration\|index"
@@ -52,4 +52,4 @@ fi
 
 echo ""
 echo "Script completed successfully!"
-echo "To generate the SDK, run: ./scripts/openapi-fetch-generate.sh --generate" 
+echo "To generate the SDK, run: ./scripts/openapi-fetch-generate.sh --generate"

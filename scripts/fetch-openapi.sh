@@ -9,7 +9,7 @@ echo "=============================================="
 mkdir -p tmp
 
 # Fetch the original OpenAPI spec
-curl -s https://api.gmeetbot.com/openapi.json > tmp/openapi-original.json
+curl -s https://api.meetingbaas.com/openapi.json > tmp/openapi-original.json
 echo "Saved original spec to tmp/openapi-original.json ($(wc -l < tmp/openapi-original.json) lines)"
 
 # Copy to the fixed version first
@@ -32,4 +32,4 @@ echo "=============================================="
 if [ "$1" == "--generate" ]; then
   echo "Running OpenAPI generator..."
   pnpm openapi:generate
-fi 
+fi
