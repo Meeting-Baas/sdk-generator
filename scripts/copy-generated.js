@@ -103,6 +103,24 @@ try {
 
 console.log("Successfully compiled OpenAPI client!");
 
+// Fix any issues in the compiled files
+console.log("Fixing potential issues in compiled files...");
+
+// Fix "Cannot access 'basePath' before initialization" error in base.js
+const baseJsPath = path.join(DIST_BAAS_DIR, "base.js");
+if (fs.existsSync(baseJsPath)) {
+  let baseContent = fs.readFileSync(baseJsPath, "utf8");
+
+  // Replace the problematic constructor
+  baseContent = baseContent.replace(
+    /constructor\(configuration, basePath = basePath, axios = axios_1.default\) {/g,
+    "constructor(configuration, basePath = '', axios = axios_1.default) {"
+  );
+
+  fs.writeFileSync(baseJsPath, baseContent);
+  console.log("- Fixed BaseAPI constructor in base.js");
+}
+
 // Create .mjs versions for ESM support by copying the .js files and updating
 // Path remapping is a safer approach than trying to parse and modify the JS files
 console.log("Creating ESM versions (.mjs)...");
