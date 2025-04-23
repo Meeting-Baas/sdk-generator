@@ -22,10 +22,11 @@ export class BaasClient extends GeneratedBaasClient {
 
   /**
    * Leave the current meeting
+   * @param botId The UUID of the bot to leave the meeting
    * @returns Whether the bot successfully left the meeting
    */
-  async leaveMeeting(): Promise<boolean> {
-    const response = await this.defaultApi.leave();
+  async leaveMeeting(botId: string): Promise<boolean> {
+    const response = await this.defaultApi.leave({uuid: botId});
     return response.data.ok;
   }
 

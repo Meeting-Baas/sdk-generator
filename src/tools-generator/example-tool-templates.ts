@@ -175,7 +175,7 @@ export async function executeLeaveMeeting(
       apiKey: args.apiKey
     });
 
-    const result = await client.leaveMeeting();
+    const result = await client.leaveMeeting(args.botId);
 
     if (result) {
       return `Bot has successfully left the meeting.`;
@@ -501,7 +501,6 @@ export async function executeGetMeetingData(
 
 Recording URL: ${data.mp4 || "Not available"}
 Duration: ${formatDuration(data.duration)}
-Deleted: ${data.contentDeleted ? "Yes" : "No"}
 
 Bot Details:
 - Name: ${data.botData.bot.botName}
