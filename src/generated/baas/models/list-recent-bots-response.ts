@@ -24,7 +24,7 @@ import type { RecentBotEntry } from './recent-bot-entry';
  */
 export interface ListRecentBotsResponse {
     /**
-     * Timestamp of when this data was generated
+     * Timestamp of when this data was generated (in ISO-8601 format)
      * @type {string}
      * @memberof ListRecentBotsResponse
      */

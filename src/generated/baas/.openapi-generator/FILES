@@ -5,6 +5,7 @@ README.md
 api.ts
 api/calendars-api.ts
 api/default-api.ts
+api/webhooks-api.ts
 base.ts
 common.ts
 configuration.ts
@@ -25,6 +26,7 @@ models/bot-with-params.ts
 models/bot.ts
 models/bot2.ts
 models/calendar-list-entry.ts
+models/calendar-uuid-param.ts
 models/calendar.ts
 models/create-calendar-params.ts
 models/create-calendar-response.ts
@@ -77,6 +79,7 @@ models/schedule-origin-one-of-event.ts
 models/schedule-origin-one-of.ts
 models/schedule-origin-one-of1.ts
 models/schedule-origin.ts
+models/screenshot-wrapper.ts
 models/speech-to-text-api-parameter.ts
 models/speech-to-text-provider.ts
 models/speech-to-text.ts
@@ -92,6 +95,7 @@ models/transcript3.ts
 models/transcript4.ts
 models/update-calendar-params.ts
 models/user-tokens-response.ts
+models/uuid-param.ts
 models/version.ts
 models/word.ts
 package.json

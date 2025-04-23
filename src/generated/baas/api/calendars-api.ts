@@ -40,8 +40,6 @@ import type { ListRawCalendarsParams } from '../models';
 // @ts-ignore
 import type { ListRawCalendarsResponse } from '../models';
 // @ts-ignore
-import type { ResyncAllCalendarsResponse } from '../models';
-// @ts-ignore
 import type { UpdateCalendarParams } from '../models';
 /**
  * CalendarsApi - axios parameter creator
@@ -91,11 +89,15 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Permanently removes a calendar integration by its UUID, including all associated events and bot configurations. This operation cancels any active subscriptions with the calendar provider, stops all webhook notifications, and unschedules any pending recordings. All related resources are cleaned up in the database. This action cannot be undone, and subsequent requests to this calendar\'s UUID will return 404 Not Found errors.
          * @summary Delete Calendar
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteCalendar: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/calendars/{uuid}`;
+        deleteCalendar: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('deleteCalendar', 'uuid', uuid)
+            const localVarPath = `/calendars/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -124,11 +126,15 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Retrieves detailed information about a specific calendar integration by its UUID. Returns comprehensive calendar data including the calendar name, email address, provider details (Google, Microsoft), sync status, and other metadata. This endpoint is useful for displaying calendar information to users or verifying the status of a calendar integration before performing operations on its events.
          * @summary Get Calendar
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCalendar: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/calendars/{uuid}`;
+        getCalendar: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('getCalendar', 'uuid', uuid)
+            const localVarPath = `/calendars/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -157,11 +163,15 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Retrieves comprehensive details about a specific calendar event by its UUID. Returns complete event information including title, meeting link, start and end times, organizer status, recurrence information, and the full list of attendees with their names and email addresses. Also includes any associated bot parameters if recording is scheduled for this event. The raw calendar data from the provider is also included for advanced use cases.
          * @summary Get Event
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvent: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/calendar_events/{uuid}`;
+        getEvent: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('getEvent', 'uuid', uuid)
+            const localVarPath = `/calendar_events/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -337,15 +347,19 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Updates the configuration of a bot already scheduled to record an event. Allows modification of recording settings, webhook URLs, and other bot parameters without canceling and recreating the scheduled recording. For recurring events, the \'all_occurrences\' parameter determines whether changes apply to all instances or just the specific occurrence. Returns the updated event(s) with the modified bot parameters.
          * @summary Patch Bot
+         * @param {string} uuid The UUID identifier
          * @param {BotParam3} botParam3 
          * @param {boolean | null} [allOccurrences] schedule a bot to all occurences of a recurring event
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchBot: async (botParam3: BotParam3, allOccurrences?: boolean | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        patchBot: async (uuid: string, botParam3: BotParam3, allOccurrences?: boolean | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('patchBot', 'uuid', uuid)
             // verify required parameter 'botParam3' is not null or undefined
             assertParamExists('patchBot', 'botParam3', botParam3)
-            const localVarPath = `/calendar_events/{uuid}/bot`;
+            const localVarPath = `/calendar_events/{uuid}/bot`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -379,50 +393,21 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
             };
         },
         /**
-         * Initiates a complete refresh of data for all connected calendars. This operation performs a deep sync with each calendar provider (Google, Microsoft) to ensure all events are up-to-date. Each calendar is processed individually, with success or failure tracked separately. Returns a comprehensive result object containing successfully synced calendar UUIDs and detailed error messages for any failures. This endpoint is useful for ensuring the system has the latest calendar data when inconsistencies are suspected.
-         * @summary Resync All Calendars
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        resyncAllCalendars: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/calendars/resync_all`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication ApiKeyAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "x-meeting-baas-api-key", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Configures a bot to automatically join and record a specific calendar event at its scheduled time. The request body contains detailed bot configuration, including recording options, streaming settings, and webhook notification URLs. For recurring events, the \'all_occurrences\' parameter can be set to true to schedule recording for all instances of the recurring series, or false (default) to schedule only the specific instance. Returns the updated event(s) with the bot parameters attached.
          * @summary Schedule Record Event
+         * @param {string} uuid The UUID identifier
          * @param {BotParam2} botParam2 
          * @param {boolean | null} [allOccurrences] schedule a bot to all occurences of a recurring event
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scheduleRecordEvent: async (botParam2: BotParam2, allOccurrences?: boolean | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        scheduleRecordEvent: async (uuid: string, botParam2: BotParam2, allOccurrences?: boolean | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('scheduleRecordEvent', 'uuid', uuid)
             // verify required parameter 'botParam2' is not null or undefined
             assertParamExists('scheduleRecordEvent', 'botParam2', botParam2)
-            const localVarPath = `/calendar_events/{uuid}/bot`;
+            const localVarPath = `/calendar_events/{uuid}/bot`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -458,12 +443,16 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Cancels a previously scheduled recording for a calendar event and releases associated bot resources. For recurring events, the \'all_occurrences\' parameter controls whether to unschedule from all instances of the recurring series or just the specific occurrence. This operation is idempotent and will not error if no bot was scheduled. Returns the updated event(s) with the bot parameters removed.
          * @summary Unschedule Record Event
+         * @param {string} uuid The UUID identifier
          * @param {boolean | null} [allOccurrences] unschedule a bot from all occurences of a recurring event
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        unscheduleRecordEvent: async (allOccurrences?: boolean | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/calendar_events/{uuid}/bot`;
+        unscheduleRecordEvent: async (uuid: string, allOccurrences?: boolean | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('unscheduleRecordEvent', 'uuid', uuid)
+            const localVarPath = `/calendar_events/{uuid}/bot`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -496,14 +485,18 @@ export const CalendarsApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Updates a calendar integration with new credentials or platform while maintaining the same UUID. This operation is performed as an atomic transaction to ensure data integrity. The system automatically unschedules existing bots to prevent duplicates, updates the calendar credentials, and triggers a full resync of all events. Useful when OAuth tokens need to be refreshed or when migrating a calendar between providers. Returns the updated calendar object with its new configuration.
          * @summary Update Calendar
+         * @param {string} uuid The UUID identifier
          * @param {UpdateCalendarParams} updateCalendarParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateCalendar: async (updateCalendarParams: UpdateCalendarParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateCalendar: async (uuid: string, updateCalendarParams: UpdateCalendarParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('updateCalendar', 'uuid', uuid)
             // verify required parameter 'updateCalendarParams' is not null or undefined
             assertParamExists('updateCalendar', 'updateCalendarParams', updateCalendarParams)
-            const localVarPath = `/calendars/{uuid}`;
+            const localVarPath = `/calendars/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -558,11 +551,12 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
         /**
          * Permanently removes a calendar integration by its UUID, including all associated events and bot configurations. This operation cancels any active subscriptions with the calendar provider, stops all webhook notifications, and unschedules any pending recordings. All related resources are cleaned up in the database. This action cannot be undone, and subsequent requests to this calendar\'s UUID will return 404 Not Found errors.
          * @summary Delete Calendar
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteCalendar(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCalendar(options);
+        async deleteCalendar(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCalendar(uuid, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.deleteCalendar']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -570,11 +564,12 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
         /**
          * Retrieves detailed information about a specific calendar integration by its UUID. Returns comprehensive calendar data including the calendar name, email address, provider details (Google, Microsoft), sync status, and other metadata. This endpoint is useful for displaying calendar information to users or verifying the status of a calendar integration before performing operations on its events.
          * @summary Get Calendar
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCalendar(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Calendar>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCalendar(options);
+        async getCalendar(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Calendar>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCalendar(uuid, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.getCalendar']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -582,11 +577,12 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
         /**
          * Retrieves comprehensive details about a specific calendar event by its UUID. Returns complete event information including title, meeting link, start and end times, organizer status, recurrence information, and the full list of attendees with their names and email addresses. Also includes any associated bot parameters if recording is scheduled for this event. The raw calendar data from the provider is also included for advanced use cases.
          * @summary Get Event
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvent(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Event>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvent(options);
+        async getEvent(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Event>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvent(uuid, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.getEvent']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -639,39 +635,29 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
         /**
          * Updates the configuration of a bot already scheduled to record an event. Allows modification of recording settings, webhook URLs, and other bot parameters without canceling and recreating the scheduled recording. For recurring events, the \'all_occurrences\' parameter determines whether changes apply to all instances or just the specific occurrence. Returns the updated event(s) with the modified bot parameters.
          * @summary Patch Bot
+         * @param {string} uuid The UUID identifier
          * @param {BotParam3} botParam3 
          * @param {boolean | null} [allOccurrences] schedule a bot to all occurences of a recurring event
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchBot(botParam3: BotParam3, allOccurrences?: boolean | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Event>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.patchBot(botParam3, allOccurrences, options);
+        async patchBot(uuid: string, botParam3: BotParam3, allOccurrences?: boolean | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Event>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchBot(uuid, botParam3, allOccurrences, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.patchBot']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Initiates a complete refresh of data for all connected calendars. This operation performs a deep sync with each calendar provider (Google, Microsoft) to ensure all events are up-to-date. Each calendar is processed individually, with success or failure tracked separately. Returns a comprehensive result object containing successfully synced calendar UUIDs and detailed error messages for any failures. This endpoint is useful for ensuring the system has the latest calendar data when inconsistencies are suspected.
-         * @summary Resync All Calendars
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async resyncAllCalendars(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResyncAllCalendarsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.resyncAllCalendars(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CalendarsApi.resyncAllCalendars']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * Configures a bot to automatically join and record a specific calendar event at its scheduled time. The request body contains detailed bot configuration, including recording options, streaming settings, and webhook notification URLs. For recurring events, the \'all_occurrences\' parameter can be set to true to schedule recording for all instances of the recurring series, or false (default) to schedule only the specific instance. Returns the updated event(s) with the bot parameters attached.
          * @summary Schedule Record Event
+         * @param {string} uuid The UUID identifier
          * @param {BotParam2} botParam2 
          * @param {boolean | null} [allOccurrences] schedule a bot to all occurences of a recurring event
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async scheduleRecordEvent(botParam2: BotParam2, allOccurrences?: boolean | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Event>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduleRecordEvent(botParam2, allOccurrences, options);
+        async scheduleRecordEvent(uuid: string, botParam2: BotParam2, allOccurrences?: boolean | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Event>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduleRecordEvent(uuid, botParam2, allOccurrences, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.scheduleRecordEvent']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -679,12 +665,13 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
         /**
          * Cancels a previously scheduled recording for a calendar event and releases associated bot resources. For recurring events, the \'all_occurrences\' parameter controls whether to unschedule from all instances of the recurring series or just the specific occurrence. This operation is idempotent and will not error if no bot was scheduled. Returns the updated event(s) with the bot parameters removed.
          * @summary Unschedule Record Event
+         * @param {string} uuid The UUID identifier
          * @param {boolean | null} [allOccurrences] unschedule a bot from all occurences of a recurring event
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async unscheduleRecordEvent(allOccurrences?: boolean | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Event>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.unscheduleRecordEvent(allOccurrences, options);
+        async unscheduleRecordEvent(uuid: string, allOccurrences?: boolean | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Event>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.unscheduleRecordEvent(uuid, allOccurrences, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.unscheduleRecordEvent']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -692,12 +679,13 @@ export const CalendarsApiFp = function(configuration?: Configuration) {
         /**
          * Updates a calendar integration with new credentials or platform while maintaining the same UUID. This operation is performed as an atomic transaction to ensure data integrity. The system automatically unschedules existing bots to prevent duplicates, updates the calendar credentials, and triggers a full resync of all events. Useful when OAuth tokens need to be refreshed or when migrating a calendar between providers. Returns the updated calendar object with its new configuration.
          * @summary Update Calendar
+         * @param {string} uuid The UUID identifier
          * @param {UpdateCalendarParams} updateCalendarParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateCalendar(updateCalendarParams: UpdateCalendarParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCalendarResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCalendar(updateCalendarParams, options);
+        async updateCalendar(uuid: string, updateCalendarParams: UpdateCalendarParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCalendarResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCalendar(uuid, updateCalendarParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CalendarsApi.updateCalendar']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -725,29 +713,32 @@ export const CalendarsApiFactory = function (configuration?: Configuration, base
         /**
          * Permanently removes a calendar integration by its UUID, including all associated events and bot configurations. This operation cancels any active subscriptions with the calendar provider, stops all webhook notifications, and unschedules any pending recordings. All related resources are cleaned up in the database. This action cannot be undone, and subsequent requests to this calendar\'s UUID will return 404 Not Found errors.
          * @summary Delete Calendar
+         * @param {CalendarsApiDeleteCalendarRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteCalendar(options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deleteCalendar(options).then((request) => request(axios, basePath));
+        deleteCalendar(requestParameters: CalendarsApiDeleteCalendarRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteCalendar(requestParameters.uuid, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves detailed information about a specific calendar integration by its UUID. Returns comprehensive calendar data including the calendar name, email address, provider details (Google, Microsoft), sync status, and other metadata. This endpoint is useful for displaying calendar information to users or verifying the status of a calendar integration before performing operations on its events.
          * @summary Get Calendar
+         * @param {CalendarsApiGetCalendarRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCalendar(options?: RawAxiosRequestConfig): AxiosPromise<Calendar> {
-            return localVarFp.getCalendar(options).then((request) => request(axios, basePath));
+        getCalendar(requestParameters: CalendarsApiGetCalendarRequest, options?: RawAxiosRequestConfig): AxiosPromise<Calendar> {
+            return localVarFp.getCalendar(requestParameters.uuid, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves comprehensive details about a specific calendar event by its UUID. Returns complete event information including title, meeting link, start and end times, organizer status, recurrence information, and the full list of attendees with their names and email addresses. Also includes any associated bot parameters if recording is scheduled for this event. The raw calendar data from the provider is also included for advanced use cases.
          * @summary Get Event
+         * @param {CalendarsApiGetEventRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvent(options?: RawAxiosRequestConfig): AxiosPromise<Event> {
-            return localVarFp.getEvent(options).then((request) => request(axios, basePath));
+        getEvent(requestParameters: CalendarsApiGetEventRequest, options?: RawAxiosRequestConfig): AxiosPromise<Event> {
+            return localVarFp.getEvent(requestParameters.uuid, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves all calendars that have been integrated with the system for the authenticated user. Returns a list of calendars with their names, email addresses, provider information, and sync status. This endpoint shows only calendars that have been formally connected through the create_calendar endpoint, not all available calendars from the provider.
@@ -786,16 +777,7 @@ export const CalendarsApiFactory = function (configuration?: Configuration, base
          * @throws {RequiredError}
          */
         patchBot(requestParameters: CalendarsApiPatchBotRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>> {
-            return localVarFp.patchBot(requestParameters.botParam3, requestParameters.allOccurrences, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Initiates a complete refresh of data for all connected calendars. This operation performs a deep sync with each calendar provider (Google, Microsoft) to ensure all events are up-to-date. Each calendar is processed individually, with success or failure tracked separately. Returns a comprehensive result object containing successfully synced calendar UUIDs and detailed error messages for any failures. This endpoint is useful for ensuring the system has the latest calendar data when inconsistencies are suspected.
-         * @summary Resync All Calendars
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        resyncAllCalendars(options?: RawAxiosRequestConfig): AxiosPromise<ResyncAllCalendarsResponse> {
-            return localVarFp.resyncAllCalendars(options).then((request) => request(axios, basePath));
+            return localVarFp.patchBot(requestParameters.uuid, requestParameters.botParam3, requestParameters.allOccurrences, options).then((request) => request(axios, basePath));
         },
         /**
          * Configures a bot to automatically join and record a specific calendar event at its scheduled time. The request body contains detailed bot configuration, including recording options, streaming settings, and webhook notification URLs. For recurring events, the \'all_occurrences\' parameter can be set to true to schedule recording for all instances of the recurring series, or false (default) to schedule only the specific instance. Returns the updated event(s) with the bot parameters attached.
@@ -805,7 +787,7 @@ export const CalendarsApiFactory = function (configuration?: Configuration, base
          * @throws {RequiredError}
          */
         scheduleRecordEvent(requestParameters: CalendarsApiScheduleRecordEventRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>> {
-            return localVarFp.scheduleRecordEvent(requestParameters.botParam2, requestParameters.allOccurrences, options).then((request) => request(axios, basePath));
+            return localVarFp.scheduleRecordEvent(requestParameters.uuid, requestParameters.botParam2, requestParameters.allOccurrences, options).then((request) => request(axios, basePath));
         },
         /**
          * Cancels a previously scheduled recording for a calendar event and releases associated bot resources. For recurring events, the \'all_occurrences\' parameter controls whether to unschedule from all instances of the recurring series or just the specific occurrence. This operation is idempotent and will not error if no bot was scheduled. Returns the updated event(s) with the bot parameters removed.
@@ -814,8 +796,8 @@ export const CalendarsApiFactory = function (configuration?: Configuration, base
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        unscheduleRecordEvent(requestParameters: CalendarsApiUnscheduleRecordEventRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>> {
-            return localVarFp.unscheduleRecordEvent(requestParameters.allOccurrences, options).then((request) => request(axios, basePath));
+        unscheduleRecordEvent(requestParameters: CalendarsApiUnscheduleRecordEventRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>> {
+            return localVarFp.unscheduleRecordEvent(requestParameters.uuid, requestParameters.allOccurrences, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates a calendar integration with new credentials or platform while maintaining the same UUID. This operation is performed as an atomic transaction to ensure data integrity. The system automatically unschedules existing bots to prevent duplicates, updates the calendar credentials, and triggers a full resync of all events. Useful when OAuth tokens need to be refreshed or when migrating a calendar between providers. Returns the updated calendar object with its new configuration.
@@ -825,7 +807,7 @@ export const CalendarsApiFactory = function (configuration?: Configuration, base
          * @throws {RequiredError}
          */
         updateCalendar(requestParameters: CalendarsApiUpdateCalendarRequest, options?: RawAxiosRequestConfig): AxiosPromise<CreateCalendarResponse> {
-            return localVarFp.updateCalendar(requestParameters.updateCalendarParams, options).then((request) => request(axios, basePath));
+            return localVarFp.updateCalendar(requestParameters.uuid, requestParameters.updateCalendarParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -849,29 +831,32 @@ export interface CalendarsApiInterface {
     /**
      * Permanently removes a calendar integration by its UUID, including all associated events and bot configurations. This operation cancels any active subscriptions with the calendar provider, stops all webhook notifications, and unschedules any pending recordings. All related resources are cleaned up in the database. This action cannot be undone, and subsequent requests to this calendar\'s UUID will return 404 Not Found errors.
      * @summary Delete Calendar
+     * @param {CalendarsApiDeleteCalendarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CalendarsApiInterface
      */
-    deleteCalendar(options?: RawAxiosRequestConfig): AxiosPromise<void>;
+    deleteCalendar(requestParameters: CalendarsApiDeleteCalendarRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * Retrieves detailed information about a specific calendar integration by its UUID. Returns comprehensive calendar data including the calendar name, email address, provider details (Google, Microsoft), sync status, and other metadata. This endpoint is useful for displaying calendar information to users or verifying the status of a calendar integration before performing operations on its events.
      * @summary Get Calendar
+     * @param {CalendarsApiGetCalendarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CalendarsApiInterface
      */
-    getCalendar(options?: RawAxiosRequestConfig): AxiosPromise<Calendar>;
+    getCalendar(requestParameters: CalendarsApiGetCalendarRequest, options?: RawAxiosRequestConfig): AxiosPromise<Calendar>;
 
     /**
      * Retrieves comprehensive details about a specific calendar event by its UUID. Returns complete event information including title, meeting link, start and end times, organizer status, recurrence information, and the full list of attendees with their names and email addresses. Also includes any associated bot parameters if recording is scheduled for this event. The raw calendar data from the provider is also included for advanced use cases.
      * @summary Get Event
+     * @param {CalendarsApiGetEventRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CalendarsApiInterface
      */
-    getEvent(options?: RawAxiosRequestConfig): AxiosPromise<Event>;
+    getEvent(requestParameters: CalendarsApiGetEventRequest, options?: RawAxiosRequestConfig): AxiosPromise<Event>;
 
     /**
      * Retrieves all calendars that have been integrated with the system for the authenticated user. Returns a list of calendars with their names, email addresses, provider information, and sync status. This endpoint shows only calendars that have been formally connected through the create_calendar endpoint, not all available calendars from the provider.
@@ -913,15 +898,6 @@ export interface CalendarsApiInterface {
     patchBot(requestParameters: CalendarsApiPatchBotRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>>;
 
     /**
-     * Initiates a complete refresh of data for all connected calendars. This operation performs a deep sync with each calendar provider (Google, Microsoft) to ensure all events are up-to-date. Each calendar is processed individually, with success or failure tracked separately. Returns a comprehensive result object containing successfully synced calendar UUIDs and detailed error messages for any failures. This endpoint is useful for ensuring the system has the latest calendar data when inconsistencies are suspected.
-     * @summary Resync All Calendars
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CalendarsApiInterface
-     */
-    resyncAllCalendars(options?: RawAxiosRequestConfig): AxiosPromise<ResyncAllCalendarsResponse>;
-
-    /**
      * Configures a bot to automatically join and record a specific calendar event at its scheduled time. The request body contains detailed bot configuration, including recording options, streaming settings, and webhook notification URLs. For recurring events, the \'all_occurrences\' parameter can be set to true to schedule recording for all instances of the recurring series, or false (default) to schedule only the specific instance. Returns the updated event(s) with the bot parameters attached.
      * @summary Schedule Record Event
      * @param {CalendarsApiScheduleRecordEventRequest} requestParameters Request parameters.
@@ -939,7 +915,7 @@ export interface CalendarsApiInterface {
      * @throws {RequiredError}
      * @memberof CalendarsApiInterface
      */
-    unscheduleRecordEvent(requestParameters?: CalendarsApiUnscheduleRecordEventRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>>;
+    unscheduleRecordEvent(requestParameters: CalendarsApiUnscheduleRecordEventRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<Event>>;
 
     /**
      * Updates a calendar integration with new credentials or platform while maintaining the same UUID. This operation is performed as an atomic transaction to ensure data integrity. The system automatically unschedules existing bots to prevent duplicates, updates the calendar credentials, and triggers a full resync of all events. Useful when OAuth tokens need to be refreshed or when migrating a calendar between providers. Returns the updated calendar object with its new configuration.
@@ -965,6 +941,48 @@ export interface CalendarsApiCreateCalendarRequest {
      * @memberof CalendarsApiCreateCalendar
      */
     readonly createCalendarParams: CreateCalendarParams
+}
+
+/**
+ * Request parameters for deleteCalendar operation in CalendarsApi.
+ * @export
+ * @interface CalendarsApiDeleteCalendarRequest
+ */
+export interface CalendarsApiDeleteCalendarRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiDeleteCalendar
+     */
+    readonly uuid: string
+}
+
+/**
+ * Request parameters for getCalendar operation in CalendarsApi.
+ * @export
+ * @interface CalendarsApiGetCalendarRequest
+ */
+export interface CalendarsApiGetCalendarRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiGetCalendar
+     */
+    readonly uuid: string
+}
+
+/**
+ * Request parameters for getEvent operation in CalendarsApi.
+ * @export
+ * @interface CalendarsApiGetEventRequest
+ */
+export interface CalendarsApiGetEventRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiGetEvent
+     */
+    readonly uuid: string
 }
 
 /**
@@ -1051,6 +1069,13 @@ export interface CalendarsApiListRawCalendarsRequest {
  */
 export interface CalendarsApiPatchBotRequest {
     /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiPatchBot
+     */
+    readonly uuid: string
+
+    /**
      * 
      * @type {BotParam3}
      * @memberof CalendarsApiPatchBot
@@ -1071,6 +1096,13 @@ export interface CalendarsApiPatchBotRequest {
  * @interface CalendarsApiScheduleRecordEventRequest
  */
 export interface CalendarsApiScheduleRecordEventRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiScheduleRecordEvent
+     */
+    readonly uuid: string
+
     /**
      * 
      * @type {BotParam2}
@@ -1093,6 +1125,13 @@ export interface CalendarsApiScheduleRecordEventRequest {
  */
 export interface CalendarsApiUnscheduleRecordEventRequest {
     /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiUnscheduleRecordEvent
+     */
+    readonly uuid: string
+
+    /**
      * unschedule a bot from all occurences of a recurring event
      * @type {boolean}
      * @memberof CalendarsApiUnscheduleRecordEvent
@@ -1106,6 +1145,13 @@ export interface CalendarsApiUnscheduleRecordEventRequest {
  * @interface CalendarsApiUpdateCalendarRequest
  */
 export interface CalendarsApiUpdateCalendarRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof CalendarsApiUpdateCalendar
+     */
+    readonly uuid: string
+
     /**
      * 
      * @type {UpdateCalendarParams}
@@ -1136,34 +1182,37 @@ export class CalendarsApi extends BaseAPI implements CalendarsApiInterface {
     /**
      * Permanently removes a calendar integration by its UUID, including all associated events and bot configurations. This operation cancels any active subscriptions with the calendar provider, stops all webhook notifications, and unschedules any pending recordings. All related resources are cleaned up in the database. This action cannot be undone, and subsequent requests to this calendar\'s UUID will return 404 Not Found errors.
      * @summary Delete Calendar
+     * @param {CalendarsApiDeleteCalendarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CalendarsApi
      */
-    public deleteCalendar(options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).deleteCalendar(options).then((request) => request(this.axios, this.basePath));
+    public deleteCalendar(requestParameters: CalendarsApiDeleteCalendarRequest, options?: RawAxiosRequestConfig) {
+        return CalendarsApiFp(this.configuration).deleteCalendar(requestParameters.uuid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Retrieves detailed information about a specific calendar integration by its UUID. Returns comprehensive calendar data including the calendar name, email address, provider details (Google, Microsoft), sync status, and other metadata. This endpoint is useful for displaying calendar information to users or verifying the status of a calendar integration before performing operations on its events.
      * @summary Get Calendar
+     * @param {CalendarsApiGetCalendarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CalendarsApi
      */
-    public getCalendar(options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).getCalendar(options).then((request) => request(this.axios, this.basePath));
+    public getCalendar(requestParameters: CalendarsApiGetCalendarRequest, options?: RawAxiosRequestConfig) {
+        return CalendarsApiFp(this.configuration).getCalendar(requestParameters.uuid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Retrieves comprehensive details about a specific calendar event by its UUID. Returns complete event information including title, meeting link, start and end times, organizer status, recurrence information, and the full list of attendees with their names and email addresses. Also includes any associated bot parameters if recording is scheduled for this event. The raw calendar data from the provider is also included for advanced use cases.
      * @summary Get Event
+     * @param {CalendarsApiGetEventRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CalendarsApi
      */
-    public getEvent(options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).getEvent(options).then((request) => request(this.axios, this.basePath));
+    public getEvent(requestParameters: CalendarsApiGetEventRequest, options?: RawAxiosRequestConfig) {
+        return CalendarsApiFp(this.configuration).getEvent(requestParameters.uuid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1210,18 +1259,7 @@ export class CalendarsApi extends BaseAPI implements CalendarsApiInterface {
      * @memberof CalendarsApi
      */
     public patchBot(requestParameters: CalendarsApiPatchBotRequest, options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).patchBot(requestParameters.botParam3, requestParameters.allOccurrences, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Initiates a complete refresh of data for all connected calendars. This operation performs a deep sync with each calendar provider (Google, Microsoft) to ensure all events are up-to-date. Each calendar is processed individually, with success or failure tracked separately. Returns a comprehensive result object containing successfully synced calendar UUIDs and detailed error messages for any failures. This endpoint is useful for ensuring the system has the latest calendar data when inconsistencies are suspected.
-     * @summary Resync All Calendars
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CalendarsApi
-     */
-    public resyncAllCalendars(options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).resyncAllCalendars(options).then((request) => request(this.axios, this.basePath));
+        return CalendarsApiFp(this.configuration).patchBot(requestParameters.uuid, requestParameters.botParam3, requestParameters.allOccurrences, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1233,7 +1271,7 @@ export class CalendarsApi extends BaseAPI implements CalendarsApiInterface {
      * @memberof CalendarsApi
      */
     public scheduleRecordEvent(requestParameters: CalendarsApiScheduleRecordEventRequest, options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).scheduleRecordEvent(requestParameters.botParam2, requestParameters.allOccurrences, options).then((request) => request(this.axios, this.basePath));
+        return CalendarsApiFp(this.configuration).scheduleRecordEvent(requestParameters.uuid, requestParameters.botParam2, requestParameters.allOccurrences, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1244,8 +1282,8 @@ export class CalendarsApi extends BaseAPI implements CalendarsApiInterface {
      * @throws {RequiredError}
      * @memberof CalendarsApi
      */
-    public unscheduleRecordEvent(requestParameters: CalendarsApiUnscheduleRecordEventRequest = {}, options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).unscheduleRecordEvent(requestParameters.allOccurrences, options).then((request) => request(this.axios, this.basePath));
+    public unscheduleRecordEvent(requestParameters: CalendarsApiUnscheduleRecordEventRequest, options?: RawAxiosRequestConfig) {
+        return CalendarsApiFp(this.configuration).unscheduleRecordEvent(requestParameters.uuid, requestParameters.allOccurrences, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1257,7 +1295,7 @@ export class CalendarsApi extends BaseAPI implements CalendarsApiInterface {
      * @memberof CalendarsApi
      */
     public updateCalendar(requestParameters: CalendarsApiUpdateCalendarRequest, options?: RawAxiosRequestConfig) {
-        return CalendarsApiFp(this.configuration).updateCalendar(requestParameters.updateCalendarParams, options).then((request) => request(this.axios, this.basePath));
+        return CalendarsApiFp(this.configuration).updateCalendar(requestParameters.uuid, requestParameters.updateCalendarParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

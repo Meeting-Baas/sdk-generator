@@ -35,6 +35,8 @@ import type { ListRecentBotsResponse } from '../models';
 import type { Metadata } from '../models';
 // @ts-ignore
 import type { RetranscribeBody } from '../models';
+// @ts-ignore
+import type { ScreenshotWrapper } from '../models';
 /**
  * DefaultApi - axios parameter creator
  * @export
@@ -42,12 +44,13 @@ import type { RetranscribeBody } from '../models';
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Preview endpoint. Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
+         * Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
          * @summary List Bots with Metadata
          * @param {string | null} [botName] Filter bots by name containing this string.  Performs a case-insensitive partial match on the bot\&#39;s name. Useful for finding bots with specific naming conventions or to locate a particular bot when you don\&#39;t have its ID.  Example: \&quot;Sales\&quot; would match \&quot;Sales Meeting\&quot;, \&quot;Quarterly Sales\&quot;, etc.
          * @param {string | null} [createdAfter] Filter bots created after this date (ISO format).  Limits results to bots created at or after the specified timestamp. Used for time-based filtering to find recent additions.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-01T00:00:00\&quot;
          * @param {string | null} [createdBefore] Filter bots created before this date (ISO format).  Limits results to bots created at or before the specified timestamp. Used for time-based filtering to exclude recent additions.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-31T23:59:59\&quot;
          * @param {string | null} [cursor] Cursor for pagination, obtained from previous response.  Used for retrieving the next set of results after a previous call. The cursor value is returned in the &#x60;nextCursor&#x60; field of responses that have additional results available.  Format: Base64-encoded string containing pagination metadata
+         * @param {string | null} [endedAfter] Filter bots ended after this date (ISO format).  Limits results to bots that ended at or after the specified timestamp. Useful for finding completed meetings within a specific time period.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-01T00:00:00\&quot;
          * @param {string | null} [filterByExtra] Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the &#x60;extra&#x60; JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \&quot;field:value\&quot; - Multiple conditions: \&quot;field1:value1,field2:value2\&quot;  Examples: - \&quot;customerId:12345\&quot; - Only bots with this customer ID - \&quot;status:active,project:sales\&quot; - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
          * @param {number} [limit] Maximum number of bots to return in a single request.  Limits the number of results returned in a single API call. This parameter helps control response size and page length.  Default: 10 Minimum: 1 Maximum: 50
          * @param {string | null} [meetingUrl] Filter bots by meeting URL containing this string.  Performs a case-insensitive partial match on the bot\&#39;s meeting URL. Use this to find bots associated with specific meeting platforms or particular meeting IDs.  Example: \&quot;zoom.us\&quot; would match all Zoom meetings
@@ -56,7 +59,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        botsWithMetadata: async (botName?: string | null, createdAfter?: string | null, createdBefore?: string | null, cursor?: string | null, filterByExtra?: string | null, limit?: number, meetingUrl?: string | null, sortByExtra?: string | null, speakerName?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        botsWithMetadata: async (botName?: string | null, createdAfter?: string | null, createdBefore?: string | null, cursor?: string | null, endedAfter?: string | null, filterByExtra?: string | null, limit?: number, meetingUrl?: string | null, sortByExtra?: string | null, speakerName?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/bots/bots_with_metadata`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -86,6 +89,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (cursor !== undefined) {
                 localVarQueryParameter['cursor'] = cursor;
+            }
+
+            if (endedAfter !== undefined) {
+                localVarQueryParameter['ended_after'] = endedAfter;
             }
 
             if (filterByExtra !== undefined) {
@@ -122,11 +129,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
          * @summary Delete Data
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteData: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/bots/{uuid}/delete_data`;
+        deleteData: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('deleteData', 'uuid', uuid)
+            const localVarPath = `/bots/{uuid}/delete_data`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -193,7 +204,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Have a bot join a meeting, now or in the future
+         * Retrieves screenshots captured during the bot\'s session
+         * @summary Get Screenshots
+         * @param {string} uuid The UUID identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScreenshots: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('getScreenshots', 'uuid', uuid)
+            const localVarPath = `/bots/{uuid}/screenshots`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-meeting-baas-api-key", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Have a bot join a meeting, now or in the future. You can provide a `webhook_url` parameter to receive webhook events specific to this bot, overriding your account\'s default webhook URL. Events include recording completion, failures, and transcription updates.
          * @summary Join
          * @param {JoinRequest} joinRequest 
          * @param {*} [options] Override http request option.
@@ -234,11 +282,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * Leave
          * @summary Leave
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        leave: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/bots/{uuid}`;
+        leave: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('leave', 'uuid', uuid)
+            const localVarPath = `/bots/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -314,12 +366,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
-         * Preview endpoint. Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
+         * Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
          * @summary List Bots with Metadata
          * @param {string | null} [botName] Filter bots by name containing this string.  Performs a case-insensitive partial match on the bot\&#39;s name. Useful for finding bots with specific naming conventions or to locate a particular bot when you don\&#39;t have its ID.  Example: \&quot;Sales\&quot; would match \&quot;Sales Meeting\&quot;, \&quot;Quarterly Sales\&quot;, etc.
          * @param {string | null} [createdAfter] Filter bots created after this date (ISO format).  Limits results to bots created at or after the specified timestamp. Used for time-based filtering to find recent additions.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-01T00:00:00\&quot;
          * @param {string | null} [createdBefore] Filter bots created before this date (ISO format).  Limits results to bots created at or before the specified timestamp. Used for time-based filtering to exclude recent additions.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-31T23:59:59\&quot;
          * @param {string | null} [cursor] Cursor for pagination, obtained from previous response.  Used for retrieving the next set of results after a previous call. The cursor value is returned in the &#x60;nextCursor&#x60; field of responses that have additional results available.  Format: Base64-encoded string containing pagination metadata
+         * @param {string | null} [endedAfter] Filter bots ended after this date (ISO format).  Limits results to bots that ended at or after the specified timestamp. Useful for finding completed meetings within a specific time period.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-01T00:00:00\&quot;
          * @param {string | null} [filterByExtra] Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the &#x60;extra&#x60; JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \&quot;field:value\&quot; - Multiple conditions: \&quot;field1:value1,field2:value2\&quot;  Examples: - \&quot;customerId:12345\&quot; - Only bots with this customer ID - \&quot;status:active,project:sales\&quot; - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
          * @param {number} [limit] Maximum number of bots to return in a single request.  Limits the number of results returned in a single API call. This parameter helps control response size and page length.  Default: 10 Minimum: 1 Maximum: 50
          * @param {string | null} [meetingUrl] Filter bots by meeting URL containing this string.  Performs a case-insensitive partial match on the bot\&#39;s meeting URL. Use this to find bots associated with specific meeting platforms or particular meeting IDs.  Example: \&quot;zoom.us\&quot; would match all Zoom meetings
@@ -328,8 +381,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async botsWithMetadata(botName?: string | null, createdAfter?: string | null, createdBefore?: string | null, cursor?: string | null, filterByExtra?: string | null, limit?: number, meetingUrl?: string | null, sortByExtra?: string | null, speakerName?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListRecentBotsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.botsWithMetadata(botName, createdAfter, createdBefore, cursor, filterByExtra, limit, meetingUrl, sortByExtra, speakerName, options);
+        async botsWithMetadata(botName?: string | null, createdAfter?: string | null, createdBefore?: string | null, cursor?: string | null, endedAfter?: string | null, filterByExtra?: string | null, limit?: number, meetingUrl?: string | null, sortByExtra?: string | null, speakerName?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListRecentBotsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.botsWithMetadata(botName, createdAfter, createdBefore, cursor, endedAfter, filterByExtra, limit, meetingUrl, sortByExtra, speakerName, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.botsWithMetadata']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -337,11 +390,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
          * @summary Delete Data
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteData(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteData(options);
+        async deleteData(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteData(uuid, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteData']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -360,7 +414,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Have a bot join a meeting, now or in the future
+         * Retrieves screenshots captured during the bot\'s session
+         * @summary Get Screenshots
+         * @param {string} uuid The UUID identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getScreenshots(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScreenshotWrapper>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getScreenshots(uuid, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getScreenshots']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Have a bot join a meeting, now or in the future. You can provide a `webhook_url` parameter to receive webhook events specific to this bot, overriding your account\'s default webhook URL. Events include recording completion, failures, and transcription updates.
          * @summary Join
          * @param {JoinRequest} joinRequest 
          * @param {*} [options] Override http request option.
@@ -375,11 +442,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * Leave
          * @summary Leave
+         * @param {string} uuid The UUID identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async leave(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LeaveResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.leave(options);
+        async leave(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LeaveResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.leave(uuid, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.leave']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath = '') => createRequestFunction(localVarAxiosArgs, globalAxios, basePath, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -408,23 +476,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
-         * Preview endpoint. Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
+         * Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
          * @summary List Bots with Metadata
          * @param {DefaultApiBotsWithMetadataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         botsWithMetadata(requestParameters: DefaultApiBotsWithMetadataRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ListRecentBotsResponse> {
-            return localVarFp.botsWithMetadata(requestParameters.botName, requestParameters.createdAfter, requestParameters.createdBefore, requestParameters.cursor, requestParameters.filterByExtra, requestParameters.limit, requestParameters.meetingUrl, requestParameters.sortByExtra, requestParameters.speakerName, options).then((request) => request(axios, basePath));
+            return localVarFp.botsWithMetadata(requestParameters.botName, requestParameters.createdAfter, requestParameters.createdBefore, requestParameters.cursor, requestParameters.endedAfter, requestParameters.filterByExtra, requestParameters.limit, requestParameters.meetingUrl, requestParameters.sortByExtra, requestParameters.speakerName, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
          * @summary Delete Data
+         * @param {DefaultApiDeleteDataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteData(options?: RawAxiosRequestConfig): AxiosPromise<DeleteResponse> {
-            return localVarFp.deleteData(options).then((request) => request(axios, basePath));
+        deleteData(requestParameters: DefaultApiDeleteDataRequest, options?: RawAxiosRequestConfig): AxiosPromise<DeleteResponse> {
+            return localVarFp.deleteData(requestParameters.uuid, options).then((request) => request(axios, basePath));
         },
         /**
          * Get meeting recording and metadata
@@ -437,7 +506,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getMeetingData(requestParameters.botId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Have a bot join a meeting, now or in the future
+         * Retrieves screenshots captured during the bot\'s session
+         * @summary Get Screenshots
+         * @param {DefaultApiGetScreenshotsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScreenshots(requestParameters: DefaultApiGetScreenshotsRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<ScreenshotWrapper>> {
+            return localVarFp.getScreenshots(requestParameters.uuid, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Have a bot join a meeting, now or in the future. You can provide a `webhook_url` parameter to receive webhook events specific to this bot, overriding your account\'s default webhook URL. Events include recording completion, failures, and transcription updates.
          * @summary Join
          * @param {DefaultApiJoinRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -449,11 +528,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * Leave
          * @summary Leave
+         * @param {DefaultApiLeaveRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        leave(options?: RawAxiosRequestConfig): AxiosPromise<LeaveResponse> {
-            return localVarFp.leave(options).then((request) => request(axios, basePath));
+        leave(requestParameters: DefaultApiLeaveRequest, options?: RawAxiosRequestConfig): AxiosPromise<LeaveResponse> {
+            return localVarFp.leave(requestParameters.uuid, options).then((request) => request(axios, basePath));
         },
         /**
          * Transcribe or retranscribe a bot\'s audio using the Default or your provided Speech to Text Provider
@@ -475,7 +555,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export interface DefaultApiInterface {
     /**
-     * Preview endpoint. Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
+     * Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
      * @summary List Bots with Metadata
      * @param {DefaultApiBotsWithMetadataRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -487,11 +567,12 @@ export interface DefaultApiInterface {
     /**
      * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
      * @summary Delete Data
+     * @param {DefaultApiDeleteDataRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    deleteData(options?: RawAxiosRequestConfig): AxiosPromise<DeleteResponse>;
+    deleteData(requestParameters: DefaultApiDeleteDataRequest, options?: RawAxiosRequestConfig): AxiosPromise<DeleteResponse>;
 
     /**
      * Get meeting recording and metadata
@@ -504,7 +585,17 @@ export interface DefaultApiInterface {
     getMeetingData(requestParameters: DefaultApiGetMeetingDataRequest, options?: RawAxiosRequestConfig): AxiosPromise<Metadata>;
 
     /**
-     * Have a bot join a meeting, now or in the future
+     * Retrieves screenshots captured during the bot\'s session
+     * @summary Get Screenshots
+     * @param {DefaultApiGetScreenshotsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getScreenshots(requestParameters: DefaultApiGetScreenshotsRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<ScreenshotWrapper>>;
+
+    /**
+     * Have a bot join a meeting, now or in the future. You can provide a `webhook_url` parameter to receive webhook events specific to this bot, overriding your account\'s default webhook URL. Events include recording completion, failures, and transcription updates.
      * @summary Join
      * @param {DefaultApiJoinRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -516,11 +607,12 @@ export interface DefaultApiInterface {
     /**
      * Leave
      * @summary Leave
+     * @param {DefaultApiLeaveRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    leave(options?: RawAxiosRequestConfig): AxiosPromise<LeaveResponse>;
+    leave(requestParameters: DefaultApiLeaveRequest, options?: RawAxiosRequestConfig): AxiosPromise<LeaveResponse>;
 
     /**
      * Transcribe or retranscribe a bot\'s audio using the Default or your provided Speech to Text Provider
@@ -569,6 +661,13 @@ export interface DefaultApiBotsWithMetadataRequest {
     readonly cursor?: string | null
 
     /**
+     * Filter bots ended after this date (ISO format).  Limits results to bots that ended at or after the specified timestamp. Useful for finding completed meetings within a specific time period.  Format: ISO-8601 date-time string (YYYY-MM-DDThh:mm:ss) Example: \&quot;2023-05-01T00:00:00\&quot;
+     * @type {string}
+     * @memberof DefaultApiBotsWithMetadata
+     */
+    readonly endedAfter?: string | null
+
+    /**
      * Filter bots by matching values in the extra JSON payload.  This parameter performs in-memory filtering on the &#x60;extra&#x60; JSON field, similar to a SQL WHERE clause. It reduces the result set to only include bots that match all specified conditions.  Format specifications: - Single condition: \&quot;field:value\&quot; - Multiple conditions: \&quot;field1:value1,field2:value2\&quot;  Examples: - \&quot;customerId:12345\&quot; - Only bots with this customer ID - \&quot;status:active,project:sales\&quot; - Only active bots from sales projects  Notes: - All conditions must match for a bot to be included - Values are matched exactly (case-sensitive) - Bots without the specified field are excluded
      * @type {string}
      * @memberof DefaultApiBotsWithMetadata
@@ -605,6 +704,20 @@ export interface DefaultApiBotsWithMetadataRequest {
 }
 
 /**
+ * Request parameters for deleteData operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDeleteDataRequest
+ */
+export interface DefaultApiDeleteDataRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof DefaultApiDeleteData
+     */
+    readonly uuid: string
+}
+
+/**
  * Request parameters for getMeetingData operation in DefaultApi.
  * @export
  * @interface DefaultApiGetMeetingDataRequest
@@ -619,6 +732,20 @@ export interface DefaultApiGetMeetingDataRequest {
 }
 
 /**
+ * Request parameters for getScreenshots operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetScreenshotsRequest
+ */
+export interface DefaultApiGetScreenshotsRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof DefaultApiGetScreenshots
+     */
+    readonly uuid: string
+}
+
+/**
  * Request parameters for join operation in DefaultApi.
  * @export
  * @interface DefaultApiJoinRequest
@@ -630,6 +757,20 @@ export interface DefaultApiJoinRequest {
      * @memberof DefaultApiJoin
      */
     readonly joinRequest: JoinRequest
+}
+
+/**
+ * Request parameters for leave operation in DefaultApi.
+ * @export
+ * @interface DefaultApiLeaveRequest
+ */
+export interface DefaultApiLeaveRequest {
+    /**
+     * The UUID identifier
+     * @type {string}
+     * @memberof DefaultApiLeave
+     */
+    readonly uuid: string
 }
 
 /**
@@ -654,7 +795,7 @@ export interface DefaultApiRetranscribeBotRequest {
  */
 export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     /**
-     * Preview endpoint. Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
+     * Retrieves a paginated list of the user\'s bots with essential metadata, including IDs, names, and meeting details. Supports filtering, sorting, and advanced querying options.
      * @summary List Bots with Metadata
      * @param {DefaultApiBotsWithMetadataRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -662,18 +803,19 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @memberof DefaultApi
      */
     public botsWithMetadata(requestParameters: DefaultApiBotsWithMetadataRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).botsWithMetadata(requestParameters.botName, requestParameters.createdAfter, requestParameters.createdBefore, requestParameters.cursor, requestParameters.filterByExtra, requestParameters.limit, requestParameters.meetingUrl, requestParameters.sortByExtra, requestParameters.speakerName, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).botsWithMetadata(requestParameters.botName, requestParameters.createdAfter, requestParameters.createdBefore, requestParameters.cursor, requestParameters.endedAfter, requestParameters.filterByExtra, requestParameters.limit, requestParameters.meetingUrl, requestParameters.sortByExtra, requestParameters.speakerName, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Deletes a bot\'s data including recording, transcription, and logs. Only metadata is retained. Rate limited to 5 requests per minute per API key.
      * @summary Delete Data
+     * @param {DefaultApiDeleteDataRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deleteData(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deleteData(options).then((request) => request(this.axios, this.basePath));
+    public deleteData(requestParameters: DefaultApiDeleteDataRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteData(requestParameters.uuid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -689,7 +831,19 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * Have a bot join a meeting, now or in the future
+     * Retrieves screenshots captured during the bot\'s session
+     * @summary Get Screenshots
+     * @param {DefaultApiGetScreenshotsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getScreenshots(requestParameters: DefaultApiGetScreenshotsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getScreenshots(requestParameters.uuid, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Have a bot join a meeting, now or in the future. You can provide a `webhook_url` parameter to receive webhook events specific to this bot, overriding your account\'s default webhook URL. Events include recording completion, failures, and transcription updates.
      * @summary Join
      * @param {DefaultApiJoinRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -703,12 +857,13 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     /**
      * Leave
      * @summary Leave
+     * @param {DefaultApiLeaveRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public leave(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).leave(options).then((request) => request(this.axios, this.basePath));
+    public leave(requestParameters: DefaultApiLeaveRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).leave(requestParameters.uuid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

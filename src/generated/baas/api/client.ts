@@ -1,6 +1,7 @@
 import { Configuration } from '../configuration';
 import { CalendarsApi } from './calendars-api';
 import { DefaultApi } from './default-api';
+import { WebhooksApi } from './webhooks-api';
 
 export interface BaasClientConfig {
   apiKey: string;
@@ -15,6 +16,7 @@ export class BaasClient {
   private configuration: Configuration;
   private _calendarsApi: CalendarsApi;
   private _defaultApi: DefaultApi;
+  private _webhooksApi: WebhooksApi;
 
   constructor(config: BaasClientConfig) {
     this.configuration = new Configuration({
@@ -23,6 +25,7 @@ export class BaasClient {
     });
     this._calendarsApi = new CalendarsApi(this.configuration);
     this._defaultApi = new DefaultApi(this.configuration);
+    this._webhooksApi = new WebhooksApi(this.configuration);
   }
 
   /**
@@ -37,5 +40,12 @@ export class BaasClient {
    */
   get defaultApi() {
     return this._defaultApi;
+  }
+
+  /**
+   * Get the WebhooksApi instance
+   */
+  get webhooksApi() {
+    return this._webhooksApi;
   }
 }

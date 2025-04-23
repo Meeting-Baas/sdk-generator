@@ -27,13 +27,13 @@ export interface RecentBotEntry {
      */
     'access_count'?: number | null;
     /**
-     * Indicates whether the recording content has been deleted
-     * @type {boolean}
+     * Name of the bot
+     * @type {string}
      * @memberof RecentBotEntry
      */
-    'contentDeleted': boolean;
+    'botName': string;
     /**
-     * Creation timestamp of the bot
+     * Creation timestamp of the bot in ISO-8601 format
      * @type {string}
      * @memberof RecentBotEntry
      */
@@ -45,7 +45,7 @@ export interface RecentBotEntry {
      */
     'duration'?: number | null;
     /**
-     * End time of the bot session (if completed)
+     * End time of the bot session (if completed) in ISO-8601 format
      * @type {string}
      * @memberof RecentBotEntry
      */
@@ -74,12 +74,6 @@ export interface RecentBotEntry {
      * @memberof RecentBotEntry
      */
     'meetingUrl': string;
-    /**
-     * Name of the bot
-     * @type {string}
-     * @memberof RecentBotEntry
-     */
-    'name': string;
     /**
      * Session ID if the bot is active
      * @type {string}

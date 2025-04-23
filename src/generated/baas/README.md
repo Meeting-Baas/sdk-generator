@@ -1,29 +1,25 @@
-## @meeting-baas/sdk@4.0.4
+## @meeting-baas/sdk@4.0.5
 
 This generator creates TypeScript/JavaScript client that utilizes [axios](https://github.com/axios/axios). The generated Node module can be used in the following environments:
 
 Environment
-
-- Node.js
-- Webpack
-- Browserify
+* Node.js
+* Webpack
+* Browserify
 
 Language level
-
-- ES5 - you must have a Promises/A+ library installed
-- ES6
+* ES5 - you must have a Promises/A+ library installed
+* ES6
 
 Module system
-
-- CommonJS
-- ES6 module system
+* CommonJS
+* ES6 module system
 
 It can be used in both TypeScript and JavaScript. In TypeScript, the definition will be automatically resolved via `package.json`. ([Reference](https://www.typescriptlang.org/docs/handbook/declaration-files/consumption.html))
 
 ### Building
 
 To build and compile the typescript sources to javascript use:
-
 ```
 npm install
 npm run build
@@ -40,7 +36,7 @@ navigate to the folder of your consuming project and run one of the following co
 _published:_
 
 ```
-npm install @meeting-baas/sdk@4.0.4 --save
+npm install @meeting-baas/sdk@4.0.5 --save
 ```
 
 _unPublished (not recommended):_

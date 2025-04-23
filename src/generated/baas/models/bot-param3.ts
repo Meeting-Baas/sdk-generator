@@ -107,6 +107,18 @@ export interface BotParam3 {
      * @memberof BotParam3
      */
     'webhook_url'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BotParam3
+     */
+    'zoom_sdk_id'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BotParam3
+     */
+    'zoom_sdk_pwd'?: string | null;
 }
 
 
