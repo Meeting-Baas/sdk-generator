@@ -21,7 +21,7 @@ import type { AudioFrequency } from './audio-frequency';
 import type { StreamingApiParameter } from './streaming-api-parameter';
 
 /**
- * WebSocket streams for 16kHz audio. Input stream receives audio sent to the bot. Output stream receives audio from the bot.
+ * WebSocket streams for 16 kHz audio. Input stream receives audio sent to the bot. Output stream receives audio from the bot.
  * @export
  * @interface JoinRequestStreaming
  */

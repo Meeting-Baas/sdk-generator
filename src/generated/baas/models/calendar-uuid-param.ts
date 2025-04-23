@@ -14,7 +14,17 @@
 
 
 
-export * from './api/calendars-api';
-export * from './api/default-api';
-export * from './api/webhooks-api';
+/**
+ * Calendar UUID path parameter for API endpoints
+ * @export
+ * @interface CalendarUuidParam
+ */
+export interface CalendarUuidParam {
+    /**
+     * The calendar UUID
+     * @type {string}
+     * @memberof CalendarUuidParam
+     */
+    'calendarUuid': string;
+}
 

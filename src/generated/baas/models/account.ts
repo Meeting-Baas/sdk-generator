@@ -67,6 +67,12 @@ export interface Account {
     'phone'?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof Account
+     */
+    'secret': string;
+    /**
+     * 
      * @type {number}
      * @memberof Account
      */

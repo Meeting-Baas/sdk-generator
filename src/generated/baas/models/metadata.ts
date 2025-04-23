@@ -30,19 +30,13 @@ export interface Metadata {
      */
     'botData': BotData;
     /**
-     * Indicates whether the recording has been deleted
-     * @type {boolean}
-     * @memberof Metadata
-     */
-    'contentDeleted': boolean;
-    /**
      * Duration of the recording in seconds
      * @type {number}
      * @memberof Metadata
      */
     'duration': number;
     /**
-     * URL to access the recording MP4 file. Will be null if content has been deleted.
+     * URL to access the recording MP4 file. Will be an empty string if the file doesn\'t exist in S3.
      * @type {string}
      * @memberof Metadata
      */

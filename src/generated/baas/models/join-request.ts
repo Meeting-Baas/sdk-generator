@@ -41,7 +41,7 @@ export interface JoinRequest {
      */
     'automatic_leave'?: JoinRequestAutomaticLeave;
     /**
-     * The image to use for the bot, must be a URL. Recommended ratio is 4:3.
+     * The image to use for the bot, must be a URL. Recommended ratio is 16:9.
      * @type {string}
      * @memberof JoinRequest
      */
@@ -112,5 +112,17 @@ export interface JoinRequest {
      * @memberof JoinRequest
      */
     'webhook_url'?: string;
+    /**
+     * For the Own Zoom Credentials feature, we need your zoom sdk id.
+     * @type {string}
+     * @memberof JoinRequest
+     */
+    'zoom_sdk_id'?: string;
+    /**
+     * For the Own Zoom Credentials feature, we need your zoom sdk pwd.
+     * @type {string}
+     * @memberof JoinRequest
+     */
+    'zoom_sdk_pwd'?: string;
 }
 

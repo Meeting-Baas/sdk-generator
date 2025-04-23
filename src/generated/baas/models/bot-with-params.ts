@@ -197,6 +197,18 @@ export interface BotWithParams {
      * @memberof BotWithParams
      */
     'webhookUrl': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BotWithParams
+     */
+    'zoom_sdk_id'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BotWithParams
+     */
+    'zoom_sdk_pwd'?: string | null;
 }
 
 
