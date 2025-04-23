@@ -12,10 +12,10 @@ if (!fs.existsSync(tmpDir)) {
 // Target file path
 const targetFile = path.resolve(__dirname, '../tmp/openapi.json');
 
-console.log('Fetching OpenAPI spec from https://api.meetingbaas.com/openapi.json...');
+console.log('Fetching OpenAPI spec from https://api.pre-prod-meetingbaas.com/openapi.json...');
 
-// Make HTTPS request to api.meetingbaas.com
-const req = https.get('https://api.meetingbaas.com/openapi.json', (res) => {
+// Make HTTPS request to api.pre-prod-meetingbaas.com
+const req = https.get('https://api.pre-prod-meetingbaas.com/openapi.json', (res) => {
   if (res.statusCode !== 200) {
     console.error(`Failed to fetch OpenAPI spec: ${res.statusCode} ${res.statusMessage}`);
     process.exit(1);
